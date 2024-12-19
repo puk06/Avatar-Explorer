@@ -37,7 +37,7 @@ namespace Avatar_Explorer.Forms
             PictureBox pictureBox = new PictureBox();
             pictureBox.Size = new Size(56, 56);
             pictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
-            pictureBox.Image = Image.FromFile(item.ImagePath);
+            pictureBox.Image = File.Exists(item.ImagePath) ? Image.FromFile(item.ImagePath) : Image.FromFile("./Datas/FileIcon.png");
             pictureBox.Location = new Point(3, 3);
             button.Controls.Add(pictureBox);
 
