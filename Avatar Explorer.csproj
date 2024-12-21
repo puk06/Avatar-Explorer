@@ -16,10 +16,25 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Content Include="icon.ico" />
+		<Content Include="icon.ico" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="HtmlAgilityPack" Version="1.11.71" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="Font Files\NotoSans-Regular.ttf">
+			<Link>Datas/NotoSans-Regular.ttf</Link>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Font Files\NotoSansJP-Regular.ttf">
+			<Link>Datas/NotoSansJP-Regular.ttf</Link>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Font Files\NotoSansKR-Regular.ttf">
+			<Link>Datas/NotoSansKR-Regular.ttf</Link>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 </Project>
