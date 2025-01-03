@@ -242,17 +242,32 @@ namespace Avatar_Explorer.Forms
                     SharedImages.GetImage(SharedImages.Images.EditIcon));
                 toolStripMenuItem4.Click += (_, _) =>
                 {
+                    var prePath = item.ItemPath;
                     AddItem addItem = new(this, item.Type, true, item, null);
                     addItem.ShowDialog();
+
+                    //対応アバターのパスを変えてあげる
+                    foreach (var item2 in Items)
+                    {
+                        if (item2.SupportedAvatar.Contains(prePath))
+                        {
+                            item2.SupportedAvatar = item2.SupportedAvatar.Select(avatar =>
+                                avatar == prePath ? item.ItemPath : avatar).ToArray();
+                        }
+                    }
+
+                    // もしアイテムで編集されたアイテムを開いていたら、パスなどに使用される文字列も更新しないといけないため
+                    if (CurrentPath.CurrentSelectedAvatarPath == prePath)
+                    {
+                        CurrentPath.CurrentSelectedAvatar = item.Title;
+                        CurrentPath.CurrentSelectedAvatarPath = item.ItemPath;
+                    }
 
                     // もしアバターの欄を右で開いていたら、そのアイテムの情報も更新しないといけないため
                     if (_openingWindow == Window.ItemList && !_isSearching) GenerateItems();
 
                     //検索中だと、検索画面を再読込してあげる
                     if (_isSearching) SearchItems();
-
-                    // もしアイテムで編集されたアイテムを開いていたら、パスなどに使用される文字列も更新しないといけないため
-                    if (CurrentPath.CurrentSelectedAvatarPath == item.ItemPath) CurrentPath.CurrentSelectedAvatar = item.Title;
 
                     // 検索時の文字列を消さないようにするために_isSearchingでチェックしている
                     if (!_isSearching) PathTextBox.Text = GeneratePath();
@@ -269,9 +284,7 @@ namespace Avatar_Explorer.Forms
                         Helper.Translate("確認", CurrentLanguage), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                     if (result != DialogResult.Yes) return;
 
-                    var undo = false;
-
-                    // もし削除されるアイテムが開かれていたら、画面を戻さないといけないため。
+                    var undo = false; //もし削除されるアイテムが開かれていたら
                     if (CurrentPath.CurrentSelectedItem?.ItemPath == item.ItemPath)
                     {
                         CurrentPath.CurrentSelectedItemCategory = null;
@@ -279,9 +292,7 @@ namespace Avatar_Explorer.Forms
                         undo = true;
                     }
 
-                    var undo2 = false;
-
-                    // アバターモードでもし削除されるアバターからメニューが開かれていたら、画面を戻さないといけないため。
+                    var undo2 = false; //アバターモードでもし削除されるアバターから今までのアイテムが開かれていたら
                     if (CurrentPath.CurrentSelectedAvatarPath == item.ItemPath && !_authorMode && !_categoryMode)
                     {
                         CurrentPath = new CurrentPath();
@@ -325,29 +336,81 @@ namespace Avatar_Explorer.Forms
                     MessageBox.Show(Helper.Translate("削除が完了しました。", CurrentLanguage),
                         Helper.Translate("完了", CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                    // 削除されるアイテムが開かれていただけなら、アイテム選択画面まで戻す。
-                    if (_openingWindow == Window.ItemList || undo)
+                    if (_isSearching)
                     {
-                        if (_isSearching)
+                        GenerateAvatarList();
+                        GenerateAuthorList();
+                        GenerateCategoryListLeft();
+
+                        // フォルダー内検索の時
+                        if (_openingWindow is Window.ItemFolderCategoryList or Window.ItemFolderItemsList)
                         {
-                            SearchItems();
+                            // 選択されたアバターから現在の所まで来てる場合
+                            if (undo2)
+                            {
+                                SearchBox.Text = "";
+                                SearchResultLabel.Text = "";
+                                _isSearching = false;
+                                ResetAvatarList(true);
+                                PathTextBox.Text = GeneratePath();
+                                Helper.SaveItemsData(Items);
+                                return;
+                            }
+
+                            // アイテムとして選択されている場合
+                            if (undo)
+                            {
+                                SearchBox.Text = "";
+                                SearchResultLabel.Text = "";
+                                _isSearching = false;
+                                GenerateItems();
+                                PathTextBox.Text = GeneratePath();
+                                Helper.SaveItemsData(Items);
+                            }
                         }
                         else
                         {
-                            GenerateItems();
+                            SearchItems();
+                            Helper.SaveItemsData(Items);
                         }
                     }
+                    else
+                    {
+                        GenerateAvatarList();
+                        GenerateAuthorList();
+                        GenerateCategoryListLeft();
 
-                    // アバターから削除されるアイテムが開かれていたら、初期画面まで戻す。
-                    if (undo2) ResetAvatarList(true);
+                        // アバターが選択された状態(CurrentSelectedAvatarPathとして設定されている時)
+                        if (undo2)
+                        {
+                            ResetAvatarList(true);
+                            PathTextBox.Text = GeneratePath();
+                            Helper.SaveItemsData(Items);
+                            return;
+                        }
 
-                    // 検索時の文字列を消さないようにするために_isSearchingでチェックしている
-                    if (!_isSearching) PathTextBox.Text = GeneratePath();
+                        // フォルダーを開いていって、アイテムが選択された状態(CurrentSelectedItemとして設定されている時)
+                        if (undo)
+                        {
+                            GenerateItems();
+                            PathTextBox.Text = GeneratePath();
+                            Helper.SaveItemsData(Items);
+                            return;
+                        }
 
-                    GenerateAvatarList();
-                    GenerateAuthorList();
-                    GenerateCategoryListLeft();
-                    Helper.SaveItemsData(Items);
+                        // アイテム画面に既にいる
+                        if (_openingWindow == Window.ItemList)
+                        {
+                            GenerateItems();
+                            Helper.SaveItemsData(Items);
+                            return;
+                        }
+
+                        // アイテム画面の前にいる
+                        RefleshWindow();
+
+                        Helper.SaveItemsData(Items);
+                    }
                 };
 
                 contextMenuStrip.Items.Add(toolStripMenuItem2);
@@ -580,6 +643,7 @@ namespace Avatar_Explorer.Forms
                 {
                     if (!Directory.Exists(item.ItemPath))
                     {
+                        var prePath = item.ItemPath;
                         DialogResult result =
                             MessageBox.Show(Helper.Translate("フォルダが見つかりませんでした。編集しますか？", CurrentLanguage),
                                 Helper.Translate("エラー", CurrentLanguage), MessageBoxButtons.YesNo,
@@ -587,6 +651,23 @@ namespace Avatar_Explorer.Forms
                         if (result != DialogResult.Yes) return;
                         AddItem addItem = new(this, CurrentPath.CurrentSelectedCategory, true, item, null);
                         addItem.ShowDialog();
+
+                        //対応アバターのパスを変えてあげる
+                        foreach (var item2 in Items)
+                        {
+                            if (item2.SupportedAvatar.Contains(prePath))
+                            {
+                                item2.SupportedAvatar = item2.SupportedAvatar.Select(avatar =>
+                                    avatar == prePath ? item.ItemPath : avatar).ToArray();
+                            }
+                        }
+
+                        if (CurrentPath.CurrentSelectedAvatarPath == prePath)
+                        {
+                            CurrentPath.CurrentSelectedAvatar = item.Title;
+                            CurrentPath.CurrentSelectedAvatarPath = item.ItemPath;
+                        }
+
                         RefleshWindow();
                         Helper.SaveItemsData(Items);
                     }
@@ -713,9 +794,27 @@ namespace Avatar_Explorer.Forms
                     SharedImages.GetImage(SharedImages.Images.EditIcon));
                 toolStripMenuItem4.Click += (_, _) =>
                 {
+                    var prePath = item.ItemPath;
                     AddItem addItem = new(this, CurrentPath.CurrentSelectedCategory, true, item, null);
                     addItem.ShowDialog();
-                    if (CurrentPath.CurrentSelectedAvatarPath == item.ItemPath) CurrentPath.CurrentSelectedAvatar = item.Title;
+
+                    //対応アバターのパスを変えてあげる
+                    foreach (var item2 in Items)
+                    {
+                        if (item2.SupportedAvatar.Contains(prePath))
+                        {
+                            item2.SupportedAvatar = item2.SupportedAvatar.Select(avatar =>
+                                avatar == prePath ? item.ItemPath : avatar).ToArray();
+                        }
+                    }
+
+
+                    if (CurrentPath.CurrentSelectedAvatarPath == prePath)
+                    {
+                        CurrentPath.CurrentSelectedAvatar = item.Title;
+                        CurrentPath.CurrentSelectedAvatarPath = item.ItemPath;
+                    }
+
                     if (!_isSearching) PathTextBox.Text = GeneratePath();
                     RefleshWindow();
                     Helper.SaveItemsData(Items);
@@ -772,8 +871,21 @@ namespace Avatar_Explorer.Forms
                     MessageBox.Show(Helper.Translate("削除が完了しました。", CurrentLanguage),
                         Helper.Translate("完了", CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                    if (undo) ResetAvatarList(true);
-                    RefleshWindow();
+                    if (undo)
+                    {
+                        SearchBox.Text = "";
+                        SearchResultLabel.Text = "";
+                        _isSearching = false;
+                        GenerateAvatarList();
+                        GenerateAuthorList();
+                        GenerateCategoryListLeft();
+                        ResetAvatarList(true);
+                    }
+                    else
+                    {
+                        RefleshWindow();
+                    }
+
                     Helper.SaveItemsData(Items);
                 };
 
@@ -938,6 +1050,7 @@ namespace Avatar_Explorer.Forms
                 {
                     if (!Directory.Exists(item.ItemPath))
                     {
+                        var prePath = item.ItemPath;
                         DialogResult result =
                             MessageBox.Show(Helper.Translate("フォルダが見つかりませんでした。編集しますか？", CurrentLanguage),
                                 Helper.Translate("エラー", CurrentLanguage), MessageBoxButtons.YesNo,
@@ -945,6 +1058,17 @@ namespace Avatar_Explorer.Forms
                         if (result != DialogResult.Yes) return;
                         AddItem addItem = new(this, CurrentPath.CurrentSelectedCategory, true, item, null);
                         addItem.ShowDialog();
+
+                        //対応アバターのパスを変えてあげる
+                        foreach (var item2 in Items)
+                        {
+                            if (item2.SupportedAvatar.Contains(prePath))
+                            {
+                                item2.SupportedAvatar = item2.SupportedAvatar.Select(avatar =>
+                                    avatar == prePath ? item.ItemPath : avatar).ToArray();
+                            }
+                        }
+
                         GenerateFilteredItem(searchFilter);
                         GenerateAvatarList();
                         GenerateAuthorList();
@@ -1071,8 +1195,26 @@ namespace Avatar_Explorer.Forms
                     SharedImages.GetImage(SharedImages.Images.EditIcon));
                 toolStripMenuItem4.Click += (_, _) =>
                 {
+                    var prePath = item.ItemPath;
                     AddItem addItem = new(this, item.Type, true, item, null);
                     addItem.ShowDialog();
+
+                    //対応アバターのパスを変えてあげる
+                    foreach (var item2 in Items)
+                    {
+                        if (item2.SupportedAvatar.Contains(prePath))
+                        {
+                            item2.SupportedAvatar = item2.SupportedAvatar.Select(avatar =>
+                                avatar == prePath ? item.ItemPath : avatar).ToArray();
+                        }
+                    }
+
+                    if (CurrentPath.CurrentSelectedAvatarPath == prePath)
+                    {
+                        CurrentPath.CurrentSelectedAvatar = item.Title;
+                        CurrentPath.CurrentSelectedAvatarPath = item.ItemPath;
+                    }
+
                     GenerateFilteredItem(searchFilter);
                     GenerateAvatarList();
                     GenerateAuthorList();
@@ -1472,7 +1614,13 @@ namespace Avatar_Explorer.Forms
         // ResetAvatarList
         private void ResetAvatarList(bool startLabelVisible = false)
         {
-            if (startLabelVisible) CurrentPath = new CurrentPath();
+            if (startLabelVisible)
+            {
+                _authorMode = false;
+                _categoryMode = false;
+                CurrentPath = new CurrentPath();
+            }
+
             for (int i = AvatarItemExplorer.Controls.Count - 1; i >= 0; i--)
             {
                 if (AvatarItemExplorer.Controls[i].Name != "StartLabel")
