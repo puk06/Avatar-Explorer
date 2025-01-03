@@ -1,4 +1,8 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics;
+using System.Formats.Tar;
+using System.IO.Compression;
+using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 
@@ -391,6 +395,71 @@ namespace Avatar_Explorer.Classes
             catch
             {
                 Console.WriteLine("Failed to write error log.");
+            }
+        }
+
+        public static string CheckFilePath(string s)
+        {
+            var invalidChars = Path.GetInvalidFileNameChars();
+            return string.Concat(s.Where(c => !invalidChars.Contains(c)));
+        }
+
+        public async Task ModifyUnityPackageFilePathAsync(FileData file, CurrentPath currentPath, string currentLanguage)
+        {
+            try
+            {
+                var authorName = currentPath.CurrentSelectedItem?.AuthorName ?? "Unknown";
+                var itemTitle = currentPath.CurrentSelectedItem?.Title ?? "Unknown";
+
+                authorName = CheckFilePath(authorName);
+                itemTitle = CheckFilePath(itemTitle);
+
+                string saveFolder = Path.Combine("./Datas", "Temp", authorName, itemTitle);
+                string saveFilePath = Path.Combine(saveFolder, $"{Path.GetFileNameWithoutExtension(file.FileName)}_export.unitypackage");
+
+                if (!Directory.Exists(saveFolder))
+                {
+                    Directory.CreateDirectory(saveFolder);
+                }
+
+                await using var fileStream = File.OpenRead(file.FilePath);
+                await using var gzipStream = new GZipStream(fileStream, CompressionMode.Decompress);
+                await using var tarReader = new TarReader(gzipStream);
+
+                await using var outputFileStream = File.Create(saveFilePath);
+                await using var tarWriter = new TarWriter(outputFileStream);
+
+                while (await tarReader.GetNextEntryAsync() is { } entry)
+                {
+                    if (Path.GetFileName(entry.Name) == "pathname" && entry.DataStream != null)
+                    {
+                        using StreamReader reader = new StreamReader(entry.DataStream);
+                        string assetPath = await reader.ReadToEndAsync();
+
+                        assetPath = assetPath.Insert(7,
+                            $"{GetCategoryName(currentPath.CurrentSelectedCategory, currentLanguage)}/");
+
+                        entry.DataStream = new MemoryStream(Encoding.UTF8.GetBytes(assetPath));
+                    }
+
+                    await tarWriter.WriteEntryAsync(entry);
+                }
+
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = saveFilePath,
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                ErrorLogger("UnityPackageの展開に失敗しました。", ex);
+                MessageBox.Show(
+                    Translate("UnityPackageの展開に失敗しました。詳細はErrorLog.txtをご覧ください。", currentLanguage),
+                    Translate("エラー", currentLanguage),
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
             }
         }
     }

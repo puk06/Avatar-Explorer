@@ -124,7 +124,7 @@
   "最終自動バックアップ: ": "Last auto backup: ",
   "自動バックアップフォルダから復元しますか？": "Restore from auto backup folder?",
   "バックアップフォルダが見つかりませんでした。": "Backup folder not found.",
-  "バックアップする時間のフォルダを選択してください": "Please select the folder to backup.",
+  "復元する時間のバックアップフォルダを選択してください": "Please select the backup folder to restore from.",
   "バックアップエラー": "Backup Error",
   "復元が完了しました。": "Restore completed.",
   "このアバターを対応アバターとしているアイテムの対応アバターからこのアバターを削除しますか？": "Remove this avatar from the supported avatars of items that support this avatar?",

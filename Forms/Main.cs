@@ -1890,7 +1890,7 @@ namespace Avatar_Explorer.Forms
                 FolderBrowserDialog fbd = new()
                 {
                     UseDescriptionForTitle = true,
-                    Description = Helper.Translate("バックアップする時間のフォルダを選択してください", CurrentLanguage),
+                    Description = Helper.Translate("復元する時間のバックアップフォルダを選択してください", CurrentLanguage),
                     ShowNewFolderButton = false,
                     SelectedPath = firstFolder
                 };
@@ -1946,6 +1946,11 @@ namespace Avatar_Explorer.Forms
 
                 try
                 {
+                    if (Directory.Exists(Path.Combine(fbd.SelectedPath, "Datas")) && File.Exists(Path.Combine(fbd.SelectedPath, "Datas", "ItemsData.json")) && !File.Exists(Path.Combine(fbd.SelectedPath, "ItemsData.json")))
+                    {
+                        fbd.SelectedPath += "/Datas";
+                    }
+
                     var filePath = fbd.SelectedPath + "/ItemsData.json";
                     if (!File.Exists(filePath))
                     {
