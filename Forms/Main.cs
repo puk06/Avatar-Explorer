@@ -2294,8 +2294,15 @@ namespace Avatar_Explorer.Forms
         // Form Closing
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (!Directory.Exists("./Datas/Temp")) return;
-            Directory.Delete("./Datas/Temp", true);
+            try
+            {
+                if (!Directory.Exists("./Datas/Temp")) return;
+                Directory.Delete("./Datas/Temp", true);
+            }
+            catch (Exception ex)
+            {
+                Helper.ErrorLogger("一時フォルダの削除に失敗しました。", ex);
+            }
         }
     }
 }
