@@ -970,11 +970,18 @@ namespace Avatar_Explorer.Forms
                 {
                     try
                     {
-                        Process.Start(new ProcessStartInfo
+                        if (file.FileExtension is ".unitypackage")
                         {
-                            FileName = file.FilePath,
-                            UseShellExecute = true
-                        });
+                            _ = Helper.ModifyUnityPackageFilePathAsync(file, CurrentPath, CurrentLanguage);
+                        }
+                        else
+                        {
+                            Process.Start(new ProcessStartInfo
+                            {
+                                FileName = file.FilePath,
+                                UseShellExecute = true
+                            });
+                        }
                     }
                     catch
                     {

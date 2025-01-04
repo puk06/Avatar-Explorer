@@ -5,6 +5,10 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
+using SharpCompress.Archives;
+using SharpCompress.Archives.Tar;
+using SharpCompress.Common;
+using SharpCompress.Writers;
 
 namespace Avatar_Explorer.Classes
 {
@@ -131,7 +135,9 @@ namespace Avatar_Explorer.Classes
             }
             else
             {
-                button.Picture = File.Exists(imagePath) ? ResizeImage(imagePath, 100, 100) : SharedImages.GetImage(SharedImages.Images.FileIcon);
+                button.Picture = File.Exists(imagePath)
+                    ? ResizeImage(imagePath, 100, 100)
+                    : SharedImages.GetImage(SharedImages.Images.FileIcon);
             }
 
             button.ImagePath = imagePath;
@@ -268,7 +274,8 @@ namespace Avatar_Explorer.Classes
                 {
                     var avatar = avatars.FirstOrDefault(x => x.Title == supportedAvatar);
                     if (avatar == null) continue;
-                    item.SupportedAvatar = item.SupportedAvatar.Where(x => x != supportedAvatar).Append(avatar.ItemPath).ToArray();
+                    item.SupportedAvatar = item.SupportedAvatar.Where(x => x != supportedAvatar).Append(avatar.ItemPath)
+                        .ToArray();
                 }
             }
 
@@ -283,14 +290,16 @@ namespace Avatar_Explorer.Classes
             return item?.Title;
         }
 
-        public static SupportedOrCommonAvatar IsSupportedAvatarOrCommon(Item item, CommonAvatar[] commonAvatars, string? path)
+        public static SupportedOrCommonAvatar IsSupportedAvatarOrCommon(Item item, CommonAvatar[] commonAvatars,
+            string? path)
         {
             if (string.IsNullOrEmpty(path)) return new SupportedOrCommonAvatar();
             if (item.SupportedAvatar.Contains(path)) return new SupportedOrCommonAvatar { IsSupported = true };
 
             if (item.Type != ItemType.Clothing) return new SupportedOrCommonAvatar();
             var commonAvatarsArray = commonAvatars.Where(x => x.Avatars.Contains(path)).ToArray();
-            var commonAvatarBool = item.SupportedAvatar.Any(supportedAvatar => commonAvatarsArray.Any(x => x.Avatars.Contains(supportedAvatar)));
+            var commonAvatarBool = item.SupportedAvatar.Any(supportedAvatar =>
+                commonAvatarsArray.Any(x => x.Avatars.Contains(supportedAvatar)));
 
             if (!commonAvatarBool) return new SupportedOrCommonAvatar();
             {
@@ -404,30 +413,26 @@ namespace Avatar_Explorer.Classes
             return string.Concat(s.Where(c => !invalidChars.Contains(c)));
         }
 
-        public async Task ModifyUnityPackageFilePathAsync(FileData file, CurrentPath currentPath, string currentLanguage)
+        public static async Task ModifyUnityPackageFilePathAsync(FileData file, CurrentPath currentPath,
+            string currentLanguage)
         {
+            ProgressForm progressForm = new ProgressForm(currentLanguage);
+            progressForm.Show();
+
             try
             {
-                var authorName = currentPath.CurrentSelectedItem?.AuthorName ?? "Unknown";
-                var itemTitle = currentPath.CurrentSelectedItem?.Title ?? "Unknown";
-
-                authorName = CheckFilePath(authorName);
-                itemTitle = CheckFilePath(itemTitle);
+                progressForm.UpdateProgress(0, Translate("準備中", currentLanguage));
+                var authorName = CheckFilePath(currentPath.CurrentSelectedItem?.AuthorName ?? "Unknown");
+                var itemTitle = CheckFilePath(currentPath.CurrentSelectedItem?.Title ?? "Unknown");
 
                 string saveFolder = Path.Combine("./Datas", "Temp", authorName, itemTitle);
-                string saveFilePath = Path.Combine(saveFolder, $"{Path.GetFileNameWithoutExtension(file.FileName)}_export.unitypackage");
+                string saveFilePath = Path.Combine(saveFolder, $"{Path.GetFileNameWithoutExtension(file.FileName)}_export");
+                if (!Directory.Exists(saveFolder)) Directory.CreateDirectory(saveFolder);
 
-                if (!Directory.Exists(saveFolder))
-                {
-                    Directory.CreateDirectory(saveFolder);
-                }
-
+                progressForm.UpdateProgress(10, Translate("ファイルの展開中", currentLanguage));
                 await using var fileStream = File.OpenRead(file.FilePath);
                 await using var gzipStream = new GZipStream(fileStream, CompressionMode.Decompress);
                 await using var tarReader = new TarReader(gzipStream);
-
-                await using var outputFileStream = File.Create(saveFilePath);
-                await using var tarWriter = new TarWriter(outputFileStream);
 
                 while (await tarReader.GetNextEntryAsync() is { } entry)
                 {
@@ -442,13 +447,32 @@ namespace Avatar_Explorer.Classes
                         entry.DataStream = new MemoryStream(Encoding.UTF8.GetBytes(assetPath));
                     }
 
-                    await tarWriter.WriteEntryAsync(entry);
+                    var entryPath = Path.Combine(saveFilePath, entry.Name);
+                    if (entryPath.EndsWith("/"))
+                    {
+                        Directory.CreateDirectory(entryPath);
+                    }
+                    else
+                    {
+                        if (entry.DataStream == null) continue;
+                        await using var entryStream = File.Create(entryPath);
+                        await entry.DataStream.CopyToAsync(entryStream);
+                    }
                 }
 
-                Process.Start(new ProcessStartInfo
+                var unityPackagePath = saveFolder + ".unitypackage";
+                if (File.Exists(unityPackagePath)) File.Delete(unityPackagePath);
+
+                progressForm.UpdateProgress(50, Translate("UnityPackageの作成中", currentLanguage));
+                CreateTarArchive(saveFilePath, unityPackagePath);
+
+                Directory.Delete(saveFilePath, true);
+                progressForm.UpdateProgress(100, Translate("完了", currentLanguage));
+
+                Process.Start(new ProcessStartInfo()
                 {
-                    FileName = saveFilePath,
-                    UseShellExecute = true
+                    FileName = unityPackagePath,
+                    UseShellExecute = true,
                 });
             }
             catch (Exception ex)
@@ -460,7 +484,84 @@ namespace Avatar_Explorer.Classes
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error
                 );
+
+                Process.Start(new ProcessStartInfo()
+                {
+                    FileName = file.FilePath,
+                    UseShellExecute = true
+                });
             }
+            finally
+            {
+                progressForm.Close();
+            }
+        }
+
+        private sealed class ProgressForm : Form
+        {
+            private readonly ProgressBar _progressBar;
+            private readonly Label _progressLabel;
+
+            public ProgressForm(string currentLanguage)
+            {
+                Text = Helper.Translate("Unitypackageのインポート先の変更中", currentLanguage);
+                Size = new Size(400, 90);
+                FormBorderStyle = FormBorderStyle.FixedDialog;
+                StartPosition = FormStartPosition.CenterScreen;
+                MaximizeBox = false;
+                MinimizeBox = false;
+
+                _progressBar = new ProgressBar
+                {
+                    Dock = DockStyle.Top,
+                    Style = ProgressBarStyle.Continuous,
+                    Minimum = 0,
+                    Maximum = 100
+                };
+
+                _progressLabel = new Label
+                {
+                    Dock = DockStyle.Top,
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Text = "0%",
+                    AutoSize = false,
+                    Height = 20
+                };
+
+                Controls.Add(_progressBar);
+                Controls.Add(_progressLabel);
+            }
+
+            public void UpdateProgress(int percentage, string message = "")
+            {
+                if (InvokeRequired)
+                {
+                    Invoke(() => UpdateProgress(percentage, message));
+                    return;
+                }
+
+                _progressBar.Value = percentage;
+                _progressLabel.Text = $"{percentage}% {message}";
+            }
+        }
+
+        private static void CreateTarArchive(string sourceFolder, string outputTarFile)
+        {
+            if (!Directory.Exists(sourceFolder))
+            {
+                throw new DirectoryNotFoundException($"指定されたフォルダーが見つかりません: {sourceFolder}");
+            }
+
+            using var archive = TarArchive.Create();
+
+            foreach (string filePath in Directory.EnumerateFiles(sourceFolder, "*", SearchOption.AllDirectories))
+            {
+                string relativePath = Path.GetRelativePath(sourceFolder, filePath);
+                archive.AddEntry(relativePath, filePath);
+            }
+
+            using var fileStream = File.OpenWrite(outputTarFile);
+            archive.SaveTo(fileStream, new WriterOptions(CompressionType.None));
         }
     }
 }

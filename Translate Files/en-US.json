@@ -130,5 +130,10 @@
   "このアバターを対応アバターとしているアイテムの対応アバターからこのアバターを削除しますか？": "Remove this avatar from the supported avatars of items that support this avatar?",
   "このアバターを共通素体グループから削除しますか？": "Remove this avatar from the common avatar group?",
   "フォルダを開けませんでした。": "Failed to open folder.",
-  "分前": " minutes ago"
+  "分前": " minutes ago",
+  "準備中": "Preparing",
+  "ファイルの展開中": "Extracting file",
+  "UnityPackageの作成中": "Creating UnityPackage",
+  "UnityPackageの展開に失敗しました。詳細はErrorLog.txtをご覧ください。": "Failed to extract UnityPackage. Please see ErrorLog.txt for details.",
+  "Unitypackageのインポート先の変更中": "Changing Unitypackage import destination"
 }

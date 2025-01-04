@@ -131,5 +131,10 @@
   "このアバターを対応アバターとしているアイテムの対応アバターからこのアバターを削除しますか？": null,
   "このアバターを共通素体グループから削除しますか？": null,
   "フォルダを開けませんでした。": null,
-  "分前": null
+  "分前": null,
+  "準備中": null,
+  "ファイルの展開中": null,
+  "UnityPackageの作成中": null,
+  "UnityPackageの展開に失敗しました。詳細はErrorLog.txtをご覧ください。": null,
+  "Unitypackageのインポート先の変更中": null
 }
