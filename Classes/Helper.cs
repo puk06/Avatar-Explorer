@@ -413,8 +413,7 @@ namespace Avatar_Explorer.Classes
             return string.Concat(s.Where(c => !invalidChars.Contains(c)));
         }
 
-        public static async Task ModifyUnityPackageFilePathAsync(FileData file, CurrentPath currentPath,
-            string currentLanguage)
+        public static async Task ModifyUnityPackageFilePathAsync(FileData file, CurrentPath currentPath, string currentLanguage)
         {
             ProgressForm progressForm = new ProgressForm(currentLanguage);
             progressForm.Show();
@@ -424,25 +423,51 @@ namespace Avatar_Explorer.Classes
                 progressForm.UpdateProgress(0, Translate("準備中", currentLanguage));
                 var authorName = CheckFilePath(currentPath.CurrentSelectedItem?.AuthorName ?? "Unknown");
                 var itemTitle = CheckFilePath(currentPath.CurrentSelectedItem?.Title ?? "Unknown");
+                var category = GetCategoryName(currentPath.CurrentSelectedCategory, currentLanguage);
 
                 string saveFolder = Path.Combine("./Datas", "Temp", authorName, itemTitle);
                 string saveFilePath = Path.Combine(saveFolder, $"{Path.GetFileNameWithoutExtension(file.FileName)}_export");
-                if (!Directory.Exists(saveFolder)) Directory.CreateDirectory(saveFolder);
+                if (!Directory.Exists(saveFolder))
+                {
+                    Directory.CreateDirectory(saveFolder);
+                }
+                else if (Directory.Exists(saveFilePath))
+                {
+                    Directory.Delete(saveFilePath, true);
+                }
 
-                progressForm.UpdateProgress(10, Translate("ファイルの展開中", currentLanguage));
-                await using var fileStream = File.OpenRead(file.FilePath);
-                await using var gzipStream = new GZipStream(fileStream, CompressionMode.Decompress);
-                await using var tarReader = new TarReader(gzipStream);
+                var extractingStatus = Translate("ファイルの展開中", currentLanguage);
+                progressForm.UpdateProgress(10, extractingStatus);
 
-                while (await tarReader.GetNextEntryAsync() is { } entry)
+                // ファイル数を取得するための一時リスト
+                var entries = new List<TarEntry>();
+                await using (var fileStream = File.OpenRead(file.FilePath))
+                await using (var gzipStream = new GZipStream(fileStream, CompressionMode.Decompress))
+                await using (var tarReader = new TarReader(gzipStream))
+                {
+                    while (await tarReader.GetNextEntryAsync() is { } entry)
+                    {
+                        entries.Add(entry);
+                    }
+                }
+
+                // 合計ファイル数
+                int totalEntries = entries.Count;
+                int processedEntries = 0;
+
+                // 再度読み込みして処理
+                await using var fileStream2 = File.OpenRead(file.FilePath);
+                await using var gzipStream2 = new GZipStream(fileStream2, CompressionMode.Decompress);
+                await using var tarReader2 = new TarReader(gzipStream2);
+
+                while (await tarReader2.GetNextEntryAsync() is { } entry)
                 {
                     if (Path.GetFileName(entry.Name) == "pathname" && entry.DataStream != null)
                     {
                         using StreamReader reader = new StreamReader(entry.DataStream);
                         string assetPath = await reader.ReadToEndAsync();
 
-                        assetPath = assetPath.Insert(7,
-                            $"{GetCategoryName(currentPath.CurrentSelectedCategory, currentLanguage)}/");
+                        assetPath = assetPath.Insert(7, $"{category}/");
 
                         entry.DataStream = new MemoryStream(Encoding.UTF8.GetBytes(assetPath));
                     }
@@ -458,12 +483,17 @@ namespace Avatar_Explorer.Classes
                         await using var entryStream = File.Create(entryPath);
                         await entry.DataStream.CopyToAsync(entryStream);
                     }
+
+                    // 進捗更新
+                    processedEntries++;
+                    int progress = 10 + (int)(80.0 * processedEntries / totalEntries);
+                    progressForm.UpdateProgress(progress, extractingStatus + ": " + processedEntries + "/" + totalEntries);
                 }
 
                 var unityPackagePath = saveFilePath + ".unitypackage";
                 if (File.Exists(unityPackagePath)) File.Delete(unityPackagePath);
 
-                progressForm.UpdateProgress(50, Translate("UnityPackageの作成中", currentLanguage));
+                progressForm.UpdateProgress(90, Translate("UnityPackageの作成中", currentLanguage));
                 CreateTarArchive(saveFilePath, unityPackagePath);
 
                 Directory.Delete(saveFilePath, true);
@@ -501,10 +531,12 @@ namespace Avatar_Explorer.Classes
         {
             private readonly ProgressBar _progressBar;
             private readonly Label _progressLabel;
+            private readonly string _formTitle;
 
             public ProgressForm(string currentLanguage)
             {
-                Text = Helper.Translate("Unitypackageのインポート先の変更中", currentLanguage);
+                _formTitle = Translate("Unitypackageのインポート先の変更中", currentLanguage);
+                Text = _formTitle;
                 Size = new Size(400, 90);
                 FormBorderStyle = FormBorderStyle.FixedDialog;
                 StartPosition = FormStartPosition.CenterScreen;
@@ -542,6 +574,7 @@ namespace Avatar_Explorer.Classes
 
                 _progressBar.Value = percentage;
                 _progressLabel.Text = $"{percentage}% {message}";
+                Text = $"{_formTitle} - {percentage}%";
             }
         }
 
