@@ -460,7 +460,7 @@ namespace Avatar_Explorer.Classes
                     }
                 }
 
-                var unityPackagePath = saveFolder + ".unitypackage";
+                var unityPackagePath = saveFilePath + ".unitypackage";
                 if (File.Exists(unityPackagePath)) File.Delete(unityPackagePath);
 
                 progressForm.UpdateProgress(50, Translate("UnityPackageの作成中", currentLanguage));
