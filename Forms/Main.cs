@@ -169,7 +169,9 @@ namespace Avatar_Explorer.Forms
                     {
                         try
                         {
-                            Clipboard.SetText($"https://booth.pm/{Helper.GetCurrentLanguageCode(CurrentLanguage)}/items/" + item.BoothId);
+                            Clipboard.SetText(
+                                $"https://booth.pm/{Helper.GetCurrentLanguageCode(CurrentLanguage)}/items/" +
+                                item.BoothId);
                         }
                         catch (Exception ex)
                         {
@@ -187,7 +189,8 @@ namespace Avatar_Explorer.Forms
                     {
                         try
                         {
-                            Process.Start($"https://booth.pm/{Helper.GetCurrentLanguageCode(CurrentLanguage)}/items/" + item.BoothId);
+                            Process.Start($"https://booth.pm/{Helper.GetCurrentLanguageCode(CurrentLanguage)}/items/" +
+                                          item.BoothId);
                         }
                         catch
                         {
@@ -304,27 +307,31 @@ namespace Avatar_Explorer.Forms
                     // アバターのときは対応アバター削除、共通素体グループから削除用の処理を実行する
                     if (item.Type == ItemType.Avatar)
                     {
-                        var result2 = MessageBox.Show(Helper.Translate("このアバターを対応アバターとしているアイテムの対応アバターからこのアバターを削除しますか？", CurrentLanguage),
+                        var result2 = MessageBox.Show(
+                            Helper.Translate("このアバターを対応アバターとしているアイテムの対応アバターからこのアバターを削除しますか？", CurrentLanguage),
                             Helper.Translate("確認", CurrentLanguage), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
                         if (result2 == DialogResult.Yes)
                         {
                             foreach (var item2 in Items)
                             {
-                                item2.SupportedAvatar = item2.SupportedAvatar.Where(avatar => avatar != item.ItemPath).ToArray();
+                                item2.SupportedAvatar = item2.SupportedAvatar.Where(avatar => avatar != item.ItemPath)
+                                    .ToArray();
                             }
                         }
 
                         if (CommonAvatars.Any(commonAvatar => commonAvatar.Avatars.Contains(item.ItemPath)))
                         {
                             var result3 = MessageBox.Show(Helper.Translate("このアバターを共通素体グループから削除しますか？", CurrentLanguage),
-                                Helper.Translate("確認", CurrentLanguage), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                                Helper.Translate("確認", CurrentLanguage), MessageBoxButtons.YesNo,
+                                MessageBoxIcon.Question);
 
                             if (result3 == DialogResult.Yes)
                             {
                                 foreach (var commonAvatar in CommonAvatars)
                                 {
-                                    commonAvatar.Avatars = commonAvatar.Avatars.Where(avatar => avatar != item.ItemPath).ToArray();
+                                    commonAvatar.Avatars = commonAvatar.Avatars.Where(avatar => avatar != item.ItemPath)
+                                        .ToArray();
                                 }
 
                                 Helper.SaveCommonAvatarData(CommonAvatars);
@@ -637,7 +644,8 @@ namespace Avatar_Explorer.Forms
                     }
                 }
 
-                Button button = Helper.CreateButton(item.ImagePath, item.Title, authorText, false, item.Title, GetItemExplorerListWidth());
+                Button button = Helper.CreateButton(item.ImagePath, item.Title, authorText, false, item.Title,
+                    GetItemExplorerListWidth());
                 button.Location = new Point(0, (70 * index) + 2);
                 button.Click += (_, _) =>
                 {
@@ -715,7 +723,9 @@ namespace Avatar_Explorer.Forms
                     {
                         try
                         {
-                            Clipboard.SetText($"https://booth.pm/{Helper.GetCurrentLanguageCode(CurrentLanguage)}/items/" + item.BoothId);
+                            Clipboard.SetText(
+                                $"https://booth.pm/{Helper.GetCurrentLanguageCode(CurrentLanguage)}/items/" +
+                                item.BoothId);
                         }
                         catch (Exception ex)
                         {
@@ -735,7 +745,8 @@ namespace Avatar_Explorer.Forms
                         {
                             Process.Start(new ProcessStartInfo
                             {
-                                FileName = $"https://booth.pm/{Helper.GetCurrentLanguageCode(CurrentLanguage)}/items/" + item.BoothId,
+                                FileName = $"https://booth.pm/{Helper.GetCurrentLanguageCode(CurrentLanguage)}/items/" +
+                                           item.BoothId,
                                 UseShellExecute = true
                             });
                         }
@@ -786,6 +797,7 @@ namespace Avatar_Explorer.Forms
                     {
                         GenerateItems();
                     }
+
                     GenerateAvatarList();
                     Helper.SaveItemsData(Items);
                 };
@@ -840,28 +852,33 @@ namespace Avatar_Explorer.Forms
 
                     if (item.Type == ItemType.Avatar)
                     {
-                        var result2 = MessageBox.Show(Helper.Translate("このアバターを対応アバターとしているアイテムの対応アバターからこのアバターを削除しますか？", CurrentLanguage),
+                        var result2 = MessageBox.Show(
+                            Helper.Translate("このアバターを対応アバターとしているアイテムの対応アバターからこのアバターを削除しますか？", CurrentLanguage),
                             Helper.Translate("確認", CurrentLanguage), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
                         if (result2 == DialogResult.Yes)
                         {
                             foreach (var item2 in Items)
                             {
-                                item2.SupportedAvatar = item2.SupportedAvatar.Where(avatar => avatar != item.ItemPath).ToArray();
+                                item2.SupportedAvatar = item2.SupportedAvatar.Where(avatar => avatar != item.ItemPath)
+                                    .ToArray();
                             }
                         }
 
                         if (CommonAvatars.Any(commonAvatar => commonAvatar.Avatars.Contains(item.ItemPath)))
                         {
                             var result3 = MessageBox.Show(Helper.Translate("このアバターを共通素体グループから削除しますか？", CurrentLanguage),
-                                Helper.Translate("確認", CurrentLanguage), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                                Helper.Translate("確認", CurrentLanguage), MessageBoxButtons.YesNo,
+                                MessageBoxIcon.Question);
 
                             if (result3 == DialogResult.Yes)
                             {
                                 foreach (var commonAvatar in CommonAvatars)
                                 {
-                                    commonAvatar.Avatars = commonAvatar.Avatars.Where(avatar => avatar != item.ItemPath).ToArray();
+                                    commonAvatar.Avatars = commonAvatar.Avatars.Where(avatar => avatar != item.ItemPath)
+                                        .ToArray();
                                 }
+
                                 Helper.SaveCommonAvatarData(CommonAvatars);
                             }
                         }
@@ -925,7 +942,8 @@ namespace Avatar_Explorer.Forms
                 if (itemCount == 0) continue;
 
                 Button button = Helper.CreateButton(null,
-                    Helper.Translate(itemType, CurrentLanguage), itemCount + Helper.Translate("個の項目", CurrentLanguage), false, "", GetItemExplorerListWidth());
+                    Helper.Translate(itemType, CurrentLanguage), itemCount + Helper.Translate("個の項目", CurrentLanguage),
+                    false, "", GetItemExplorerListWidth());
                 button.Location = new Point(0, (70 * index) + 2);
 
                 button.Click += (_, _) =>
@@ -1131,7 +1149,9 @@ namespace Avatar_Explorer.Forms
                     {
                         try
                         {
-                            Clipboard.SetText($"https://booth.pm/{Helper.GetCurrentLanguageCode(CurrentLanguage)}/items/" + item.BoothId);
+                            Clipboard.SetText(
+                                $"https://booth.pm/{Helper.GetCurrentLanguageCode(CurrentLanguage)}/items/" +
+                                item.BoothId);
                         }
                         catch (Exception ex)
                         {
@@ -1151,7 +1171,8 @@ namespace Avatar_Explorer.Forms
                         {
                             Process.Start(new ProcessStartInfo
                             {
-                                FileName = $"https://booth.pm/{Helper.GetCurrentLanguageCode(CurrentLanguage)}/items/" + item.BoothId,
+                                FileName = $"https://booth.pm/{Helper.GetCurrentLanguageCode(CurrentLanguage)}/items/" +
+                                           item.BoothId,
                                 UseShellExecute = true
                             });
                         }
@@ -1241,28 +1262,33 @@ namespace Avatar_Explorer.Forms
 
                     if (item.Type == ItemType.Avatar)
                     {
-                        var result2 = MessageBox.Show(Helper.Translate("このアバターを対応アバターとしているアイテムの対応アバターからこのアバターを削除しますか？", CurrentLanguage),
+                        var result2 = MessageBox.Show(
+                            Helper.Translate("このアバターを対応アバターとしているアイテムの対応アバターからこのアバターを削除しますか？", CurrentLanguage),
                             Helper.Translate("確認", CurrentLanguage), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
                         if (result2 == DialogResult.Yes)
                         {
                             foreach (var item2 in Items)
                             {
-                                item2.SupportedAvatar = item2.SupportedAvatar.Where(avatar => avatar != item.ItemPath).ToArray();
+                                item2.SupportedAvatar = item2.SupportedAvatar.Where(avatar => avatar != item.ItemPath)
+                                    .ToArray();
                             }
                         }
 
                         if (CommonAvatars.Any(commonAvatar => commonAvatar.Avatars.Contains(item.ItemPath)))
                         {
                             var result3 = MessageBox.Show(Helper.Translate("このアバターを共通素体グループから削除しますか？", CurrentLanguage),
-                                Helper.Translate("確認", CurrentLanguage), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                                Helper.Translate("確認", CurrentLanguage), MessageBoxButtons.YesNo,
+                                MessageBoxIcon.Question);
 
                             if (result3 == DialogResult.Yes)
                             {
                                 foreach (var commonAvatar in CommonAvatars)
                                 {
-                                    commonAvatar.Avatars = commonAvatar.Avatars.Where(avatar => avatar != item.ItemPath).ToArray();
+                                    commonAvatar.Avatars = commonAvatar.Avatars.Where(avatar => avatar != item.ItemPath)
+                                        .ToArray();
                                 }
+
                                 Helper.SaveCommonAvatarData(CommonAvatars);
                             }
                         }
@@ -1598,13 +1624,15 @@ namespace Avatar_Explorer.Forms
             string[] pathTextArr = Array.Empty<string>();
             if (searchFilter.Author.Length != 0)
             {
-                pathTextArr = pathTextArr.Append(Helper.Translate("作者", CurrentLanguage) + ": " + string.Join(", ", searchFilter.Author))
+                pathTextArr = pathTextArr.Append(Helper.Translate("作者", CurrentLanguage) + ": " +
+                                                 string.Join(", ", searchFilter.Author))
                     .ToArray();
             }
 
             if (searchFilter.Title.Length != 0)
             {
-                pathTextArr = pathTextArr.Append(Helper.Translate("タイトル", CurrentLanguage) + ": " + string.Join(", ", searchFilter.Title))
+                pathTextArr = pathTextArr.Append(Helper.Translate("タイトル", CurrentLanguage) + ": " +
+                                                 string.Join(", ", searchFilter.Title))
                     .ToArray();
             }
 
@@ -1892,7 +1920,8 @@ namespace Avatar_Explorer.Forms
                 }
 
                 //最初のフォルダ
-                var firstFolder = Directory.GetDirectories(backupPath).MaxBy(d => new DirectoryInfo(d).CreationTime) ?? backupPath;
+                var firstFolder = Directory.GetDirectories(backupPath).MaxBy(d => new DirectoryInfo(d).CreationTime) ??
+                                  backupPath;
 
                 FolderBrowserDialog fbd = new()
                 {
@@ -1953,7 +1982,9 @@ namespace Avatar_Explorer.Forms
 
                 try
                 {
-                    if (Directory.Exists(Path.Combine(fbd.SelectedPath, "Datas")) && File.Exists(Path.Combine(fbd.SelectedPath, "Datas", "ItemsData.json")) && !File.Exists(Path.Combine(fbd.SelectedPath, "ItemsData.json")))
+                    if (Directory.Exists(Path.Combine(fbd.SelectedPath, "Datas")) &&
+                        File.Exists(Path.Combine(fbd.SelectedPath, "Datas", "ItemsData.json")) &&
+                        !File.Exists(Path.Combine(fbd.SelectedPath, "ItemsData.json")))
                     {
                         fbd.SelectedPath += "/Datas";
                     }
@@ -2224,9 +2255,11 @@ namespace Avatar_Explorer.Forms
             {
                 if (_lastBackupTime == DateTime.MinValue)
                 {
-                    if (_lastBackupError) Text = CurrentVersionFormText + " - " + Helper.Translate("バックアップエラー", CurrentLanguage);
+                    if (_lastBackupError)
+                        Text = CurrentVersionFormText + " - " + Helper.Translate("バックアップエラー", CurrentLanguage);
                     return;
                 }
+
                 var timeSpan = DateTime.Now - _lastBackupTime;
                 var minutes = timeSpan.Minutes;
                 Text = CurrentVersionFormText +
@@ -2257,5 +2290,8 @@ namespace Avatar_Explorer.Forms
                 Helper.ErrorLogger("自動バックアップに失敗しました。", ex);
             }
         }
+
+        // Form Closing
+        private void Main_FormClosing(object sender, FormClosingEventArgs e) => Directory.Delete("./Datas/Temp", true);
     }
 }

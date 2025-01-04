@@ -260,6 +260,7 @@ namespace Avatar_Explorer.Forms
             // 
             // Main
             // 
+
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1266, 699);
@@ -279,6 +280,7 @@ namespace Avatar_Explorer.Forms
             Controls.Add(UndoButton);
             FormBorderStyle = FormBorderStyle.Sizable;
             Resize += Main_Resize;
+            FormClosing += Main_FormClosing;
             Name = "Main";
             Text = "Avatar Explorer";
             AvatarSearchFilterList.ResumeLayout(false);
