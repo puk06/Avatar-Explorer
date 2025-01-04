@@ -1688,9 +1688,14 @@ namespace Avatar_Explorer.Forms
             }
 
             AddItem addItem = new(this, CurrentPath.CurrentSelectedCategory, false, null, folderPath);
-            addItem.ShowDialog();
-            RefleshWindow();
-            Helper.SaveItemsData(Items);
+            addItem.ItemAdded += (_, _) =>
+            {
+                RefleshWindow();
+                Helper.SaveItemsData(Items);
+                Enabled = true;
+            };
+            addItem.Show();
+            Enabled = false;
         }
 
         private void AvatarPage_DragDrop(object sender, DragEventArgs e)
@@ -1709,9 +1714,14 @@ namespace Avatar_Explorer.Forms
             }
 
             AddItem addItem = new(this, ItemType.Avatar, false, null, folderPath);
-            addItem.ShowDialog();
-            RefleshWindow();
-            Helper.SaveItemsData(Items);
+            addItem.ItemAdded += (_, _) =>
+            {
+                RefleshWindow();
+                Helper.SaveItemsData(Items);
+                Enabled = true;
+            };
+            addItem.Show();
+            Enabled = false;
         }
 
         // Export to CSV

@@ -9,6 +9,8 @@ namespace Avatar_Explorer.Forms
         private static readonly HttpClient HttpClient = new();
         private bool _addButtonEnabled;
 
+        public event EventHandler? ItemAdded;
+
         public Item Item = new();
 
         public string[] SupportedAvatar = Array.Empty<string>();
@@ -370,5 +372,7 @@ namespace Avatar_Explorer.Forms
 
             ClearErrorState();
         }
+
+        private void AddItem_FormClosing(object sender, FormClosingEventArgs e) => ItemAdded?.Invoke(this, EventArgs.Empty);
     }
 }
