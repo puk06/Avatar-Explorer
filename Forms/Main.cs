@@ -2292,6 +2292,10 @@ namespace Avatar_Explorer.Forms
         }
 
         // Form Closing
-        private void Main_FormClosing(object sender, FormClosingEventArgs e) => Directory.Delete("./Datas/Temp", true);
+        private void Main_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (!Directory.Exists("./Datas/Temp")) return;
+            Directory.Delete("./Datas/Temp", true);
+        }
     }
 }
