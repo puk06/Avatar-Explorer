@@ -1736,14 +1736,15 @@ namespace Avatar_Explorer.Forms
                     Directory.CreateDirectory("./Output");
                 }
 
-                var fileName = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + ".csv";
+                var currentTimeStr = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
+                var fileName = currentTimeStr + ".csv";
 
-                if (File.Exists("./Output/" + fileName))
+                var index = 1;
+                while (File.Exists("./Output/" + fileName))
                 {
-                    MessageBox.Show(Helper.Translate("ファイル名が重複しています。すこし時間を開けてから再度実行してください。", CurrentLanguage),
-                        Helper.Translate("エラー", CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    ExportButton.Enabled = true;
-                    return;
+                    if (index > 60) throw new Exception("Too many exports.");
+                    fileName = currentTimeStr + $"_{index}.csv";
+                    index++;
                 }
 
                 using var sw = new StreamWriter("./Output/" + fileName, false, Encoding.UTF8);
@@ -1767,10 +1768,11 @@ namespace Avatar_Explorer.Forms
                     MessageBoxIcon.Information);
                 ExportButton.Enabled = true;
             }
-            catch
+            catch (Exception ex)
             {
                 MessageBox.Show(Helper.Translate("エクスポートに失敗しました", CurrentLanguage),
                     Helper.Translate("エラー", CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Helper.ErrorLogger("エクスポートに失敗しました。", ex);
                 ExportButton.Enabled = true;
             }
         }
@@ -1786,14 +1788,15 @@ namespace Avatar_Explorer.Forms
                     Directory.CreateDirectory("./Backup");
                 }
 
-                var fileName = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + ".zip";
+                var currentTimeStr = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
+                var fileName = currentTimeStr + ".zip";
 
-                if (File.Exists("./Backup/" + fileName))
+                var index = 1;
+                while (File.Exists("./Backup/" + fileName))
                 {
-                    MessageBox.Show(Helper.Translate("ファイル名が重複しています。すこし時間を開けてから再度実行してください。", CurrentLanguage),
-                        Helper.Translate("エラー", CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    MakeBackupButton.Enabled = true;
-                    return;
+                    if (index > 60) throw new Exception("Too many backups");
+                    fileName = currentTimeStr + $"_{index}.zip";
+                    index++;
                 }
 
                 ZipFile.CreateFromDirectory("./Datas", "./Backup/" + fileName);
@@ -1805,10 +1808,11 @@ namespace Avatar_Explorer.Forms
                     MessageBoxIcon.Information);
                 MakeBackupButton.Enabled = true;
             }
-            catch
+            catch (Exception ex)
             {
                 MessageBox.Show(Helper.Translate("バックアップに失敗しました", CurrentLanguage),
                     Helper.Translate("エラー", CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Helper.ErrorLogger("バックアップに失敗しました。", ex);
                 MakeBackupButton.Enabled = true;
             }
         }
