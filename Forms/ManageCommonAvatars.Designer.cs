@@ -149,6 +149,9 @@
             Controls.Add(CommonAvatarsCombobox);
             Name = "ManageCommonAvatars";
             Text = "共通素体の管理";
+            MaximizeBox = false;
+            MinimizeBox = false;
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             AvatarListTab.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
