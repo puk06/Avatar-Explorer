@@ -123,7 +123,8 @@ namespace Avatar_Explorer.Forms
                 }
             }
 
-            GuiFont = _fontFamilies[CurrentLanguage];
+            var newFont = _fontFamilies.TryGetValue(CurrentLanguage, out var family) ? family : _fontFamilies["ja-JP"];
+            GuiFont = newFont;
         }
 
         // Generate List (LEFT)
