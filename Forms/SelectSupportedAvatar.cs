@@ -41,7 +41,7 @@ namespace Avatar_Explorer.Forms
             items = items.OrderBy(item => item.Title).ToList();
 
             var index = 0;
-            foreach (Item item in _mainForm.Items.Where(item => item.Type == ItemType.Avatar))
+            foreach (Item item in items)
             {
                 if (item.ItemPath == _addItem.Item.ItemPath) continue;
                 Button button = CreateAvatarButton(item, _mainForm.CurrentLanguage);
