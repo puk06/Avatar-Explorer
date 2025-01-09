@@ -12,7 +12,7 @@ namespace Avatar_Explorer.Forms
     public sealed partial class Main : Form
     {
         // Current Version
-        private const string CurrentVersion = "v1.0.1";
+        private const string CurrentVersion = "v1.0.2";
 
         // Current Version Form Text
         private const string CurrentVersionFormText = $"VRChat Avatar Explorer {CurrentVersion} by ‚Õ‚±‚é‚Ó";
