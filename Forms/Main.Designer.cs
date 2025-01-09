@@ -234,6 +234,7 @@ namespace Avatar_Explorer.Forms
             LanguageBox.Name = "LanguageBox";
             LanguageBox.Size = new Size(196, 29);
             LanguageBox.TabIndex = 13;
+            LanguageBox.SelectedIndex = 0;
             LanguageBox.SelectedIndexChanged += LanguageBox_SelectedIndexChanged;
             // 
             // ManageCommonAvatarButton
@@ -260,7 +261,7 @@ namespace Avatar_Explorer.Forms
             // 
             // Main
             // 
-
+            Font = new Font("Yu Gothic UI", 9F);
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1266, 699);

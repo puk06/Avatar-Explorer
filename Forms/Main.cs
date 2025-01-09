@@ -70,33 +70,45 @@ namespace Avatar_Explorer.Forms
         // Searching Bool
         private bool _isSearching;
 
+        // Initialized Bool
+        private readonly bool _initialized;
+
         public Main()
         {
-            Items = Helper.LoadItemsData();
-            CommonAvatars = Helper.LoadCommonAvatarData();
+            try
+            {
+                Items = Helper.LoadItemsData();
+                CommonAvatars = Helper.LoadCommonAvatarData();
 
-            // Fix Supported Avatar Path (Title => Path)
-            Items = Helper.FixSupportedAvatarPath(Items);
+                // Fix Supported Avatar Path (Title => Path)
+                Items = Helper.FixSupportedAvatarPath(Items);
 
-            AddFontFile();
-            InitializeComponent();
+                AddFontFile();
+                InitializeComponent();
 
-            // Save the default Size
-            _initialFormSize = ClientSize;
-            _baseAvatarSearchFilterListWidth = AvatarSearchFilterList.Width;
-            _baseAvatarItemExplorerListWidth = AvatarItemExplorer.Width;
-            LanguageBox.SelectedIndex = 0;
+                // Save the default Size
+                _initialFormSize = ClientSize;
+                _baseAvatarSearchFilterListWidth = AvatarSearchFilterList.Width;
+                _baseAvatarItemExplorerListWidth = AvatarItemExplorer.Width;
+                _initialized = true;
 
-            // Render Window
-            RefleshWindow();
+                // Render Window
+                RefleshWindow();
 
-            // Start AutoBackup
-            AutoBackup();
+                // Start AutoBackup
+                AutoBackup();
 
-            // Set Backup Title Loop
-            BackupTimeTitle();
+                // Set Backup Title Loop
+                BackupTimeTitle();
 
-            Text = $"VRChat Avatar Explorer {CurrentVersion} by ぷこるふ";
+                Text = $"VRChat Avatar Explorer {CurrentVersion} by ぷこるふ";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("ソフトの起動中にエラーが発生しました。\n\n" + ex,
+                    "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Environment.Exit(0);
+            }
         }
 
         private void AddFontFile()
@@ -1837,6 +1849,7 @@ namespace Avatar_Explorer.Forms
                 if (string.IsNullOrEmpty(control.Text)) continue;
                 _controlNames.TryAdd(control.Name, control.Text);
                 control.Text = Helper.Translate(_controlNames[control.Name], CurrentLanguage);
+                ChangeControlFont(control);
             }
 
             foreach (Control control in AvatarSearchFilterList.Controls)
@@ -1844,6 +1857,7 @@ namespace Avatar_Explorer.Forms
                 if (string.IsNullOrEmpty(control.Text)) continue;
                 _controlNames.TryAdd(control.Name, control.Text);
                 control.Text = Helper.Translate(_controlNames[control.Name], CurrentLanguage);
+                ChangeControlFont(control);
             }
 
             foreach (Control control in ExplorerList.Controls)
@@ -1851,6 +1865,7 @@ namespace Avatar_Explorer.Forms
                 if (string.IsNullOrEmpty(control.Text)) continue;
                 _controlNames.TryAdd(control.Name, control.Text);
                 control.Text = Helper.Translate(_controlNames[control.Name], CurrentLanguage);
+                ChangeControlFont(control);
             }
 
             foreach (Control control in AvatarItemExplorer.Controls)
@@ -1858,10 +1873,22 @@ namespace Avatar_Explorer.Forms
                 if (string.IsNullOrEmpty(control.Text)) continue;
                 _controlNames.TryAdd(control.Name, control.Text);
                 control.Text = Helper.Translate(_controlNames[control.Name], CurrentLanguage);
+                ChangeControlFont(control);
             }
 
             RefleshWindow();
             PathTextBox.Text = GeneratePath();
+        }
+
+        private void ChangeControlFont(Control control)
+        {
+            if (GuiFont == null) return;
+            var previousFont = control.Font;
+            var familyName = previousFont.FontFamily.Name;
+            if (familyName == "Yu Gothic UI") return;
+            var previousSize = control.Font.Size;
+            if (previousSize is < 0 or >= float.MaxValue) return;
+            control.Font = new Font(GuiFont, previousSize);
         }
 
         private void RefleshWindow(bool reloadLeft = true)
@@ -2108,6 +2135,7 @@ namespace Avatar_Explorer.Forms
 
         private void ResizeControl()
         {
+            if (!_initialized) return;
             var widthRatio = (float)ClientSize.Width / _initialFormSize.Width;
             var heightRatio = (float)ClientSize.Height / _initialFormSize.Height;
 
@@ -2162,6 +2190,7 @@ namespace Avatar_Explorer.Forms
                             // 小さくなる場合のみフォントサイズを変更
                             if (!(newFontSize < defaultFontSize)) continue;
                             newFontSize = Math.Max(newFontSize, MinFontSize);
+                            if (newFontSize is < 0 or >= float.MaxValue) continue;
                             label.Font = new Font(label.Font.FontFamily, newFontSize, label.Font.Style);
                             break;
                         }
@@ -2177,6 +2206,7 @@ namespace Avatar_Explorer.Forms
                             var scaleRatio = Math.Min(widthRatio, heightRatio);
                             var newFontSize = defaultFontSize * scaleRatio;
                             newFontSize = Math.Max(newFontSize, MinFontSize);
+                            if (newFontSize is < 0 or >= float.MaxValue) continue;
                             label.Font = new Font(label.Font.FontFamily, newFontSize, label.Font.Style);
                             break;
                         }
@@ -2191,6 +2221,7 @@ namespace Avatar_Explorer.Forms
                             var scaleRatio = Math.Min(widthRatio, heightRatio);
                             var newFontSize = defaultFontSize * scaleRatio;
                             newFontSize = Math.Max(newFontSize, MinFontSize);
+                            if (newFontSize is < 0 or >= float.MaxValue) continue;
                             control.Font = new Font(control.Font.FontFamily, newFontSize, control.Font.Style);
                             break;
                         }
