@@ -261,7 +261,6 @@ namespace Avatar_Explorer.Forms
             // 
             // Main
             // 
-            Font = new Font("Yu Gothic UI", 9F);
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1266, 699);
