@@ -673,6 +673,13 @@ namespace Avatar_Explorer.Forms
                         AddItem addItem = new(this, CurrentPath.CurrentSelectedCategory, true, item, null);
                         addItem.ShowDialog();
 
+                        if (!Directory.Exists(item.ItemPath))
+                        {
+                            MessageBox.Show(Helper.Translate("フォルダが見つかりませんでした。", CurrentLanguage),
+                                Helper.Translate("エラー", CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
                         //対応アバターのパスを変えてあげる
                         foreach (var item2 in Items)
                         {
@@ -1096,6 +1103,13 @@ namespace Avatar_Explorer.Forms
                         if (result != DialogResult.Yes) return;
                         AddItem addItem = new(this, CurrentPath.CurrentSelectedCategory, true, item, null);
                         addItem.ShowDialog();
+
+                        if (!Directory.Exists(item.ItemPath))
+                        {
+                            MessageBox.Show(Helper.Translate("フォルダが見つかりませんでした。", CurrentLanguage),
+                                Helper.Translate("エラー", CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
 
                         //対応アバターのパスを変えてあげる
                         foreach (var item2 in Items)
