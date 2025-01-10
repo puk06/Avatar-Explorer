@@ -141,6 +141,7 @@ namespace Avatar_Explorer.Forms
             if (result == DialogResult.No) return;
 
             _commonAvatars = _commonAvatars.Where(ca => ca.Name != commonAvatar.Name).ToArray();
+            _mainForm.CommonAvatars = _commonAvatars;
             MessageBox.Show(Helper.Translate("削除が完了しました。", _mainForm.CurrentLanguage),
                 Helper.Translate("完了", _mainForm.CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Information);
             RefleshCommonAvatarButtonColor();

@@ -1594,6 +1594,7 @@ namespace Avatar_Explorer.Forms
             if (string.IsNullOrEmpty(SearchBox.Text))
             {
                 SearchResultLabel.Text = "";
+                PathTextBox.Text = GeneratePath();
                 if (CurrentPath.CurrentSelectedItemCategory != null)
                 {
                     GenerateItemFiles();
