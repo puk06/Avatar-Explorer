@@ -17,6 +17,11 @@ namespace Avatar_Explorer.Classes
         private static readonly HttpClient HttpClient = new();
         private static readonly Dictionary<string, Dictionary<string, string>> TranslateData = new();
 
+        /// <summary>
+        /// Returns the item data of the booth.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public static async Task<Item> GetBoothItemInfoAsync(string id)
         {
             var url = $"https://booth.pm/ja/items/{id}.json";
@@ -49,6 +54,12 @@ namespace Avatar_Explorer.Classes
             return match.Success ? match.Groups[1].Value : "";
         }
 
+        /// <summary>
+        /// Returns Translated Category Name from ItemType.
+        /// </summary>
+        /// <param name="itemType"></param>
+        /// <param name="lang"></param>
+        /// <returns></returns>
         public static string GetCategoryName(ItemType itemType, string lang)
         {
             return itemType switch
@@ -66,6 +77,12 @@ namespace Avatar_Explorer.Classes
             };
         }
 
+        /// <summary>
+        ///  Returns FolderData of the specified folder.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="materialPath"></param>
+        /// <returns></returns>
         public static ItemFolderInfo GetItemFolderInfo(string path, string materialPath)
         {
             var itemFolderInfo = new ItemFolderInfo();
@@ -121,6 +138,16 @@ namespace Avatar_Explorer.Classes
             return itemFolderInfo;
         }
 
+        /// <summary>
+        /// Create a button with the specified parameters.
+        /// </summary>
+        /// <param name="imagePath"></param>
+        /// <param name="labelTitle"></param>
+        /// <param name="description"></param>
+        /// <param name="short"></param>
+        /// <param name="tooltip"></param>
+        /// <param name="listWidthDiff"></param>
+        /// <returns></returns>
         public static Button CreateButton(string? imagePath, string labelTitle, string? description,
             bool @short = false, string tooltip = "", int listWidthDiff = 0)
         {
@@ -189,8 +216,18 @@ namespace Avatar_Explorer.Classes
             return suggestType;
         }
 
+        /// <summary>
+        /// Remove spaces and slashes from the string.
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
         public static string RemoveFormat(string str) => str.Replace(' ', '_').Replace('/', '-');
 
+        /// <summary>
+        /// Load the item data from the specified path.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static Item[] LoadItemsData(string path = "./Datas/ItemsData.json")
         {
             try
@@ -206,12 +243,21 @@ namespace Avatar_Explorer.Classes
             }
         }
 
+        /// <summary>
+        /// Save the item data to the specified path.
+        /// </summary>
+        /// <param name="items"></param>
         public static void SaveItemsData(Item[] items)
         {
             using var sw = new StreamWriter("./Datas/ItemsData.json");
             sw.Write(JsonSerializer.Serialize(items, new JsonSerializerOptions { WriteIndented = true }));
         }
 
+        /// <summary>
+        /// Load the common avatar data from the specified path.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static CommonAvatar[] LoadCommonAvatarData(string path = "./Datas/CommonAvatar.json")
         {
             try
@@ -227,6 +273,10 @@ namespace Avatar_Explorer.Classes
             }
         }
 
+        /// <summary>
+        /// Save the common avatar data to the specified path.
+        /// </summary>
+        /// <param name="commonAvatars"></param>
         public static void SaveCommonAvatarData(CommonAvatar[] commonAvatars)
         {
             using var sw = new StreamWriter("./Datas/CommonAvatar.json");
@@ -235,7 +285,14 @@ namespace Avatar_Explorer.Classes
 
         public static void DragEnter(object _, DragEventArgs e) => e.Effect = DragDropEffects.All;
 
-        private static Image ResizeImage(string imagePath, int width, int height)
+        /// <summary>
+        /// Resize the image to the specified size.
+        /// </summary>
+        /// <param name="imagePath"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <returns></returns>
+        private static Bitmap ResizeImage(string imagePath, int width, int height)
         {
             if (!File.Exists(imagePath)) return new Bitmap(width, height);
             using var originalImage = Image.FromFile(imagePath);
@@ -246,6 +303,12 @@ namespace Avatar_Explorer.Classes
             return resizedImage;
         }
 
+        /// <summary>
+        /// Translate the string to the specified language.
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="to"></param>
+        /// <returns></returns>
         public static string Translate(string str, string to)
         {
             if (to == "ja-JP") return str;
@@ -264,6 +327,11 @@ namespace Avatar_Explorer.Classes
             return translateData;
         }
 
+        /// <summary>
+        /// Fix the supported avatar path.
+        /// </summary>
+        /// <param name="items"></param>
+        /// <returns></returns>
         public static Item[] FixSupportedAvatarPath(Item[] items)
         {
             var avatars = items.Where(x => x.Type == ItemType.Avatar).ToArray();
@@ -282,6 +350,12 @@ namespace Avatar_Explorer.Classes
             return items;
         }
 
+        /// <summary>
+        /// Get the avatar name from the specified path.
+        /// </summary>
+        /// <param name="items"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static string? GetAvatarName(Item[] items, string? path)
         {
             if (string.IsNullOrEmpty(path)) return null;
@@ -290,6 +364,13 @@ namespace Avatar_Explorer.Classes
             return item?.Title;
         }
 
+        /// <summary>
+        /// Check if the avatar is supported or common.
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="commonAvatars"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static SupportedOrCommonAvatar IsSupportedAvatarOrCommon(Item item, CommonAvatar[] commonAvatars,
             string? path)
         {
@@ -323,6 +404,11 @@ namespace Avatar_Explorer.Classes
             public string CommonAvatarName { get; set; } = "";
         }
 
+        /// <summary>
+        /// Get the search filter from the specified search word.
+        /// </summary>
+        /// <param name="searchWord"></param>
+        /// <returns></returns>
         public static SearchFilter GetSearchFilter(string searchWord)
         {
             var searchFilter = new SearchFilter();
@@ -358,6 +444,10 @@ namespace Avatar_Explorer.Classes
             return searchFilter;
         }
 
+        /// <summary>
+        /// Backup the specified path.
+        /// </summary>
+        /// <param name="path"></param>
         public static void Backup(string[] path)
         {
             var folderPath = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
@@ -382,6 +472,11 @@ namespace Avatar_Explorer.Classes
             }
         }
 
+        /// <summary>
+        /// Get the current language code.
+        /// </summary>
+        /// <param name="language"></param>
+        /// <returns></returns>
         public static string GetCurrentLanguageCode(string language = "")
         {
             return language switch
@@ -393,6 +488,11 @@ namespace Avatar_Explorer.Classes
             };
         }
 
+        /// <summary>
+        /// Error log output.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="exception"></param>
         public static void ErrorLogger(string message, Exception exception)
         {
             try
@@ -407,12 +507,24 @@ namespace Avatar_Explorer.Classes
             }
         }
 
-        public static string CheckFilePath(string s)
+        /// <summary>
+        /// Check if the specified path is a Valid Path.
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public static string CheckFilePath(string filePath)
         {
             var invalidChars = Path.GetInvalidFileNameChars();
-            return string.Concat(s.Where(c => !invalidChars.Contains(c)));
+            return string.Concat(filePath.Where(c => !invalidChars.Contains(c)));
         }
 
+        /// <summary>
+        /// Modify the UnityPackage file path.
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="currentPath"></param>
+        /// <param name="currentLanguage"></param>
+        /// <returns></returns>
         public static async Task ModifyUnityPackageFilePathAsync(FileData file, CurrentPath currentPath, string currentLanguage)
         {
             ProgressForm progressForm = new ProgressForm(currentLanguage);
@@ -595,6 +707,37 @@ namespace Avatar_Explorer.Classes
 
             using var fileStream = File.OpenWrite(outputTarFile);
             archive.SaveTo(fileStream, new WriterOptions(CompressionType.None));
+        }
+
+        /// <summary>
+        /// Set the custom categories.
+        /// </summary>
+        /// <returns></returns>
+        public static string[] LoadCustomCategoriesData(string path = "./Datas/CustomCategory.txt")
+        {
+            if (!File.Exists(path))
+            {
+                File.Create(path).Close();
+                return Array.Empty<string>();
+            }
+
+            var categories = File.ReadAllLines(path, Encoding.UTF8);
+            categories = categories.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+
+            return categories;
+        }
+
+        /// <summary>
+        /// Save the custom categories.
+        /// </summary>
+        /// <param name="customCategories"></param>
+        public static void SaveCustomCategoriesData(string[] customCategories)
+        {
+            using var sw = new StreamWriter("./Datas/CustomCategory.txt", false, Encoding.UTF8);
+            foreach (var category in customCategories)
+            {
+                sw.WriteLine(category);
+            }
         }
     }
 }

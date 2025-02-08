@@ -15,7 +15,7 @@ namespace Avatar_Explorer.Forms
 
         public string[] SupportedAvatar = Array.Empty<string>();
 
-        public AddItem(Main mainForm, ItemType type, bool edit, Item? item, string? folderPath)
+        public AddItem(Main mainForm, ItemType type, string? customCategory, bool edit, Item? item, string? folderPath)
         {
             _edit = edit;
             _mainForm = mainForm;
@@ -40,9 +40,32 @@ namespace Avatar_Explorer.Forms
                 }
             }
 
+            for (var i = 0; i < mainForm.CustomCategories.Length; i++)
+            {
+                TypeComboBox.Items.Add(mainForm.CustomCategories[i]);
+            }
+
             if (folderPath != null) FolderTextBox.Text = folderPath;
 
-            TypeComboBox.SelectedIndex = (int)type == 9 ? 0 : (int)type;
+            ItemType itemType = type;
+
+            if (type == ItemType.Custom)
+            {
+                if (!string.IsNullOrEmpty(customCategory))
+                {
+                    var typeIndex = TypeComboBox.Items.IndexOf(customCategory);
+                    TypeComboBox.SelectedIndex = typeIndex == -1 ? 0 : typeIndex;
+                }
+                else
+                {
+                    TypeComboBox.SelectedIndex = 0;
+                }
+            }
+            else
+            {
+                TypeComboBox.SelectedIndex = (int)type == 10 ? 0 : (int)type;
+            }
+
             Text = Helper.Translate("アイテムの追加", _mainForm.CurrentLanguage);
 
             if (!(edit && item != null)) return;
@@ -62,6 +85,17 @@ namespace Avatar_Explorer.Forms
             MaterialTextBox.Text = item.MaterialPath;
             FolderTextBox.Enabled = false;
             openFolderButton.Enabled = false;
+
+            if (item.Type == ItemType.Custom)
+            {
+                var typeIndex = TypeComboBox.Items.IndexOf(item.CustomCategory);
+                TypeComboBox.SelectedIndex = typeIndex == -1 ? 0 : typeIndex;
+            }
+            else
+            {
+                TypeComboBox.SelectedIndex = (int)item.Type;
+            }
+
             SupportedAvatar = item.SupportedAvatar;
             TitleTextBox.Text = item.Title;
             AuthorTextBox.Text = item.AuthorName;
@@ -141,10 +175,25 @@ namespace Avatar_Explorer.Forms
 
         private async void AddButton_Click(object sender, EventArgs e)
         {
+            ItemType type;
+            if (TypeComboBox.SelectedIndex >= 9)
+            {
+                type = ItemType.Custom;
+            }
+            else
+            {
+                type = (ItemType)TypeComboBox.SelectedIndex;
+            }
+
             AddButton.Enabled = false;
             Item.Title = TitleTextBox.Text;
             Item.AuthorName = AuthorTextBox.Text;
-            Item.Type = (ItemType)TypeComboBox.SelectedIndex;
+            Item.Type = type;
+            if (type == ItemType.Custom)
+            {
+                Item.CustomCategory = TypeComboBox.Text;
+            }
+
             Item.ItemPath = FolderTextBox.Text;
             if (Item.Type != ItemType.Avatar) Item.SupportedAvatar = SupportedAvatar;
             Item.MaterialPath = MaterialTextBox.Text;
@@ -160,6 +209,11 @@ namespace Avatar_Explorer.Forms
 
             if (Item.BoothId != -1)
             {
+                if (!Directory.Exists("./Datas/Thumbnail"))
+                {
+                    Directory.CreateDirectory("./Datas/Thumbnail");
+                }
+
                 var thumbnailPath = Path.Combine("./Datas", "Thumbnail", $"{Item.BoothId}.png");
                 if (!File.Exists(thumbnailPath))
                 {
@@ -189,6 +243,11 @@ namespace Avatar_Explorer.Forms
 
             if (!string.IsNullOrEmpty(Item.AuthorId))
             {
+                if (!Directory.Exists(Path.Combine("./Datas", "AuthorImage")))
+                {
+                    Directory.CreateDirectory(Path.Combine("./Datas", "AuthorImage"));
+                }
+
                 var authorImagePath = Path.Combine("./Datas", "AuthorImage", $"{Item.AuthorId}.png");
                 if (!File.Exists(authorImagePath))
                 {

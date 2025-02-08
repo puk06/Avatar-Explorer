@@ -13,6 +13,7 @@
         public string AuthorImageUrl { get; set; } = "";
         public string AuthorImageFilePath { get; set; } = "";
         public ItemType Type { get; set; }
+        public string CustomCategory { get; set; } = "";
         public string[] SupportedAvatar { get; set; } = Array.Empty<string>();
     }
 }

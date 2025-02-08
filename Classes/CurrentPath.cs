@@ -6,6 +6,7 @@
         public string? CurrentSelectedAvatarPath;
         public Author? CurrentSelectedAuthor;
         public ItemType CurrentSelectedCategory = ItemType.Unknown;
+        public string CurrentSelectedCustomCategory = "";
         public Item? CurrentSelectedItem;
         public string? CurrentSelectedItemCategory;
         public ItemFolderInfo CurrentSelectedItemFolderInfo = new();
@@ -15,7 +16,7 @@
             return CurrentSelectedAvatar == null &&
                    CurrentSelectedAvatarPath == null &&
                    CurrentSelectedAuthor == null &&
-                   CurrentSelectedCategory == ItemType.Unknown && 
+                   CurrentSelectedCategory == ItemType.Unknown &&
                    CurrentSelectedItem == null &&
                    CurrentSelectedItemCategory == null;
         }

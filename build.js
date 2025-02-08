@@ -47,5 +47,9 @@ for (let i = 0; i < fontFilesLength; i++) {
     console.log("Copying: " + file);
 }
 
+const CUSTOM_CATEGORY_FILES = "../../../CustomCategory.txt";
+console.log("Copying Custom Category");
+fs.copyFileSync(CUSTOM_CATEGORY_FILES, "Datas/CustomCategory.txt");
+
 fs.rmSync("build.js");
 console.log("Build Completed!");

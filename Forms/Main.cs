@@ -12,7 +12,7 @@ namespace Avatar_Explorer.Forms
     public sealed partial class Main : Form
     {
         // Current Version
-        private const string CurrentVersion = "v1.0.2";
+        private const string CurrentVersion = "v1.0.3";
 
         // Current Version Form Text
         private const string CurrentVersionFormText = $"VRChat Avatar Explorer {CurrentVersion} by ぷこるふ";
@@ -28,6 +28,9 @@ namespace Avatar_Explorer.Forms
 
         // Common Avatars
         public CommonAvatar[] CommonAvatars;
+
+        // Custom Categories
+        public string[] CustomCategories;
 
         // Current Path
         public CurrentPath CurrentPath = new();
@@ -57,8 +60,16 @@ namespace Avatar_Explorer.Forms
         private readonly int _baseAvatarSearchFilterListWidth;
         private readonly int _baseAvatarItemExplorerListWidth;
 
-        // For Resize Button
+        /// <summary>
+        /// Get AvatarList Width
+        /// </summary>
+        /// <returns>AvatarList Width</returns>
         private int GetAvatarListWidth() => AvatarSearchFilterList.Width - _baseAvatarSearchFilterListWidth;
+
+        /// <summary>
+        /// Get ItemExplorerList Width
+        /// </summary>
+        /// <returns>ItemExplorerList Width</returns>
         private int GetItemExplorerListWidth() => AvatarItemExplorer.Width - _baseAvatarItemExplorerListWidth;
 
         // Last Backup Time
@@ -84,6 +95,7 @@ namespace Avatar_Explorer.Forms
                 Items = Helper.FixSupportedAvatarPath(Items);
 
                 AddFontFile();
+                CustomCategories = Helper.LoadCustomCategoriesData();
                 InitializeComponent();
 
                 // Save the default Size
@@ -142,7 +154,7 @@ namespace Avatar_Explorer.Forms
         // Generate List (LEFT)
         private void GenerateAvatarList()
         {
-            AvatarPage.Controls.Clear();
+            ResetAvatarPage(AvatarPage);
 
             var items = Items.Where(item => item.Type == ItemType.Avatar).ToArray();
             if (items.Length == 0) return;
@@ -259,7 +271,8 @@ namespace Avatar_Explorer.Forms
                 toolStripMenuItem4.Click += (_, _) =>
                 {
                     var prePath = item.ItemPath;
-                    AddItem addItem = new(this, item.Type, true, item, null);
+
+                    AddItem addItem = new(this, item.Type, item.CustomCategory, true, item, null);
                     addItem.ShowDialog();
 
                     //対応アバターのパスを変えてあげる
@@ -446,7 +459,8 @@ namespace Avatar_Explorer.Forms
 
         private void GenerateAuthorList()
         {
-            AvatarAuthorPage.Controls.Clear();
+            ResetAvatarPage(AvatarAuthorPage);
+
             var index = 0;
 
             var authors = Array.Empty<Author>();
@@ -522,11 +536,12 @@ namespace Avatar_Explorer.Forms
 
         private void GenerateCategoryListLeft()
         {
-            CategoryPage.Controls.Clear();
+            ResetAvatarPage(CategoryPage);
+
             var index = 0;
             foreach (ItemType itemType in Enum.GetValues(typeof(ItemType)))
             {
-                if (itemType is ItemType.Unknown) continue;
+                if (itemType is ItemType.Unknown or ItemType.Custom) continue;
 
                 var items = Items.Where(item => item.Type == itemType);
                 var itemCount = items.Count();
@@ -552,6 +567,37 @@ namespace Avatar_Explorer.Forms
                 CategoryPage.Controls.Add(button);
                 index++;
             }
+
+            if (CustomCategories.Length == 0) return;
+
+            foreach (var customCategory in CustomCategories)
+            {
+                var items = Items.Where(item => item.CustomCategory == customCategory);
+                var itemCount = items.Count();
+
+                Button button = Helper.CreateButton(null, customCategory,
+                    itemCount + Helper.Translate("個の項目", CurrentLanguage), true, "", GetAvatarListWidth());
+                button.Location = new Point(0, (70 * index) + 2);
+
+                button.Click += (_, _) =>
+                {
+                    CurrentPath = new CurrentPath
+                    {
+                        CurrentSelectedCategory = ItemType.Custom,
+                        CurrentSelectedCustomCategory = customCategory
+                    };
+                    _authorMode = false;
+                    _categoryMode = true;
+                    SearchBox.Text = "";
+                    SearchResultLabel.Text = "";
+                    _isSearching = false;
+                    GenerateItems();
+                    PathTextBox.Text = GeneratePath();
+                };
+
+                CategoryPage.Controls.Add(button);
+                index++;
+            }
         }
 
         // Generate List (RIGHT)
@@ -563,7 +609,7 @@ namespace Avatar_Explorer.Forms
             var index = 0;
             foreach (ItemType itemType in Enum.GetValues(typeof(ItemType)))
             {
-                if (itemType is ItemType.Unknown) continue;
+                if (itemType is ItemType.Unknown or ItemType.Custom) continue;
 
                 int itemCount = 0;
                 if (_authorMode)
@@ -595,6 +641,47 @@ namespace Avatar_Explorer.Forms
                 button.Click += (_, _) =>
                 {
                     CurrentPath.CurrentSelectedCategory = itemType;
+                    GenerateItems();
+                    PathTextBox.Text = GeneratePath();
+                };
+
+                AvatarItemExplorer.Controls.Add(button);
+                index++;
+            }
+
+            if (CustomCategories.Length == 0) return;
+            foreach (var customCategory in CustomCategories)
+            {
+                var itemCount = 0;
+                if (_authorMode)
+                {
+                    itemCount = Items.Count(item =>
+                        item.CustomCategory == customCategory &&
+                        item.AuthorName == CurrentPath.CurrentSelectedAuthor?.AuthorName
+                    );
+                }
+                else
+                {
+                    itemCount = Items.Count(item =>
+                        item.CustomCategory == customCategory &&
+                        (
+                            Helper.IsSupportedAvatarOrCommon(item, CommonAvatars, CurrentPath.CurrentSelectedAvatarPath)
+                                .IsSupportedOrCommon ||
+                            item.SupportedAvatar.Length == 0 || CurrentPath.CurrentSelectedAvatar == "*"
+                        )
+                    );
+                }
+
+                if (itemCount == 0) continue;
+
+                Button button = Helper.CreateButton(null, customCategory,
+                    itemCount + Helper.Translate("個の項目", CurrentLanguage), false, "", GetItemExplorerListWidth());
+                button.Location = new Point(0, (70 * index) + 2);
+
+                button.Click += (_, _) =>
+                {
+                    CurrentPath.CurrentSelectedCategory = ItemType.Custom;
+                    CurrentPath.CurrentSelectedItemCategory = customCategory;
                     GenerateItems();
                     PathTextBox.Text = GeneratePath();
                 };
@@ -670,7 +757,8 @@ namespace Avatar_Explorer.Forms
                                 Helper.Translate("エラー", CurrentLanguage), MessageBoxButtons.YesNo,
                                 MessageBoxIcon.Error);
                         if (result != DialogResult.Yes) return;
-                        AddItem addItem = new(this, CurrentPath.CurrentSelectedCategory, true, item, null);
+
+                        AddItem addItem = new(this, CurrentPath.CurrentSelectedCategory, CurrentPath.CurrentSelectedCustomCategory, true, item, null);
                         addItem.ShowDialog();
 
                         if (!Directory.Exists(item.ItemPath))
@@ -827,7 +915,8 @@ namespace Avatar_Explorer.Forms
                 toolStripMenuItem4.Click += (_, _) =>
                 {
                     var prePath = item.ItemPath;
-                    AddItem addItem = new(this, CurrentPath.CurrentSelectedCategory, true, item, null);
+
+                    AddItem addItem = new(this, CurrentPath.CurrentSelectedCategory, CurrentPath.CurrentSelectedCustomCategory, true, item, null);
                     addItem.ShowDialog();
 
                     //対応アバターのパスを変えてあげる
@@ -1101,7 +1190,8 @@ namespace Avatar_Explorer.Forms
                                 Helper.Translate("エラー", CurrentLanguage), MessageBoxButtons.YesNo,
                                 MessageBoxIcon.Error);
                         if (result != DialogResult.Yes) return;
-                        AddItem addItem = new(this, CurrentPath.CurrentSelectedCategory, true, item, null);
+
+                        AddItem addItem = new(this, CurrentPath.CurrentSelectedCategory, CurrentPath.CurrentSelectedCustomCategory, true, item, null);
                         addItem.ShowDialog();
 
                         if (!Directory.Exists(item.ItemPath))
@@ -1251,7 +1341,7 @@ namespace Avatar_Explorer.Forms
                 toolStripMenuItem4.Click += (_, _) =>
                 {
                     var prePath = item.ItemPath;
-                    AddItem addItem = new(this, item.Type, true, item, null);
+                    AddItem addItem = new(this, item.Type, item.CustomCategory, true, item, null);
                     addItem.ShowDialog();
 
                     //対応アバターのパスを変えてあげる
@@ -1420,7 +1510,7 @@ namespace Avatar_Explorer.Forms
         // Add Item Form
         private void AddItemButton_Click(object sender, EventArgs e)
         {
-            AddItem addItem = new AddItem(this, CurrentPath.CurrentSelectedCategory, false, null, null);
+            AddItem addItem = new AddItem(this, CurrentPath.CurrentSelectedCategory, CurrentPath.CurrentSelectedCustomCategory, false, null, null);
             addItem.ShowDialog();
             RefleshWindow();
             Helper.SaveItemsData(Items);
@@ -1429,6 +1519,10 @@ namespace Avatar_Explorer.Forms
         // Generate Path
         private string GeneratePath()
         {
+            var categoryName = Helper.GetCategoryName(CurrentPath.CurrentSelectedCategory, CurrentLanguage);
+            if (CurrentPath.CurrentSelectedCategory == ItemType.Custom)
+                categoryName = CurrentPath.CurrentSelectedCustomCategory;
+
             if (_authorMode)
             {
                 if (CurrentPath.CurrentSelectedAuthor == null)
@@ -1437,14 +1531,14 @@ namespace Avatar_Explorer.Forms
                     return Helper.RemoveFormat(CurrentPath.CurrentSelectedAuthor.AuthorName);
                 if (CurrentPath.CurrentSelectedItem == null)
                     return Helper.RemoveFormat(CurrentPath.CurrentSelectedAuthor.AuthorName) + " / " +
-                           Helper.GetCategoryName(CurrentPath.CurrentSelectedCategory, CurrentLanguage);
+                           categoryName;
                 if (CurrentPath.CurrentSelectedItemCategory == null)
                     return Helper.RemoveFormat(CurrentPath.CurrentSelectedAuthor.AuthorName) + " / " +
-                           Helper.GetCategoryName(CurrentPath.CurrentSelectedCategory, CurrentLanguage) + " / " +
+                           categoryName + " / " +
                            Helper.RemoveFormat(CurrentPath.CurrentSelectedItem.Title);
 
                 return Helper.RemoveFormat(CurrentPath.CurrentSelectedAuthor.AuthorName) + " / " +
-                       Helper.GetCategoryName(CurrentPath.CurrentSelectedCategory, CurrentLanguage) + " / " +
+                       categoryName + " / " +
                        Helper.RemoveFormat(CurrentPath.CurrentSelectedItem.Title) + " / " +
                        Helper.Translate(CurrentPath.CurrentSelectedItemCategory, CurrentLanguage);
             }
@@ -1454,12 +1548,12 @@ namespace Avatar_Explorer.Forms
                 if (CurrentPath.CurrentSelectedCategory == ItemType.Unknown)
                     return Helper.Translate("ここには現在のパスが表示されます", CurrentLanguage);
                 if (CurrentPath.CurrentSelectedItem == null)
-                    return Helper.GetCategoryName(CurrentPath.CurrentSelectedCategory, CurrentLanguage);
+                    return categoryName;
                 if (CurrentPath.CurrentSelectedItemCategory == null)
-                    return Helper.GetCategoryName(CurrentPath.CurrentSelectedCategory, CurrentLanguage) + " / " +
+                    return categoryName + " / " +
                            Helper.RemoveFormat(CurrentPath.CurrentSelectedItem.Title);
 
-                return Helper.GetCategoryName(CurrentPath.CurrentSelectedCategory, CurrentLanguage) + " / " +
+                return categoryName + " / " +
                        Helper.RemoveFormat(CurrentPath.CurrentSelectedItem.Title) + " / " +
                        Helper.Translate(CurrentPath.CurrentSelectedItemCategory, CurrentLanguage);
             }
@@ -1469,14 +1563,14 @@ namespace Avatar_Explorer.Forms
                 return Helper.RemoveFormat(CurrentPath.CurrentSelectedAvatar);
             if (CurrentPath.CurrentSelectedItem == null)
                 return Helper.RemoveFormat(CurrentPath.CurrentSelectedAvatar) + " / " +
-                       Helper.GetCategoryName(CurrentPath.CurrentSelectedCategory, CurrentLanguage);
+                       categoryName;
             if (CurrentPath.CurrentSelectedItemCategory == null)
                 return Helper.RemoveFormat(CurrentPath.CurrentSelectedAvatar) + " / " +
-                       Helper.GetCategoryName(CurrentPath.CurrentSelectedCategory, CurrentLanguage) + " / " +
+                       categoryName + " / " +
                        Helper.RemoveFormat(CurrentPath.CurrentSelectedItem.Title);
 
             return Helper.RemoveFormat(CurrentPath.CurrentSelectedAvatar) + " / " +
-                   Helper.GetCategoryName(CurrentPath.CurrentSelectedCategory, CurrentLanguage) + " / " +
+                   categoryName + " / " +
                    Helper.RemoveFormat(CurrentPath.CurrentSelectedItem.Title) + " / " +
                    Helper.Translate(CurrentPath.CurrentSelectedItemCategory, CurrentLanguage);
         }
@@ -1488,6 +1582,8 @@ namespace Avatar_Explorer.Forms
             CurrentPath.CurrentSelectedAvatar = avatarName ?? "*";
             CurrentPath.CurrentSelectedAvatarPath = avatarPath;
             CurrentPath.CurrentSelectedCategory = item.Type;
+            if (item.Type == ItemType.Custom)
+                CurrentPath.CurrentSelectedCustomCategory = item.CustomCategory;
             CurrentPath.CurrentSelectedItem = item;
         }
 
@@ -1565,6 +1661,7 @@ namespace Avatar_Explorer.Forms
                 if (CurrentPath.CurrentSelectedCategory != ItemType.Unknown)
                 {
                     CurrentPath.CurrentSelectedCategory = ItemType.Unknown;
+                    CurrentPath.CurrentSelectedCustomCategory = string.Empty;
                     GenerateCategoryList();
                     PathTextBox.Text = GeneratePath();
                     return;
@@ -1575,6 +1672,7 @@ namespace Avatar_Explorer.Forms
                 if (CurrentPath.CurrentSelectedCategory != ItemType.Unknown)
                 {
                     CurrentPath.CurrentSelectedCategory = ItemType.Unknown;
+                    CurrentPath.CurrentSelectedCustomCategory = string.Empty;
                     GenerateCategoryList();
                     PathTextBox.Text = GeneratePath();
                     return;
@@ -1699,6 +1797,12 @@ namespace Avatar_Explorer.Forms
             }
         }
 
+        // ResetAvatarPage
+        private static void ResetAvatarPage(Control page)
+        {
+            page.Controls.Clear();
+        }
+
         // Drag and Drop Item Folder
         private void AvatarItemExplorer_DragDrop(object sender, DragEventArgs e)
         {
@@ -1715,7 +1819,7 @@ namespace Avatar_Explorer.Forms
                 return;
             }
 
-            AddItem addItem = new(this, CurrentPath.CurrentSelectedCategory, false, null, folderPath);
+            AddItem addItem = new(this, CurrentPath.CurrentSelectedCategory, CurrentPath.CurrentSelectedCustomCategory, false, null, folderPath);
             addItem.ItemAdded += (_, _) =>
             {
                 RefleshWindow();
@@ -1741,7 +1845,7 @@ namespace Avatar_Explorer.Forms
                 return;
             }
 
-            AddItem addItem = new(this, ItemType.Avatar, false, null, folderPath);
+            AddItem addItem = new(this, ItemType.Avatar, null, false, null, folderPath);
             addItem.ItemAdded += (_, _) =>
             {
                 RefleshWindow();
@@ -2017,6 +2121,18 @@ namespace Avatar_Explorer.Forms
                         Helper.SaveCommonAvatarData(CommonAvatars);
                     }
 
+                    var customCategoryPath = fbd.SelectedPath + "/CustomCategory.txt";
+                    if (!File.Exists(customCategoryPath))
+                    {
+                        MessageBox.Show(Helper.Translate("カスタムカテゴリーファイルが見つかりませんでした。", CurrentLanguage),
+                            Helper.Translate("エラー", CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    else
+                    {
+                        CustomCategories = Helper.LoadCustomCategoriesData(customCategoryPath);
+                        Helper.SaveCustomCategoriesData(CustomCategories);
+                    }
+
                     MessageBox.Show(Helper.Translate("復元が完了しました。", CurrentLanguage),
                         Helper.Translate("完了", CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
@@ -2069,6 +2185,18 @@ namespace Avatar_Explorer.Forms
                     {
                         CommonAvatars = Helper.LoadCommonAvatarData(filePath2);
                         Helper.SaveCommonAvatarData(CommonAvatars);
+                    }
+
+                    var customCategoryPath = fbd.SelectedPath + "/CustomCategory.txt";
+                    if (!File.Exists(customCategoryPath))
+                    {
+                        MessageBox.Show(Helper.Translate("カスタムカテゴリーファイルが見つかりませんでした。", CurrentLanguage),
+                            Helper.Translate("エラー", CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    else
+                    {
+                        CustomCategories = Helper.LoadCustomCategoriesData(customCategoryPath);
+                        Helper.SaveCustomCategoriesData(CustomCategories);
                     }
 
                     var result2 = MessageBox.Show(
@@ -2338,7 +2466,8 @@ namespace Avatar_Explorer.Forms
                 var backupFilesArray = new[]
                 {
                     "./Datas/ItemsData.json",
-                    "./Datas/CommonAvatar.json"
+                    "./Datas/CommonAvatar.json",
+                    "./Datas/CustomCategory.txt"
                 };
 
                 Helper.Backup(backupFilesArray);

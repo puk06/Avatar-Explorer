@@ -11,6 +11,7 @@
         Animation,
         Tool,
         Shader,
+        Custom,
         Unknown
     }
 }
