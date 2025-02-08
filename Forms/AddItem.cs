@@ -194,9 +194,15 @@ namespace Avatar_Explorer.Forms
                 Item.CustomCategory = TypeComboBox.Text;
             }
 
-            Item.ItemPath = FolderTextBox.Text;
+            var folderPath = ExtractZipWithHandling(FolderTextBox.Text, "./Datas/Items");
+            if (folderPath == null) return;
+            Item.ItemPath = folderPath;
+
+            var materialPath = ExtractZipWithHandling(MaterialTextBox.Text, "./Datas/Items");
+            if (materialPath == null) return;
+            Item.MaterialPath = materialPath;
+
             if (Item.Type != ItemType.Avatar) Item.SupportedAvatar = SupportedAvatar;
-            Item.MaterialPath = MaterialTextBox.Text;
 
             if (string.IsNullOrEmpty(Item.Title) || string.IsNullOrEmpty(Item.AuthorName) || string.IsNullOrEmpty(Item.ItemPath))
             {
@@ -301,6 +307,32 @@ namespace Avatar_Explorer.Forms
             Close();
         }
 
+        // Extract Zip
+        private string? ExtractZipWithHandling(string path, string destination)
+        {
+            if (!string.IsNullOrEmpty(path) && path.EndsWith(".zip"))
+            {
+                try
+                {
+                    return Helper.ExtractZip(path, destination);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        Helper.Translate("zipファイルの展開に失敗しました。詳細はErrorLog.txtをご覧ください。", _mainForm.CurrentLanguage),
+                        Helper.Translate("エラー", _mainForm.CurrentLanguage),
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error
+                    );
+                    Helper.ErrorLogger("zipファイルの展開に失敗しました。", ex);
+                    AddButton.Enabled = true;
+                    return null;
+                }
+            }
+
+            return path;
+        }
+
         // Open Folder Button
         private void openFolderButton_Click(object sender, EventArgs e)
         {
@@ -329,7 +361,7 @@ namespace Avatar_Explorer.Forms
             if (dragFilePathArr == null) return;
             var folderPath = dragFilePathArr[0];
 
-            if (File.Exists(folderPath) || !Directory.Exists(folderPath))
+            if (!(File.Exists(folderPath) && folderPath.EndsWith(".zip")) && !Directory.Exists(folderPath))
             {
                 MessageBox.Show(Helper.Translate("フォルダを選択してください", _mainForm.CurrentLanguage),
                     Helper.Translate("エラー", _mainForm.CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -347,7 +379,7 @@ namespace Avatar_Explorer.Forms
             if (dragFilePathArr == null) return;
             var folderPath = dragFilePathArr[0];
 
-            if (File.Exists(folderPath) || !Directory.Exists(folderPath))
+            if (!(File.Exists(folderPath) && folderPath.EndsWith(".zip")) && !Directory.Exists(folderPath))
             {
                 MessageBox.Show(Helper.Translate("フォルダを選択してください", _mainForm.CurrentLanguage),
                     Helper.Translate("エラー", _mainForm.CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -375,13 +407,13 @@ namespace Avatar_Explorer.Forms
 
         private void ValidCheck()
         {
-            if (!Directory.Exists(FolderTextBox.Text))
+            if (!(File.Exists(FolderTextBox.Text) && FolderTextBox.Text.EndsWith(".zip")) && !Directory.Exists(FolderTextBox.Text))
             {
                 SetErrorState(Helper.Translate("エラー: フォルダパスが存在しません", _mainForm.CurrentLanguage));
                 return;
             }
 
-            if (File.Exists(FolderTextBox.Text))
+            if (File.Exists(FolderTextBox.Text) && !FolderTextBox.Text.EndsWith(".zip"))
             {
                 SetErrorState(Helper.Translate("エラー: フォルダパスがファイルです", _mainForm.CurrentLanguage));
                 return;
@@ -399,13 +431,13 @@ namespace Avatar_Explorer.Forms
                 return;
             }
 
-            if (!string.IsNullOrEmpty(MaterialTextBox.Text) && !Directory.Exists(MaterialTextBox.Text))
+            if (!string.IsNullOrEmpty(MaterialTextBox.Text) && (!(File.Exists(MaterialTextBox.Text) && MaterialTextBox.Text.EndsWith(".zip")) && !Directory.Exists(MaterialTextBox.Text)))
             {
                 SetErrorState(Helper.Translate("エラー: マテリアルフォルダパスが存在しません", _mainForm.CurrentLanguage));
                 return;
             }
 
-            if (!string.IsNullOrEmpty(MaterialTextBox.Text) && File.Exists(MaterialTextBox.Text))
+            if (!string.IsNullOrEmpty(MaterialTextBox.Text) && File.Exists(MaterialTextBox.Text) && !MaterialTextBox.Text.EndsWith(".zip"))
             {
                 SetErrorState(Helper.Translate("エラー: マテリアルフォルダパスがファイルです", _mainForm.CurrentLanguage));
                 return;

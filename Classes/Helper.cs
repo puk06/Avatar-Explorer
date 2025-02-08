@@ -739,5 +739,75 @@ namespace Avatar_Explorer.Classes
                 sw.WriteLine(category);
             }
         }
+
+        /// <summary>
+        /// Extract the zip file.
+        /// </summary>
+        /// <param name="zipPath"></param>
+        /// <param name="extractPath"></param>
+        /// <returns></returns>
+        public static string ExtractZip(string zipPath, string extractPath)
+        {
+            var extractFolder = Path.Combine(extractPath, Path.GetFileNameWithoutExtension(zipPath));
+            if (!Directory.Exists(extractFolder))
+            {
+                Directory.CreateDirectory(extractFolder);
+            }
+            else
+            {
+                int i = 2;
+                while (Directory.Exists(extractFolder + i))
+                {
+                    i++;
+                }
+                extractFolder = extractFolder + i;
+                Directory.CreateDirectory(extractFolder);
+            }
+
+            using var archive = ZipFile.OpenRead(zipPath);
+            foreach (var entry in archive.Entries)
+            {
+                var entryPath = Path.Combine(extractFolder, entry.FullName);
+                if (entryPath.EndsWith("/"))
+                {
+                    Directory.CreateDirectory(entryPath);
+                }
+                else
+                {
+                    entry.ExtractToFile(entryPath, true);
+                }
+            }
+
+            return extractFolder;
+        }
+
+        /// <summary>
+        /// Copy the directory.
+        /// </summary>
+        /// <param name="sourceDirName"></param>
+        /// <param name="destDirName"></param>
+        public static void CopyDirectory(string sourceDirName, string destDirName)
+        {
+            if (!Directory.Exists(destDirName))
+            {
+                Directory.CreateDirectory(destDirName);
+            }
+
+            var dir = new DirectoryInfo(sourceDirName);
+            var files = dir.GetFiles();
+
+            foreach (var file in files)
+            {
+                var temppath = Path.Combine(destDirName, file.Name);
+                file.CopyTo(temppath, false);
+            }
+
+            var dirs = dir.GetDirectories();
+            foreach (var subdir in dirs)
+            {
+                var temppath = Path.Combine(destDirName, subdir.Name);
+                CopyDirectory(subdir.FullName, temppath);
+            }
+        }
     }
 }

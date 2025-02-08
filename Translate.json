@@ -71,7 +71,6 @@
   "追加": null,
   "カスタムで追加": null,
   "フォルダを選択": null,
-  "선택\",\"": null,
   "Tip: フォルダを下の欄にドラッグアンドドロップすることでも入力できます！": null,
   "対応アバターを選択してください。\r\n選択されてなければ、全アバター対応として扱われます！": null,
   "確定": null,
@@ -116,7 +115,7 @@
   "アイテムファイルが見つかりませんでした。": null,
   "共通素体ファイルが見つかりませんでした。": null,
   "カスタムカテゴリーファイルが見つかりませんでした。": null,
-  "Thumbnailフォルダ、AuthorImageフォルダもコピーしますか？": null,
+  "Thumbnailフォルダ、AuthorImageフォルダ、Itemsフォルダもコピーしますか？": null,
   "コピーが完了しました。": null,
   "データの読み込みに失敗しました。詳細はErrorLog.txtをご覧ください。": null,
   "更新": null,
@@ -136,5 +135,10 @@
   "ファイルの展開中": null,
   "UnityPackageの作成中": null,
   "UnityPackageの展開に失敗しました。詳細はErrorLog.txtをご覧ください。": null,
-  "Unitypackageのインポート先の変更中": null
+  "Unitypackageのインポート先の変更中": null,
+  "zipファイルの展開に失敗しました。詳細はErrorLog.txtをご覧ください。": null,
+  "サムネイルのコピーに一部失敗しています。": null,
+  "作者画像のコピーに一部失敗しています。": null,
+  "Itemsのコピーに一部失敗しています。": null,
+  "コピー失敗一覧: ": null
 }

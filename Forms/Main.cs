@@ -1812,7 +1812,7 @@ namespace Avatar_Explorer.Forms
             if (dragFilePathArr == null) return;
             var folderPath = dragFilePathArr[0];
 
-            if (File.Exists(folderPath) || !Directory.Exists(folderPath))
+            if (!(File.Exists(folderPath) && folderPath.EndsWith(".zip")) && !Directory.Exists(folderPath))
             {
                 MessageBox.Show(Helper.Translate("フォルダを選択してください", CurrentLanguage),
                     Helper.Translate("エラー", CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -1838,7 +1838,7 @@ namespace Avatar_Explorer.Forms
             if (dragFilePathArr == null) return;
             var folderPath = dragFilePathArr[0];
 
-            if (File.Exists(folderPath) || !Directory.Exists(folderPath))
+            if (!(File.Exists(folderPath) && folderPath.EndsWith(".zip")) && !Directory.Exists(folderPath))
             {
                 MessageBox.Show(Helper.Translate("フォルダを選択してください", CurrentLanguage),
                     Helper.Translate("エラー", CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -2200,7 +2200,7 @@ namespace Avatar_Explorer.Forms
                     }
 
                     var result2 = MessageBox.Show(
-                        Helper.Translate("Thumbnailフォルダ、AuthorImageフォルダもコピーしますか？", CurrentLanguage),
+                        Helper.Translate("Thumbnailフォルダ、AuthorImageフォルダ、Itemsフォルダもコピーしますか？", CurrentLanguage),
                         Helper.Translate("確認", CurrentLanguage), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                     if (result2 != DialogResult.Yes)
                     {
@@ -2219,7 +2219,11 @@ namespace Avatar_Explorer.Forms
 
                     var thumbnailPath = fbd.SelectedPath + "/Thumbnail";
                     var authorImagePath = fbd.SelectedPath + "/AuthorImage";
+                    var itemsPath = fbd.SelectedPath + "/Items";
 
+                    var thumbnailResult = true;
+                    var authorImageResult = true;
+                    var itemsResult = true;
                     if (Directory.Exists(thumbnailPath))
                     {
                         Directory.CreateDirectory("./Datas/Thumbnail");
@@ -2232,6 +2236,7 @@ namespace Avatar_Explorer.Forms
                             catch (Exception ex)
                             {
                                 Helper.ErrorLogger("サムネイルのコピーに失敗しました。", ex);
+                                thumbnailResult = false;
                             }
                         }
                     }
@@ -2248,11 +2253,28 @@ namespace Avatar_Explorer.Forms
                             catch (Exception ex)
                             {
                                 Helper.ErrorLogger("作者画像のコピーに失敗しました。", ex);
+                                authorImageResult = false;
                             }
                         }
                     }
 
-                    MessageBox.Show(Helper.Translate("コピーが完了しました。", CurrentLanguage),
+                    if (Directory.Exists(itemsPath))
+                    {
+                        try
+                        {
+                            Helper.CopyDirectory(itemsPath, "./Datas/Items");
+                        }
+                        catch (Exception ex)
+                        {
+                            Helper.ErrorLogger("Itemsのコピーに失敗しました。", ex);
+                            itemsResult = false;
+                        }
+                    }
+
+                    MessageBox.Show(Helper.Translate("コピーが完了しました。", CurrentLanguage) + "\n" + Helper.Translate("コピー失敗一覧: ", CurrentLanguage) +
+                                    (thumbnailResult ? "" : "\n" + Helper.Translate("サムネイルのコピーに一部失敗しています。", CurrentLanguage)) +
+                                    (authorImageResult ? "" : "\n" + Helper.Translate("作者画像のコピーに一部失敗しています。", CurrentLanguage)) +
+                                    (itemsResult ? "" : "\n" + Helper.Translate("Itemsのコピーに一部失敗しています。", CurrentLanguage)),
                         Helper.Translate("完了", CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception ex)

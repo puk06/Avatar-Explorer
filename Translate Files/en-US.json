@@ -115,7 +115,7 @@
   "アイテムファイルが見つかりませんでした。": "Item file not found.",
   "共通素体ファイルが見つかりませんでした。": "Common avatar file not found.",
   "カスタムカテゴリーファイルが見つかりませんでした。": "Custom category file not found.",
-  "Thumbnailフォルダ、AuthorImageフォルダもコピーしますか？": "Copy Thumbnail and AuthorImage folders?",
+  "Thumbnailフォルダ、AuthorImageフォルダ、Itemsフォルダもコピーしますか？": "Copy Thumbnail, AuthorImage, and Items folders?",
   "コピーが完了しました。": "Copy completed.",
   "データの読み込みに失敗しました。詳細はErrorLog.txtをご覧ください。": "Failed to load data. Please see ErrorLog.txt for details.",
   "更新": "Update",
@@ -135,5 +135,10 @@
   "ファイルの展開中": "Extracting file",
   "UnityPackageの作成中": "Creating UnityPackage",
   "UnityPackageの展開に失敗しました。詳細はErrorLog.txtをご覧ください。": "Failed to extract UnityPackage. Please see ErrorLog.txt for details.",
-  "Unitypackageのインポート先の変更中": "Changing Unitypackage import destination"
+  "Unitypackageのインポート先の変更中": "Changing Unitypackage import destination",
+  "zipファイルの展開に失敗しました。詳細はErrorLog.txtをご覧ください。": "Failed to extract zip file. Please see ErrorLog.txt for details.",
+  "サムネイルのコピーに一部失敗しています。": "Failed to copy thumbnail.",
+  "作者画像のコピーに一部失敗しています。": "Failed to copy author image.",
+  "Itemsのコピーに一部失敗しています。": "Failed to copy Items.",
+  "コピー失敗一覧: ": "Copy failure list: "
 }
