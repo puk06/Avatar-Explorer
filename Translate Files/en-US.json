@@ -114,6 +114,7 @@
   "以前のバージョンのDatasフォルダ、もしくは展開したバックアップフォルダを選択してください": "Please select the Datas folder from a previous version or the extracted backup folder.",
   "アイテムファイルが見つかりませんでした。": "Item file not found.",
   "共通素体ファイルが見つかりませんでした。": "Common avatar file not found.",
+  "カスタムカテゴリーファイルが見つかりませんでした。": "Custom category file not found.",
   "Thumbnailフォルダ、AuthorImageフォルダもコピーしますか？": "Copy Thumbnail and AuthorImage folders?",
   "コピーが完了しました。": "Copy completed.",
   "データの読み込みに失敗しました。詳細はErrorLog.txtをご覧ください。": "Failed to load data. Please see ErrorLog.txt for details.",
