@@ -123,8 +123,16 @@
 
                 if (_previewPictureBox.Image is { Width: > 0, Height: > 0 })
                 {
-                    var aspectRatio = (double)_previewPictureBox.Image.Width / _previewPictureBox.Image.Height;
-                    _previewForm.Width = (int)(_previewForm.Height * aspectRatio);
+                    if (_previewPictureBox.Image.Width > _previewPictureBox.Image.Height)
+                    {
+                        var aspectRatio = (double)_previewPictureBox.Image.Width / _previewPictureBox.Image.Height;
+                        _previewForm.Width = (int)(_previewForm.Height * aspectRatio);
+                    }
+                    else
+                    {
+                        var aspectRatio = (double)_previewPictureBox.Image.Height / _previewPictureBox.Image.Width;
+                        _previewForm.Height = (int)(_previewForm.Width * aspectRatio);
+                    }
                 }
 
                 _previewForm.Controls.Add(_previewPictureBox);
