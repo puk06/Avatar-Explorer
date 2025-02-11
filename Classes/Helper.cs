@@ -31,7 +31,7 @@ namespace Avatar_Explorer.Classes
             var title = json["name"]?.ToString() ?? "";
             var author = json["shop"]?["name"]?.ToString() ?? "";
             var authorUrl = json["shop"]?["url"]?.ToString() ?? "";
-            var imageUrl = json["images"]?[0]?["original"]?.ToString() ?? "";
+            var imageUrl = json["images"]?.Count() > 0 ? json["images"]?[0]?["original"]?.ToString() ?? "" : "";
             var authorIcon = json["shop"]?["thumbnail_url"]?.ToString() ?? "";
             var authorId = GetAuthorId(authorUrl);
             var category = json["category"]?["name"]?.ToString() ?? "";

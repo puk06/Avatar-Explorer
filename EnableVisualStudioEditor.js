@@ -12,3 +12,7 @@ fs.writeFileSync("Forms/AddItem.Designer.cs", replacedData2);
 const data3 = fs.readFileSync("Forms/SelectSupportedAvatar.Designer.cs", "utf-8");
 const replacedData3 = data3.replace(/_mainForm.GuiFont/g, `"${fontName}"`);
 fs.writeFileSync("Forms/SelectSupportedAvatar.Designer.cs", replacedData3);
+
+const data4 = fs.readFileSync("Forms/ManageCommonAvatars.Designer.cs", "utf-8");
+const replacedData4 = data4.replace(/_mainForm.GuiFont/g, `"${fontName}"`);
+fs.writeFileSync("Forms/ManageCommonAvatars.Designer.cs", replacedData4);
