@@ -1138,10 +1138,34 @@ namespace Avatar_Explorer.Forms
             {
                 if (searchFilter.Author.Length != 0 && !searchFilter.Author.Contains(item.AuthorName))
                     return false;
+
                 if (searchFilter.Title.Length != 0 && !searchFilter.Title.Contains(item.Title))
                     return false;
+
                 if (searchFilter.BoothId.Length != 0 && !searchFilter.BoothId.Contains(item.BoothId.ToString()))
                     return false;
+
+                if (searchFilter.Avatar.Length != 0 && !searchFilter.Avatar.Any(avatar =>
+                {
+                    return item.SupportedAvatar.Any(supportedAvatar =>
+                    {
+                        var supportedAvatarName = Helper.GetAvatarNameFromPath(Items, supportedAvatar);
+                        return supportedAvatarName.Contains(avatar);
+                    });
+                }))
+                {
+                    return false;
+                }
+
+                if (searchFilter.Category.Length != 0 && !searchFilter.Category.Any(category =>
+                {
+                    var translatedCategory = Helper.GetCategoryName(item.Type, CurrentLanguage);
+                    return translatedCategory.Contains(category) || item.CustomCategory.Contains(category);
+
+                }))
+                {
+                    return false;
+                }
 
                 return true;
             });
@@ -1765,6 +1789,20 @@ namespace Avatar_Explorer.Forms
             if (searchFilter.BoothId.Length != 0)
             {
                 pathTextArr = pathTextArr.Append("BoothID: " + string.Join(", ", searchFilter.BoothId)).ToArray();
+            }
+
+            if (searchFilter.Avatar.Length != 0)
+            {
+                pathTextArr = pathTextArr.Append(Helper.Translate("アバター", CurrentLanguage) + ": " +
+                                                 string.Join(", ", searchFilter.Avatar))
+                    .ToArray();
+            }
+
+            if (searchFilter.Category.Length != 0)
+            {
+                pathTextArr = pathTextArr.Append(Helper.Translate("カテゴリ", CurrentLanguage) + ": " +
+                                                 string.Join(", ", searchFilter.Category))
+                    .ToArray();
             }
 
             pathTextArr = pathTextArr.Append(string.Join(", ", searchFilter.SearchWords)).ToArray();

@@ -365,6 +365,19 @@ namespace Avatar_Explorer.Classes
         }
 
         /// <summary>
+        /// Get the avatar name from the specified path.
+        /// </summary>
+        /// <param name="items"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string GetAvatarNameFromPath(Item[] items, string? path)
+        {
+            if (string.IsNullOrEmpty(path)) return "";
+            var item = items.FirstOrDefault(x => x.ItemPath == path);
+            return item?.Title ?? "";
+        }
+
+        /// <summary>
         /// Check if the avatar is supported or common.
         /// </summary>
         /// <param name="item"></param>
@@ -412,7 +425,7 @@ namespace Avatar_Explorer.Classes
         public static SearchFilter GetSearchFilter(string searchWord)
         {
             var searchFilter = new SearchFilter();
-            var regex = new Regex(@"(?<key>Author|Title|Booth)=(?:""(?<value>.*?)""|(?<value>[^\s]+))|(?<word>[^\s]+)");
+            var regex = new Regex(@"(?<key>Author|Title|Booth|Avatar|Category)=(?:""(?<value>.*?)""|(?<value>[^\s]+))|(?<word>[^\s]+)");
             var matches = regex.Matches(searchWord);
 
             foreach (Match match in matches)
@@ -432,6 +445,12 @@ namespace Avatar_Explorer.Classes
                             break;
                         case "Booth":
                             searchFilter.BoothId = searchFilter.BoothId.Append(value).ToArray();
+                            break;
+                        case "Avatar":
+                            searchFilter.Avatar = searchFilter.Avatar.Append(value).ToArray();
+                            break;
+                        case "Category":
+                            searchFilter.Category = searchFilter.Category.Append(value).ToArray();
                             break;
                     }
                 }
@@ -585,7 +604,7 @@ namespace Avatar_Explorer.Classes
                     }
 
                     var entryPath = Path.Combine(saveFilePath, entry.Name);
-                    if (entryPath.EndsWith("/"))
+                    if (entryPath.EndsWith('/'))
                     {
                         Directory.CreateDirectory(entryPath);
                     }
@@ -760,7 +779,7 @@ namespace Avatar_Explorer.Classes
                 {
                     i++;
                 }
-                extractFolder = extractFolder + i;
+                extractFolder += i;
                 Directory.CreateDirectory(extractFolder);
             }
 
@@ -768,7 +787,7 @@ namespace Avatar_Explorer.Classes
             foreach (var entry in archive.Entries)
             {
                 var entryPath = Path.Combine(extractFolder, entry.FullName);
-                if (entryPath.EndsWith("/"))
+                if (entryPath.EndsWith('/'))
                 {
                     Directory.CreateDirectory(entryPath);
                 }
