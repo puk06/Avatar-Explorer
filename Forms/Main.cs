@@ -158,7 +158,17 @@ namespace Avatar_Explorer.Forms
 
             var items = Items.Where(item => item.Type == ItemType.Avatar).ToArray();
             if (items.Length == 0) return;
-            items = items.OrderBy(item => item.Title).ToArray();
+
+            items = items.OrderBy(item =>
+            {
+                var mode = SortingBox.SelectedIndex;
+                return mode switch
+                {
+                    0 => item.Title,
+                    1 => item.AuthorName,
+                    _ => item.Title
+                };
+            }).ToArray();
 
             var index = 0;
             foreach (Item item in items)
@@ -723,7 +733,16 @@ namespace Avatar_Explorer.Forms
                 );
             }
 
-            filteredItems = filteredItems.OrderBy(item => item.Title).ToList();
+            filteredItems = filteredItems.OrderBy(item =>
+            {
+                var mode = SortingBox.SelectedIndex;
+                return mode switch
+                {
+                    0 => item.Title,
+                    1 => item.AuthorName,
+                    _ => item.Title
+                };
+            }).ToList();
             if (!filteredItems.Any()) return;
 
             var index = 0;
@@ -2009,6 +2028,12 @@ namespace Avatar_Explorer.Forms
                 ChangeControlFont(control);
             }
 
+            string[] sortingItems = { "ƒ^ƒCƒgƒ‹", "ìŽÒ" };
+            var selected = SortingBox.SelectedIndex;
+            SortingBox.Items.Clear();
+            SortingBox.Items.AddRange(sortingItems.Select(item => Helper.Translate(item, CurrentLanguage)).ToArray());
+            SortingBox.SelectedIndex = selected;
+
             foreach (Control control in AvatarSearchFilterList.Controls)
             {
                 if (string.IsNullOrEmpty(control.Text)) continue;
@@ -2036,6 +2061,8 @@ namespace Avatar_Explorer.Forms
             RefleshWindow();
             PathTextBox.Text = GeneratePath();
         }
+
+        private void SortingBox_SelectedIndexChanged(object sender, EventArgs e) => RefleshWindow();
 
         private void ChangeControlFont(Control control)
         {

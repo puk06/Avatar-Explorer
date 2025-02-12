@@ -140,5 +140,6 @@
   "サムネイルのコピーに一部失敗しています。": "Failed to copy thumbnail.",
   "作者画像のコピーに一部失敗しています。": "Failed to copy author image.",
   "Itemsのコピーに一部失敗しています。": "Failed to copy Items.",
-  "コピー失敗一覧: ": "Copy failure list: "
+  "コピー失敗一覧: ": "Copy failure list: ",
+  "並び替え順": "Sort Order"
 }

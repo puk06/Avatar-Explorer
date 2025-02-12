@@ -49,6 +49,8 @@ namespace Avatar_Explorer.Forms
             LanguageBox = new ComboBox();
             ManageCommonAvatarButton = new Button();
             LoadData = new Button();
+            SortingBox = new ComboBox();
+            SortingLabel = new Label();
             AvatarSearchFilterList.SuspendLayout();
             ExplorerList.SuspendLayout();
             AvatarItemExplorer.SuspendLayout();
@@ -218,7 +220,7 @@ namespace Avatar_Explorer.Forms
             // 
             label2.AutoSize = true;
             label2.Font = new Font("Yu Gothic UI", 13F);
-            label2.Location = new Point(848, 634);
+            label2.Location = new Point(775, 634);
             label2.Name = "label2";
             label2.Size = new Size(142, 25);
             label2.TabIndex = 12;
@@ -230,9 +232,9 @@ namespace Avatar_Explorer.Forms
             LanguageBox.Font = new Font("Yu Gothic UI", 12F);
             LanguageBox.FormattingEnabled = true;
             LanguageBox.Items.AddRange(new object[] { "日本語", "한국어", "English" });
-            LanguageBox.Location = new Point(824, 662);
+            LanguageBox.Location = new Point(785, 662);
             LanguageBox.Name = "LanguageBox";
-            LanguageBox.Size = new Size(196, 29);
+            LanguageBox.Size = new Size(121, 29);
             LanguageBox.TabIndex = 13;
             LanguageBox.SelectedIndex = 0;
             LanguageBox.SelectedIndexChanged += LanguageBox_SelectedIndexChanged;
@@ -259,11 +261,36 @@ namespace Avatar_Explorer.Forms
             LoadData.UseVisualStyleBackColor = true;
             LoadData.Click += LoadData_Click;
             // 
+            // SortingBox
+            // 
+            SortingBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            SortingBox.Font = new Font("Yu Gothic UI", 12F);
+            SortingBox.FormattingEnabled = true;
+            SortingBox.Items.AddRange(new object[] { "タイトル", "作者" });
+            SortingBox.Location = new Point(943, 662);
+            SortingBox.Name = "SortingBox";
+            SortingBox.Size = new Size(121, 29);
+            SortingBox.TabIndex = 17;
+            SortingBox.SelectedIndex = 0;
+            SortingBox.SelectedIndexChanged += SortingBox_SelectedIndexChanged;
+            // 
+            // SortingLabel
+            // 
+            SortingLabel.AutoSize = true;
+            SortingLabel.Font = new Font("Yu Gothic UI", 13F);
+            SortingLabel.Location = new Point(955, 634);
+            SortingLabel.Name = "SortingLabel";
+            SortingLabel.Size = new Size(77, 25);
+            SortingLabel.TabIndex = 16;
+            SortingLabel.Text = "並び替え順";
+            // 
             // Main
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1266, 699);
+            Controls.Add(SortingBox);
+            Controls.Add(SortingLabel);
             Controls.Add(LoadData);
             Controls.Add(ManageCommonAvatarButton);
             Controls.Add(LanguageBox);
@@ -278,11 +305,10 @@ namespace Avatar_Explorer.Forms
             Controls.Add(AvatarSearchFilterList);
             Controls.Add(PathTextBox);
             Controls.Add(UndoButton);
-            FormBorderStyle = FormBorderStyle.Sizable;
-            Resize += Main_Resize;
-            FormClosing += Main_FormClosing;
             Name = "Main";
             Text = "Avatar Explorer";
+            FormClosing += Main_FormClosing;
+            Resize += Main_Resize;
             AvatarSearchFilterList.ResumeLayout(false);
             ExplorerList.ResumeLayout(false);
             AvatarItemExplorer.ResumeLayout(false);
@@ -312,5 +338,7 @@ namespace Avatar_Explorer.Forms
         private ComboBox LanguageBox;
         private Button ManageCommonAvatarButton;
         private Button LoadData;
+        private ComboBox SortingBox;
+        private Label SortingLabel;
     }
 }
