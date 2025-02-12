@@ -2336,7 +2336,7 @@ namespace Avatar_Explorer.Forms
                         }
                     }
 
-                    MessageBox.Show(Helper.Translate("コピーが完了しました。", CurrentLanguage) + "\n" + Helper.Translate("コピー失敗一覧: ", CurrentLanguage) +
+                    MessageBox.Show(Helper.Translate("コピーが完了しました。", CurrentLanguage) + "\n\n" + Helper.Translate("コピー失敗一覧: ", CurrentLanguage) +
                                     (thumbnailResult ? "" : "\n" + Helper.Translate("サムネイルのコピーに一部失敗しています。", CurrentLanguage)) +
                                     (authorImageResult ? "" : "\n" + Helper.Translate("作者画像のコピーに一部失敗しています。", CurrentLanguage)) +
                                     (itemsResult ? "" : "\n" + Helper.Translate("Itemsのコピーに一部失敗しています。", CurrentLanguage)),
