@@ -1562,9 +1562,7 @@ namespace Avatar_Explorer.Forms
         // Generate Path
         private string GeneratePath()
         {
-            var categoryName = Helper.GetCategoryName(CurrentPath.CurrentSelectedCategory, CurrentLanguage);
-            if (CurrentPath.CurrentSelectedCategory == ItemType.Custom)
-                categoryName = CurrentPath.CurrentSelectedCustomCategory;
+            var categoryName = Helper.GetCategoryName(CurrentPath.CurrentSelectedCategory, CurrentLanguage, CurrentPath.CurrentSelectedCustomCategory);
 
             if (_authorMode)
             {
