@@ -13,6 +13,10 @@ if (!fs.existsSync("Datas/Thumbnail")) {
     fs.mkdirSync("Datas/Thumbnail");
 }
 
+if (!fs.existsSync("Datas/Items")) {
+    fs.mkdirSync("Datas/Items");
+}
+
 if (!fs.existsSync("Translate")) {
     fs.mkdirSync("Translate");
 }
