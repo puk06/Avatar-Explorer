@@ -60,7 +60,7 @@ namespace Avatar_Explorer.Classes
         /// <param name="itemType"></param>
         /// <param name="lang"></param>
         /// <returns></returns>
-        public static string GetCategoryName(ItemType itemType, string lang)
+        public static string GetCategoryName(ItemType itemType, string lang, string customCategory = "")
         {
             return itemType switch
             {
@@ -73,6 +73,7 @@ namespace Avatar_Explorer.Classes
                 ItemType.Animation => Translate("アニメーション", lang),
                 ItemType.Tool => Translate("ツール", lang),
                 ItemType.Shader => Translate("シェーダー", lang),
+                ItemType.Custom => customCategory,
                 _ => Translate("不明", lang)
             };
         }
@@ -554,7 +555,7 @@ namespace Avatar_Explorer.Classes
                 progressForm.UpdateProgress(0, Translate("準備中", currentLanguage));
                 var authorName = CheckFilePath(currentPath.CurrentSelectedItem?.AuthorName ?? "Unknown");
                 var itemTitle = CheckFilePath(currentPath.CurrentSelectedItem?.Title ?? "Unknown");
-                var category = GetCategoryName(currentPath.CurrentSelectedCategory, currentLanguage);
+                var category = GetCategoryName(currentPath.CurrentSelectedCategory, currentLanguage, currentPath.CurrentSelectedCustomCategory);
 
                 string saveFolder = Path.Combine("./Datas", "Temp", authorName, itemTitle);
                 string saveFilePath = Path.Combine(saveFolder, $"{Path.GetFileNameWithoutExtension(file.FileName)}_export");
