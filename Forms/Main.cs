@@ -691,7 +691,7 @@ namespace Avatar_Explorer.Forms
                 button.Click += (_, _) =>
                 {
                     CurrentPath.CurrentSelectedCategory = ItemType.Custom;
-                    CurrentPath.CurrentSelectedItemCategory = customCategory;
+                    CurrentPath.CurrentSelectedCustomCategory = customCategory;
                     GenerateItems();
                     PathTextBox.Text = GeneratePath();
                 };
@@ -711,20 +711,20 @@ namespace Avatar_Explorer.Forms
             if (_authorMode)
             {
                 filteredItems = Items.Where(item =>
-                    item.Type == CurrentPath.CurrentSelectedCategory &&
+                    item.Type == CurrentPath.CurrentSelectedCategory && (item.Type != ItemType.Custom || item.CustomCategory == CurrentPath.CurrentSelectedCustomCategory) &&
                     item.AuthorName == CurrentPath.CurrentSelectedAuthor?.AuthorName
                 );
             }
             else if (_categoryMode)
             {
                 filteredItems = Items.Where(item =>
-                    item.Type == CurrentPath.CurrentSelectedCategory
+                    item.Type == CurrentPath.CurrentSelectedCategory && (item.Type != ItemType.Custom || item.CustomCategory == CurrentPath.CurrentSelectedCustomCategory)
                 );
             }
             else
             {
                 filteredItems = Items.Where(item =>
-                    item.Type == CurrentPath.CurrentSelectedCategory &&
+                    item.Type == CurrentPath.CurrentSelectedCategory && (item.Type != ItemType.Custom || item.CustomCategory == CurrentPath.CurrentSelectedCustomCategory) &&
                     (
                         Helper.IsSupportedAvatarOrCommon(item, CommonAvatars, CurrentPath.CurrentSelectedAvatarPath)
                             .IsSupportedOrCommon ||
