@@ -1169,7 +1169,8 @@ namespace Avatar_Explorer.Forms
                     return item.SupportedAvatar.Any(supportedAvatar =>
                     {
                         var supportedAvatarName = Helper.GetAvatarNameFromPath(Items, supportedAvatar);
-                        return supportedAvatarName.Contains(avatar);
+                        if (supportedAvatarName == "") return false;
+                        return supportedAvatarName.ToLower().Contains(avatar.ToLower());
                     });
                 }))
                 {
@@ -1194,7 +1195,12 @@ namespace Avatar_Explorer.Forms
                     searchFilter.SearchWords.All(word =>
                         item.Title.ToLower().Contains(word.ToLower()) ||
                         item.AuthorName.ToLower().Contains(word.ToLower()) ||
-                        item.SupportedAvatar.Any(avatar => avatar.ToLower().Contains(word.ToLower())) ||
+                        item.SupportedAvatar.Any(avatar =>
+                        {
+                            var supportedAvatarName = Helper.GetAvatarNameFromPath(Items, avatar);
+                            if (supportedAvatarName == "") return false;
+                            return supportedAvatarName.ToLower().Contains(word.ToLower());
+                        }) ||
                         item.BoothId.ToString().Contains(word.ToLower())
                     )
                 )
