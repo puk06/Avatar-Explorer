@@ -1,5 +1,4 @@
-﻿
-using Avatar_Explorer.Classes;
+﻿using Avatar_Explorer.Classes;
 
 namespace Avatar_Explorer.Forms
 {
