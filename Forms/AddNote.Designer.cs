@@ -72,6 +72,9 @@
             Controls.Add(EditButton);
             Controls.Add(MemoTextBox);
             Controls.Add(AddMemoLabel);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+            MaximizeBox = false;
+            MinimizeBox = false;
             Name = "AddMemo";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "メモの追加";
