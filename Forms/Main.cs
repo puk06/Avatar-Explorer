@@ -173,9 +173,15 @@ namespace Avatar_Explorer.Forms
             var index = 0;
             foreach (Item item in items)
             {
+                var description = item.Title;
+                if (!string.IsNullOrEmpty(item.ItemMemo))
+                {
+                    description += "\n\n" + Helper.Translate("メモ: ", CurrentLanguage) + item.ItemMemo;
+                }
+
                 Button button = Helper.CreateButton(item.ImagePath, item.Title,
                     Helper.Translate("作者: ", CurrentLanguage) + item.AuthorName, true,
-                    item.Title, GetAvatarListWidth());
+                    description, GetAvatarListWidth());
                 button.Location = new Point(0, (70 * index) + 2);
 
                 EventHandler clickEvent = (_, _) =>
@@ -338,9 +344,29 @@ namespace Avatar_Explorer.Forms
                 toolStripMenuItem4.Click += clickEvent6;
                 toolStripMenuItem4.Disposed += (_, _) => toolStripMenuItem4.Click -= clickEvent6;
 
-                ToolStripMenuItem toolStripMenuItem5 = new(Helper.Translate("削除", CurrentLanguage),
-                    SharedImages.GetImage(SharedImages.Images.TrashIcon));
+                ToolStripMenuItem toolStripMenuItem5 = new(Helper.Translate("メモの追加", CurrentLanguage),
+                    SharedImages.GetImage(SharedImages.Images.EditIcon));
                 EventHandler clickEvent7 = (_, _) =>
+                {
+                    var previouseMemo = item.ItemMemo;
+                    AddNote addMemo = new(this, item);
+                    addMemo.ShowDialog();
+
+                    var memo = addMemo.Memo;
+                    if (string.IsNullOrEmpty(memo) || memo == previouseMemo) return;
+
+                    item.ItemMemo = memo;
+
+                    RefleshWindow();
+                    Helper.SaveItemsData(Items);
+                };
+
+                toolStripMenuItem5.Click += clickEvent7;
+                toolStripMenuItem5.Disposed += (_, _) => toolStripMenuItem5.Click -= clickEvent7;
+
+                ToolStripMenuItem toolStripMenuItem6 = new(Helper.Translate("削除", CurrentLanguage),
+                    SharedImages.GetImage(SharedImages.Images.TrashIcon));
+                EventHandler clickEvent8 = (_, _) =>
                 {
                     DialogResult result = MessageBox.Show(Helper.Translate("本当に削除しますか？", CurrentLanguage),
                         Helper.Translate("確認", CurrentLanguage), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -479,13 +505,14 @@ namespace Avatar_Explorer.Forms
                     }
                 };
 
-                toolStripMenuItem5.Click += clickEvent7;
-                toolStripMenuItem5.Disposed += (_, _) => toolStripMenuItem5.Click -= clickEvent7;
+                toolStripMenuItem6.Click += clickEvent8;
+                toolStripMenuItem6.Disposed += (_, _) => toolStripMenuItem6.Click -= clickEvent8;
 
                 contextMenuStrip.Items.Add(toolStripMenuItem2);
                 contextMenuStrip.Items.Add(toolStripMenuItem3);
                 contextMenuStrip.Items.Add(toolStripMenuItem4);
                 contextMenuStrip.Items.Add(toolStripMenuItem5);
+                contextMenuStrip.Items.Add(toolStripMenuItem6);
                 button.ContextMenuStrip = contextMenuStrip;
 
                 AvatarPage.Controls.Add(button);
@@ -810,7 +837,13 @@ namespace Avatar_Explorer.Forms
                     }
                 }
 
-                Button button = Helper.CreateButton(item.ImagePath, item.Title, authorText, false, item.Title,
+                var description = item.Title;
+                if (!string.IsNullOrEmpty(item.ItemMemo))
+                {
+                    description += "\n\n" + Helper.Translate("メモ: ", CurrentLanguage) + item.ItemMemo;
+                }
+
+                Button button = Helper.CreateButton(item.ImagePath, item.Title, authorText, false, description,
                     GetItemExplorerListWidth());
                 button.Location = new Point(0, (70 * index) + 2);
                 EventHandler clickEvent = (_, _) =>
@@ -1028,9 +1061,30 @@ namespace Avatar_Explorer.Forms
                 toolStripMenuItem4.Click += clickEvent6;
                 toolStripMenuItem4.Disposed += (_, _) => toolStripMenuItem4.Click -= clickEvent6;
 
-                ToolStripMenuItem toolStripMenuItem5 = new(Helper.Translate("削除", CurrentLanguage),
-                    SharedImages.GetImage(SharedImages.Images.TrashIcon));
+                ToolStripMenuItem toolStripMenuItem5 = new(Helper.Translate("メモの追加", CurrentLanguage),
+                    SharedImages.GetImage(SharedImages.Images.EditIcon));
                 EventHandler clickEvent7 = (_, _) =>
+                {
+                    var previouseMemo = item.ItemMemo;
+                    AddNote addMemo = new(this, item);
+                    addMemo.ShowDialog();
+
+                    var memo = addMemo.Memo;
+                    if (string.IsNullOrEmpty(memo) || memo == previouseMemo) return;
+
+                    item.ItemMemo = memo;
+
+                    GenerateAuthorList();
+                    GenerateItems();
+                    Helper.SaveItemsData(Items);
+                };
+
+                toolStripMenuItem5.Click += clickEvent7;
+                toolStripMenuItem5.Disposed += (_, _) => toolStripMenuItem5.Click -= clickEvent7;
+
+                ToolStripMenuItem toolStripMenuItem6 = new(Helper.Translate("削除", CurrentLanguage),
+                    SharedImages.GetImage(SharedImages.Images.TrashIcon));
+                EventHandler clickEvent8 = (_, _) =>
                 {
                     DialogResult result = MessageBox.Show(Helper.Translate("本当に削除しますか？", CurrentLanguage),
                         Helper.Translate("確認", CurrentLanguage), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -1102,13 +1156,14 @@ namespace Avatar_Explorer.Forms
                     Helper.SaveItemsData(Items);
                 };
 
-                toolStripMenuItem5.Click += clickEvent7;
-                toolStripMenuItem5.Disposed += (_, _) => toolStripMenuItem5.Click -= clickEvent7;
+                toolStripMenuItem6.Click += clickEvent8;
+                toolStripMenuItem6.Disposed += (_, _) => toolStripMenuItem6.Click -= clickEvent8;
 
                 contextMenuStrip.Items.Add(toolStripMenuItem2);
                 contextMenuStrip.Items.Add(toolStripMenuItem3);
                 contextMenuStrip.Items.Add(toolStripMenuItem4);
                 contextMenuStrip.Items.Add(toolStripMenuItem5);
+                contextMenuStrip.Items.Add(toolStripMenuItem6);
                 button.ContextMenuStrip = contextMenuStrip;
                 AvatarItemExplorer.Controls.Add(button);
                 index++;
@@ -1269,6 +1324,14 @@ namespace Avatar_Explorer.Forms
                     return false;
                 }
 
+                if (searchFilter.ItemMemo.Length != 0 && !searchFilter.ItemMemo.Any(memo =>
+                    {
+                        return item.ItemMemo.ToLower().Contains(memo.ToLower());
+                    }))
+                {
+                    return false;
+                }
+
                 return true;
             });
 
@@ -1283,7 +1346,8 @@ namespace Avatar_Explorer.Forms
                             if (supportedAvatarName == "") return false;
                             return supportedAvatarName.ToLower().Contains(word.ToLower());
                         }) ||
-                        item.BoothId.ToString().Contains(word.ToLower())
+                        item.BoothId.ToString().Contains(word.ToLower()) ||
+                        item.ItemMemo.ToLower().Contains(word.ToLower())
                     )
                 )
                 .OrderByDescending(item =>
@@ -1293,6 +1357,14 @@ namespace Avatar_Explorer.Forms
                     {
                         if (item.Title.ToLower().Contains(word.ToLower())) matchCount++;
                         if (item.AuthorName.ToLower().Contains(word.ToLower())) matchCount++;
+                        if (item.SupportedAvatar.Any(avatar =>
+                        {
+                            var supportedAvatarName = Helper.GetAvatarNameFromPath(Items, avatar);
+                            if (supportedAvatarName == "") return false;
+                            return supportedAvatarName.ToLower().Contains(word.ToLower());
+                        })) matchCount++;
+                        if (item.BoothId.ToString().Contains(word.ToLower())) matchCount++;
+                        if (item.ItemMemo.ToLower().Contains(word.ToLower())) matchCount++;
                     }
 
                     return matchCount;
@@ -1307,9 +1379,15 @@ namespace Avatar_Explorer.Forms
             var index = 0;
             foreach (Item item in filteredItems)
             {
+                var description = item.Title;
+                if (!string.IsNullOrEmpty(item.ItemMemo))
+                {
+                    description += "\n\n" + Helper.Translate("メモ: ", CurrentLanguage) + item.ItemMemo;
+                }
+
                 Button button = Helper.CreateButton(item.ImagePath, item.Title,
                     Helper.Translate("作者: ", CurrentLanguage) + item.AuthorName, false,
-                    item.Title, GetItemExplorerListWidth());
+                    description, GetItemExplorerListWidth());
                 button.Location = new Point(0, (70 * index) + 2);
                 EventHandler clickEvent = (_, _) =>
                 {
@@ -1524,9 +1602,27 @@ namespace Avatar_Explorer.Forms
                 toolStripMenuItem4.Click += clickEvent6;
                 toolStripMenuItem4.Disposed += (_, _) => toolStripMenuItem4.Click -= clickEvent6;
 
-                ToolStripMenuItem toolStripMenuItem5 = new(Helper.Translate("削除", CurrentLanguage),
-                    SharedImages.GetImage(SharedImages.Images.TrashIcon));
+                ToolStripMenuItem toolStripMenuItem5 = new(Helper.Translate("メモの追加", CurrentLanguage),
+                    SharedImages.GetImage(SharedImages.Images.EditIcon));
                 EventHandler clickEvent7 = (_, _) =>
+                {
+                    var previouseMemo = item.ItemMemo;
+                    AddNote addMemo = new(this, item);
+                    addMemo.ShowDialog();
+
+                    var memo = addMemo.Memo;
+                    if (string.IsNullOrEmpty(memo) || memo == previouseMemo) return;
+
+                    item.ItemMemo = memo;
+
+                    GenerateFilteredItem(searchFilter);
+                    GenerateAvatarList();
+                    Helper.SaveItemsData(Items);
+                };
+
+                ToolStripMenuItem toolStripMenuItem6 = new(Helper.Translate("削除", CurrentLanguage),
+                    SharedImages.GetImage(SharedImages.Images.TrashIcon));
+                EventHandler clickEvent8 = (_, _) =>
                 {
                     DialogResult result = MessageBox.Show(Helper.Translate("本当に削除しますか？", CurrentLanguage),
                         Helper.Translate("確認", CurrentLanguage), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -1579,13 +1675,14 @@ namespace Avatar_Explorer.Forms
                     Helper.SaveItemsData(Items);
                 };
 
-                toolStripMenuItem5.Click += clickEvent7;
-                toolStripMenuItem5.Disposed += (_, _) => toolStripMenuItem5.Click -= clickEvent7;
+                toolStripMenuItem6.Click += clickEvent8;
+                toolStripMenuItem6.Disposed += (_, _) => toolStripMenuItem6.Click -= clickEvent8;
 
                 contextMenuStrip.Items.Add(toolStripMenuItem2);
                 contextMenuStrip.Items.Add(toolStripMenuItem3);
                 contextMenuStrip.Items.Add(toolStripMenuItem4);
                 contextMenuStrip.Items.Add(toolStripMenuItem5);
+                contextMenuStrip.Items.Add(toolStripMenuItem6);
                 button.ContextMenuStrip = contextMenuStrip;
                 AvatarItemExplorer.Controls.Add(button);
                 index++;
@@ -1946,6 +2043,13 @@ namespace Avatar_Explorer.Forms
             {
                 pathTextArr = pathTextArr.Append(Helper.Translate("カテゴリ", CurrentLanguage) + ": " +
                                                  string.Join(", ", searchFilter.Category))
+                    .ToArray();
+            }
+
+            if (searchFilter.ItemMemo.Length != 0)
+            {
+                pathTextArr = pathTextArr.Append(Helper.Translate("メモ", CurrentLanguage) + ": " +
+                                                 string.Join(", ", searchFilter.ItemMemo))
                     .ToArray();
             }
 

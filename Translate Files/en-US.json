@@ -141,5 +141,7 @@
   "作者画像のコピーに一部失敗しています。": "Failed to copy author image.",
   "Itemsのコピーに一部失敗しています。": "Failed to copy Items.",
   "コピー失敗一覧: ": "Copy failure list: ",
-  "並び替え順": "Sort Order"
+  "並び替え順": "Sort Order",
+  "メモの追加": "Add Note",
+  "メモ: ": "Note: "
 }
