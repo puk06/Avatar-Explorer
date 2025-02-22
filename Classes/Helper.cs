@@ -614,7 +614,7 @@ namespace Avatar_Explorer.Classes
                     }
                     else
                     {
-                        if (entry.DataStream == null) continue;
+                        entry.DataStream ??= new MemoryStream();
                         await using var entryStream = File.Create(entryPath);
                         await entry.DataStream.CopyToAsync(entryStream);
                     }
