@@ -2295,8 +2295,8 @@ namespace Avatar_Explorer.Forms
                 ChangeControlFont(control);
             }
 
-            RefleshWindow();
             PathTextBox.Text = GeneratePath();
+            RefleshWindow();
         }
 
         private void SortingBox_SelectedIndexChanged(object sender, EventArgs e) => RefleshWindow();
