@@ -12,7 +12,7 @@ namespace Avatar_Explorer.Forms
     public sealed partial class Main : Form
     {
         // Current Version
-        private const string CurrentVersion = "v1.0.4";
+        private const string CurrentVersion = "v1.0.5";
 
         // Current Version Form Text
         private const string CurrentVersionFormText = $"VRChat Avatar Explorer {CurrentVersion} by ‚Õ‚±‚é‚Ó";
@@ -2276,7 +2276,7 @@ namespace Avatar_Explorer.Forms
                     var supportedAvatar = Helper.EscapeCsv(string.Join(";", avatarNames));
                     var boothId = Helper.EscapeCsv(item.BoothId.ToString());
                     var itemPath = Helper.EscapeCsv(item.ItemPath);
-                    
+
                     sw.WriteLine($"{itemTitle},{authorName},{authorImageFilePath},{imagePath},{type},{memo},{supportedAvatar},{boothId},{itemPath}");
                 }
 
