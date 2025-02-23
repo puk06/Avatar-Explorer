@@ -2256,7 +2256,7 @@ namespace Avatar_Explorer.Forms
                 }
 
                 using var sw = new StreamWriter("./Output/" + fileName, false, Encoding.UTF8);
-                sw.WriteLine("Title,AuthorName,AuthorImageFilePath,ImagePath,Type,SupportedAvatar,BoothId,ItemPath");
+                sw.WriteLine("Title,AuthorName,AuthorImageFilePath,ImagePath,Type,Memo,SupportedAvatar,BoothId,ItemPath");
                 foreach (var item in Items)
                 {
                     string[] avatarNames = Array.Empty<string>();
@@ -2267,8 +2267,17 @@ namespace Avatar_Explorer.Forms
                         avatarNames = avatarNames.Append(avatarName).ToArray();
                     }
 
-                    sw.WriteLine(
-                        $"{item.Title},{item.AuthorName},{item.AuthorImageFilePath},{item.ImagePath},{item.Type},{string.Join(";", avatarNames)},{item.BoothId},{item.ItemPath}");
+                    var itemTitle = Helper.EscapeCsv(item.Title);
+                    var authorName = Helper.EscapeCsv(item.AuthorName);
+                    var authorImageFilePath = Helper.EscapeCsv(item.AuthorImageFilePath);
+                    var imagePath = Helper.EscapeCsv(item.ImagePath);
+                    var type = Helper.EscapeCsv(Helper.GetCategoryName(item.Type, CurrentLanguage, item.CustomCategory));
+                    var memo = Helper.EscapeCsv(item.ItemMemo);
+                    var supportedAvatar = Helper.EscapeCsv(string.Join(";", avatarNames));
+                    var boothId = Helper.EscapeCsv(item.BoothId.ToString());
+                    var itemPath = Helper.EscapeCsv(item.ItemPath);
+                    
+                    sw.WriteLine($"{itemTitle},{authorName},{authorImageFilePath},{imagePath},{type},{memo},{supportedAvatar},{boothId},{itemPath}");
                 }
 
                 MessageBox.Show(Helper.Translate("Outputフォルダにエクスポートが完了しました！\nファイル名: ", CurrentLanguage) + fileName,

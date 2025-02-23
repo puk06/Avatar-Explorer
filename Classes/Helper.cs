@@ -787,17 +787,21 @@ namespace Avatar_Explorer.Classes
                 Directory.CreateDirectory(extractFolder);
             }
 
-            using var archive = ZipFile.OpenRead(zipPath);
+            using var archive = SharpCompress.Archives.Zip.ZipArchive.Open(zipPath);
             foreach (var entry in archive.Entries)
             {
-                var entryPath = Path.Combine(extractFolder, entry.FullName);
-                if (entryPath.EndsWith('/'))
+                if (entry.IsDirectory)
                 {
-                    Directory.CreateDirectory(entryPath);
+                    if (entry.Key == null) continue;
+                    Directory.CreateDirectory(Path.Combine(extractFolder, entry.Key));
                 }
                 else
                 {
-                    entry.ExtractToFile(entryPath, true);
+                    entry.WriteToDirectory(extractFolder, new ExtractionOptions()
+                    {
+                        ExtractFullPath = true,
+                        Overwrite = true
+                    });
                 }
             }
 
@@ -831,6 +835,21 @@ namespace Avatar_Explorer.Classes
                 var temppath = Path.Combine(destDirName, subdir.Name);
                 CopyDirectory(subdir.FullName, temppath);
             }
+        }
+
+        /// <summary>
+        /// Add Escape characters to the CSV.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string EscapeCsv(string value)
+        {
+            if (value.Contains('"') || value.Contains(',') || value.Contains('\n') || value.Contains('\r'))
+            {
+                return "\"" + value.Replace("\"", "\"\"") + "\"";
+            }
+
+            return value;
         }
     }
 }
