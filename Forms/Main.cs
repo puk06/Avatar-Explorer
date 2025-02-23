@@ -1234,19 +1234,61 @@ namespace Avatar_Explorer.Forms
                 button.Location = new Point(0, (70 * index) + 2);
 
                 ContextMenuStrip contextMenuStrip = new();
-                ToolStripMenuItem toolStripMenuItem = new(Helper.Translate("ファイルのパスを開く", CurrentLanguage),
+
+                ToolStripMenuItem toolStripMenuItem = new(Helper.Translate("開く", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.CopyIcon));
                 EventHandler clickEvent = (_, _) =>
                 {
-                    Process.Start("explorer.exe", "/select," + file.FilePath);
+                    try
+                    {
+                        Process.Start(new ProcessStartInfo
+                        {
+                            FileName = file.FilePath,
+                            UseShellExecute = true
+                        });
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            Process.Start("explorer.exe", "/select," + file.FilePath);
+                        }
+                        catch
+                        {
+                            MessageBox.Show(Helper.Translate("ファイルを開けませんでした。", CurrentLanguage),
+                                Helper.Translate("エラー", CurrentLanguage), MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+                        }
+                    }
                 };
 
                 toolStripMenuItem.Click += clickEvent;
                 toolStripMenuItem.Disposed += (_, _) => toolStripMenuItem.Click -= clickEvent;
 
-                contextMenuStrip.Items.Add(toolStripMenuItem);
-                button.ContextMenuStrip = contextMenuStrip;
+                ToolStripMenuItem toolStripMenuItem1 = new(Helper.Translate("ファイルのパスを開く", CurrentLanguage),
+                    SharedImages.GetImage(SharedImages.Images.CopyIcon));
                 EventHandler clickEvent1 = (_, _) =>
+                {
+                    try
+                    {
+                        Process.Start("explorer.exe", "/select," + file.FilePath);
+                    }
+                    catch
+                    {
+                        MessageBox.Show(Helper.Translate("ファイルを開けませんでした。", CurrentLanguage),
+                            Helper.Translate("エラー", CurrentLanguage), MessageBoxButtons.OK,
+                            MessageBoxIcon.Error);
+                    }
+                };
+
+                toolStripMenuItem1.Click += clickEvent1;
+                toolStripMenuItem1.Disposed += (_, _) => toolStripMenuItem1.Click -= clickEvent1;
+
+                contextMenuStrip.Items.Add(toolStripMenuItem);
+                contextMenuStrip.Items.Add(toolStripMenuItem1);
+                button.ContextMenuStrip = contextMenuStrip;
+
+                EventHandler clickEvent2 = (_, _) =>
                 {
                     try
                     {
@@ -1278,8 +1320,8 @@ namespace Avatar_Explorer.Forms
                     }
                 };
 
-                button.Click += clickEvent1;
-                button.Disposed += (_, _) => button.Click -= clickEvent1;
+                button.Click += clickEvent2;
+                button.Disposed += (_, _) => button.Click -= clickEvent2;
 
                 AvatarItemExplorer.Controls.Add(button);
                 index++;
@@ -1728,17 +1770,58 @@ namespace Avatar_Explorer.Forms
                 button.Location = new Point(0, (70 * index) + 2);
 
                 ContextMenuStrip contextMenuStrip = new();
-                ToolStripMenuItem toolStripMenuItem = new(Helper.Translate("ファイルのパスを開く", CurrentLanguage),
+
+                ToolStripMenuItem toolStripMenuItem = new(Helper.Translate("開く", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.CopyIcon));
                 EventHandler clickEvent = (_, _) =>
                 {
-                    Process.Start("explorer.exe", "/select," + file.FilePath);
+                    try
+                    {
+                        Process.Start(new ProcessStartInfo
+                        {
+                            FileName = file.FilePath,
+                            UseShellExecute = true
+                        });
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            Process.Start("explorer.exe", "/select," + file.FilePath);
+                        }
+                        catch
+                        {
+                            MessageBox.Show(Helper.Translate("ファイルを開けませんでした。", CurrentLanguage),
+                                Helper.Translate("エラー", CurrentLanguage), MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+                        }
+                    }
                 };
 
                 toolStripMenuItem.Click += clickEvent;
                 toolStripMenuItem.Disposed += (_, _) => toolStripMenuItem.Click -= clickEvent;
 
+                ToolStripMenuItem toolStripMenuItem1 = new(Helper.Translate("ファイルのパスを開く", CurrentLanguage),
+                    SharedImages.GetImage(SharedImages.Images.CopyIcon));
+                EventHandler clickEvent1 = (_, _) =>
+                {
+                    try
+                    {
+                        Process.Start("explorer.exe", "/select," + file.FilePath);
+                    }
+                    catch
+                    {
+                        MessageBox.Show(Helper.Translate("ファイルを開けませんでした。", CurrentLanguage),
+                            Helper.Translate("エラー", CurrentLanguage), MessageBoxButtons.OK,
+                            MessageBoxIcon.Error);
+                    }
+                };
+
+                toolStripMenuItem1.Click += clickEvent1;
+                toolStripMenuItem1.Disposed += (_, _) => toolStripMenuItem1.Click -= clickEvent1;
+
                 contextMenuStrip.Items.Add(toolStripMenuItem);
+                contextMenuStrip.Items.Add(toolStripMenuItem1);
                 button.ContextMenuStrip = contextMenuStrip;
 
                 EventHandler clickEvent2 = (_, _) =>
