@@ -166,6 +166,8 @@ namespace Avatar_Explorer.Forms
                 {
                     0 => item.Title,
                     1 => item.AuthorName,
+                    2 => item.CreatedDate,
+                    3 => item.UpdatedDate,
                     _ => item.Title
                 };
             }).ToArray();
@@ -814,6 +816,8 @@ namespace Avatar_Explorer.Forms
                 {
                     0 => item.Title,
                     1 => item.AuthorName,
+                    2 => item.CreatedDate,
+                    3 => item.UpdatedDate,
                     _ => item.Title
                 };
             }).ToList();
@@ -2357,7 +2361,7 @@ namespace Avatar_Explorer.Forms
                 ChangeControlFont(control);
             }
 
-            string[] sortingItems = { "タイトル", "作者" };
+            string[] sortingItems = { "タイトル", "作者", "登録日時", "更新日時" };
             var selected = SortingBox.SelectedIndex;
             SortingBox.Items.Clear();
             SortingBox.Items.AddRange(sortingItems.Select(item => Helper.Translate(item, CurrentLanguage)).ToArray());
