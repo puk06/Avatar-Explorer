@@ -250,8 +250,6 @@ namespace Avatar_Explorer.Classes
         /// <param name="items"></param>
         public static void SaveItemsData(Item[] items)
         {
-            UpdateEmptyDates(items); // 空の日付を現在の日時に更新
-
             using var sw = new StreamWriter("./Datas/ItemsData.json");
             sw.Write(JsonSerializer.Serialize(items, new JsonSerializerOptions { WriteIndented = true }));
         }
@@ -858,7 +856,8 @@ namespace Avatar_Explorer.Classes
         /// 空の登録日時と更新日時を現在の日時で埋める
         /// </summary>
         /// <param name="items"></param>
-        private static void UpdateEmptyDates(Item[] items)
+        /// <returns></returns>
+        public static Item[] UpdateEmptyDates(Item[] items)
         {
             string now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
@@ -868,11 +867,14 @@ namespace Avatar_Explorer.Classes
                 {
                     item.CreatedDate = now;
                 }
+
                 if (string.IsNullOrEmpty(item.UpdatedDate))
                 {
                     item.UpdatedDate = now;
                 }
             }
+
+            return items;
         }
     }
 }

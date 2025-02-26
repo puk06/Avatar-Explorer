@@ -94,6 +94,9 @@ namespace Avatar_Explorer.Forms
                 // Fix Supported Avatar Path (Title => Path)
                 Items = Helper.FixSupportedAvatarPath(Items);
 
+                // Update Empty Dates
+                Items = Helper.UpdateEmptyDates(Items);
+
                 AddFontFile();
                 CustomCategories = Helper.LoadCustomCategoriesData();
                 InitializeComponent();
@@ -172,6 +175,17 @@ namespace Avatar_Explorer.Forms
             foreach (Item item in items)
             {
                 var description = item.Title;
+
+                if (!string.IsNullOrEmpty(item.CreatedDate))
+                {
+                    description += "\n" + Helper.Translate("ìoò^ì˙éû", CurrentLanguage) + ": " + item.CreatedDate;
+                }
+
+                if (!string.IsNullOrEmpty(item.UpdatedDate))
+                {
+                    description += "\n" + Helper.Translate("çXêVì˙éû", CurrentLanguage) + ": " + item.UpdatedDate;
+                }
+
                 if (!string.IsNullOrEmpty(item.ItemMemo))
                 {
                     description += "\n\n" + Helper.Translate("ÉÅÉÇ: ", CurrentLanguage) + item.ItemMemo;
@@ -835,6 +849,17 @@ namespace Avatar_Explorer.Forms
                 }
 
                 var description = item.Title;
+
+                if (!string.IsNullOrEmpty(item.CreatedDate))
+                {
+                    description += "\n" + Helper.Translate("ìoò^ì˙éû", CurrentLanguage) + ": " + item.CreatedDate;
+                }
+
+                if (!string.IsNullOrEmpty(item.UpdatedDate))
+                {
+                    description += "\n" + Helper.Translate("çXêVì˙éû", CurrentLanguage) + ": " + item.UpdatedDate;
+                }
+
                 if (!string.IsNullOrEmpty(item.ItemMemo))
                 {
                     description += "\n\n" + Helper.Translate("ÉÅÉÇ: ", CurrentLanguage) + item.ItemMemo;
@@ -1419,6 +1444,17 @@ namespace Avatar_Explorer.Forms
             foreach (Item item in filteredItems)
             {
                 var description = item.Title;
+
+                if (!string.IsNullOrEmpty(item.CreatedDate))
+                {
+                    description += "\n" + Helper.Translate("ìoò^ì˙éû", CurrentLanguage) + ": " + item.CreatedDate;
+                }
+
+                if (!string.IsNullOrEmpty(item.UpdatedDate))
+                {
+                    description += "\n" + Helper.Translate("çXêVì˙éû", CurrentLanguage) + ": " + item.UpdatedDate;
+                }
+
                 if (!string.IsNullOrEmpty(item.ItemMemo))
                 {
                     description += "\n\n" + Helper.Translate("ÉÅÉÇ: ", CurrentLanguage) + item.ItemMemo;
@@ -2497,6 +2533,7 @@ namespace Avatar_Explorer.Forms
                     {
                         Items = Helper.LoadItemsData(filePath);
                         Items = Helper.FixSupportedAvatarPath(Items);
+                        Items = Helper.UpdateEmptyDates(Items);
                         Helper.SaveItemsData(Items);
                     }
 
@@ -2563,6 +2600,7 @@ namespace Avatar_Explorer.Forms
                     {
                         Items = Helper.LoadItemsData(filePath);
                         Items = Helper.FixSupportedAvatarPath(Items);
+                        Items = Helper.UpdateEmptyDates(Items);
                         Helper.SaveItemsData(Items);
                     }
 
