@@ -16,5 +16,7 @@
         public ItemType Type { get; set; }
         public string CustomCategory { get; set; } = "";
         public string[] SupportedAvatar { get; set; } = Array.Empty<string>();
+        public string CreatedDate { get; set; } = "";
+        public string UpdatedDate { get; set; } = "";
     }
 }

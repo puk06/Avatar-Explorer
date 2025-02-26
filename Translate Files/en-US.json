@@ -145,5 +145,7 @@
   "メモの追加": "Add Note",
   "メモ: ": "Note: ",
   "メモ": "Note",
-  "開く": "Open"
+  "開く": "Open",
+  "登録日時": "CreatedDate",
+  "更新日時": "UpdatedDate"
 }

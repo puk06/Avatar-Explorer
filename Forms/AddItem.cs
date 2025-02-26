@@ -281,6 +281,19 @@ namespace Avatar_Explorer.Forms
                 }
             }
 
+            // 日付更新
+            string now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+            if (_edit)
+            {
+                Item.UpdatedDate = now;
+            }
+            else
+            {
+                Item.CreatedDate = now;
+                Item.UpdatedDate = now;
+            }
+
             if (_edit)
             {
                 // 同じパスのものを削除してから追加

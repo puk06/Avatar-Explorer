@@ -266,7 +266,7 @@ namespace Avatar_Explorer.Forms
             SortingBox.DropDownStyle = ComboBoxStyle.DropDownList;
             SortingBox.Font = new Font("Yu Gothic UI", 12F);
             SortingBox.FormattingEnabled = true;
-            SortingBox.Items.AddRange(new object[] { "タイトル", "作者" });
+            SortingBox.Items.AddRange(new object[] { "タイトル", "作者", "登録日時", "更新日時" });
             SortingBox.Location = new Point(943, 662);
             SortingBox.Name = "SortingBox";
             SortingBox.Size = new Size(121, 29);

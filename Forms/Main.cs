@@ -159,16 +159,14 @@ namespace Avatar_Explorer.Forms
             var items = Items.Where(item => item.Type == ItemType.Avatar).ToArray();
             if (items.Length == 0) return;
 
-            items = items.OrderBy(item =>
+            items = SortingBox.SelectedIndex switch
             {
-                var mode = SortingBox.SelectedIndex;
-                return mode switch
-                {
-                    0 => item.Title,
-                    1 => item.AuthorName,
-                    _ => item.Title
-                };
-            }).ToArray();
+                0 => items.OrderBy(item => item.Title).ToArray(),
+                1 => items.OrderBy(item => item.AuthorName).ToArray(),
+                2 => items.OrderByDescending(item => item.CreatedDate).ToArray(),
+                3 => items.OrderByDescending(item => item.UpdatedDate).ToArray(),
+                _ => items.OrderBy(item => item.Title).ToArray(),
+            };
 
             var index = 0;
             foreach (Item item in items)
@@ -807,16 +805,15 @@ namespace Avatar_Explorer.Forms
                 );
             }
 
-            filteredItems = filteredItems.OrderBy(item =>
+            filteredItems = SortingBox.SelectedIndex switch
             {
-                var mode = SortingBox.SelectedIndex;
-                return mode switch
-                {
-                    0 => item.Title,
-                    1 => item.AuthorName,
-                    _ => item.Title
-                };
-            }).ToList();
+                0 => filteredItems.OrderBy(item => item.Title).ToArray(),
+                1 => filteredItems.OrderBy(item => item.AuthorName).ToArray(),
+                2 => filteredItems.OrderByDescending(item => item.CreatedDate).ToArray(),
+                3 => filteredItems.OrderByDescending(item => item.UpdatedDate).ToArray(),
+                _ => filteredItems.OrderBy(item => item.Title).ToArray(),
+            };
+
             if (!filteredItems.Any()) return;
 
             var index = 0;
@@ -2357,7 +2354,7 @@ namespace Avatar_Explorer.Forms
                 ChangeControlFont(control);
             }
 
-            string[] sortingItems = { "タイトル", "作者" };
+            string[] sortingItems = { "タイトル", "作者", "登録日時", "更新日時" };
             var selected = SortingBox.SelectedIndex;
             SortingBox.Items.Clear();
             SortingBox.Items.AddRange(sortingItems.Select(item => Helper.Translate(item, CurrentLanguage)).ToArray());
