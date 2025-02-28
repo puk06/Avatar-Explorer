@@ -18,7 +18,7 @@ namespace Avatar_Explorer.Classes
         private static readonly Dictionary<string, Dictionary<string, string>> TranslateData = new();
 
         /// <summary>
-        /// Returns the item data of the booth.
+        ///　Boothのアイテム情報を取得します。
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -55,7 +55,7 @@ namespace Avatar_Explorer.Classes
         }
 
         /// <summary>
-        /// Returns Translated Category Name from ItemType.
+        /// 翻訳されたカテゴリー名を取得します。
         /// </summary>
         /// <param name="itemType"></param>
         /// <param name="lang"></param>
@@ -79,7 +79,7 @@ namespace Avatar_Explorer.Classes
         }
 
         /// <summary>
-        ///  Returns FolderData of the specified folder.
+        /// 指定されたパスからアイテムフォルダー情報を取得します。
         /// </summary>
         /// <param name="path"></param>
         /// <param name="materialPath"></param>
@@ -140,7 +140,7 @@ namespace Avatar_Explorer.Classes
         }
 
         /// <summary>
-        /// Create a button with the specified parameters.
+        ///　渡された情報からアイテム用のボタンを生成します。
         /// </summary>
         /// <param name="imagePath"></param>
         /// <param name="labelTitle"></param>
@@ -178,6 +178,12 @@ namespace Avatar_Explorer.Classes
             return button;
         }
 
+        /// <summary>
+        /// アイテムのデフォルトタイプを推測、取得します。
+        /// </summary>
+        /// <param name="title"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static ItemType GetItemType(string title, string type)
         {
             var titleMappings = new Dictionary<string[], ItemType>
@@ -218,14 +224,14 @@ namespace Avatar_Explorer.Classes
         }
 
         /// <summary>
-        /// Remove spaces and slashes from the string.
+        /// 文字列からスペースを削除し、アンダースコアに変換します。
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
         public static string RemoveFormat(string str) => str.Replace(' ', '_').Replace('/', '-');
 
         /// <summary>
-        /// Load the item data from the specified path.
+        /// 指定されたパスからアイテムデータを取得します。
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
@@ -245,7 +251,7 @@ namespace Avatar_Explorer.Classes
         }
 
         /// <summary>
-        /// Save the item data to the specified path.
+        /// アイテムデータを保存します。
         /// </summary>
         /// <param name="items"></param>
         public static void SaveItemsData(Item[] items)
@@ -255,7 +261,7 @@ namespace Avatar_Explorer.Classes
         }
 
         /// <summary>
-        /// Load the common avatar data from the specified path.
+        /// 指定されたパスから共通素体データを取得します。
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
@@ -275,7 +281,7 @@ namespace Avatar_Explorer.Classes
         }
 
         /// <summary>
-        /// Save the common avatar data to the specified path.
+        /// 共通素体データを保存します。
         /// </summary>
         /// <param name="commonAvatars"></param>
         public static void SaveCommonAvatarData(CommonAvatar[] commonAvatars)
@@ -284,10 +290,15 @@ namespace Avatar_Explorer.Classes
             sw.Write(JsonSerializer.Serialize(commonAvatars, new JsonSerializerOptions { WriteIndented = true }));
         }
 
+        /// <summary>
+        /// DragEnterイベントを処理します。
+        /// </summary>
+        /// <param name="_"></param>
+        /// <param name="e"></param>
         public static void DragEnter(object _, DragEventArgs e) => e.Effect = DragDropEffects.All;
 
         /// <summary>
-        /// Resize the image to the specified size.
+        /// 画像を指定されたサイズにリサイズします。
         /// </summary>
         /// <param name="imagePath"></param>
         /// <param name="width"></param>
@@ -305,7 +316,7 @@ namespace Avatar_Explorer.Classes
         }
 
         /// <summary>
-        /// Translate the string to the specified language.
+        /// 文字列を指定された言語に翻訳します。なければそのまま返します。
         /// </summary>
         /// <param name="str"></param>
         /// <param name="to"></param>
@@ -318,6 +329,11 @@ namespace Avatar_Explorer.Classes
             return data.TryGetValue(str, out var translated) ? translated : str;
         }
 
+        /// <summary>
+        /// 翻訳データを取得します。
+        /// </summary>
+        /// <param name="lang"></param>
+        /// <returns></returns>
         private static Dictionary<string, string> GetTranslateData(string lang)
         {
             if (TranslateData.TryGetValue(lang, out var data)) return data;
@@ -329,7 +345,7 @@ namespace Avatar_Explorer.Classes
         }
 
         /// <summary>
-        /// Fix the supported avatar path.
+        /// 対応アバターのパスを修正します(前のバージョンからの移行用)。
         /// </summary>
         /// <param name="items"></param>
         /// <returns></returns>
@@ -352,7 +368,7 @@ namespace Avatar_Explorer.Classes
         }
 
         /// <summary>
-        /// Get the avatar name from the specified path.
+        ///　指定されたパスからアバター名を取得します。なければnullを返します。
         /// </summary>
         /// <param name="items"></param>
         /// <param name="path"></param>
@@ -366,7 +382,7 @@ namespace Avatar_Explorer.Classes
         }
 
         /// <summary>
-        /// Get the avatar name from the specified path.
+        ///　指定されたパスからアバター名を取得します。なければ空文字を返します。
         /// </summary>
         /// <param name="items"></param>
         /// <param name="path"></param>
@@ -379,7 +395,7 @@ namespace Avatar_Explorer.Classes
         }
 
         /// <summary>
-        /// Check if the avatar is supported or common.
+        /// 指定されたアイテムがタウ王アバターかどうか、共通素体グループに入っているかどうかを取得します。
         /// </summary>
         /// <param name="item"></param>
         /// <param name="commonAvatars"></param>
@@ -409,17 +425,39 @@ namespace Avatar_Explorer.Classes
             }
         }
 
+        /// <summary>
+        /// 対応アバターかどうか、共通素体に含まれているか、どちらかを取得します。
+        /// </summary>
         public class SupportedOrCommonAvatar
         {
+            /// <summary>
+            /// 対応アバターかどうかを取得または設定します。
+            /// </summary>
             public bool IsSupported { get; set; }
+
+            /// <summary>
+            /// 共通素体グループに含まれているかどうかを取得または設定します。
+            /// </summary>
             public bool IsCommon { get; set; }
+
+            /// <summary>
+            /// 対応アバターか共通素体に含まれているかどうかを取得します。
+            /// </summary>
             public bool IsSupportedOrCommon => IsSupported || IsCommon;
+
+            /// <summary>
+            /// 共通素体に含まれているが対応アバターではないかどうかを取得します。
+            /// </summary>
             public bool OnlyCommon => IsCommon && !IsSupported;
+
+            /// <summary>
+            /// もし共通素体グループに入っていれば、そのグループの名前を取得または設定します。
+            /// </summary>
             public string CommonAvatarName { get; set; } = "";
         }
 
         /// <summary>
-        /// Get the search filter from the specified search word.
+        /// 検索用フィルターを取得します。
         /// </summary>
         /// <param name="searchWord"></param>
         /// <returns></returns>
@@ -468,7 +506,7 @@ namespace Avatar_Explorer.Classes
         }
 
         /// <summary>
-        /// Backup the specified path.
+        ///　指定されたファイルをバックアップします。
         /// </summary>
         /// <param name="path"></param>
         public static void Backup(string[] path)
@@ -496,7 +534,7 @@ namespace Avatar_Explorer.Classes
         }
 
         /// <summary>
-        /// Get the current language code.
+        /// 言語名からBoothのリンクの言語コードを取得します。
         /// </summary>
         /// <param name="language"></param>
         /// <returns></returns>
@@ -512,7 +550,7 @@ namespace Avatar_Explorer.Classes
         }
 
         /// <summary>
-        /// Error log output.
+        /// 渡されたエラーを記録します。
         /// </summary>
         /// <param name="message"></param>
         /// <param name="exception"></param>
@@ -531,7 +569,7 @@ namespace Avatar_Explorer.Classes
         }
 
         /// <summary>
-        /// Check if the specified path is a Valid Path.
+        /// ファイル名が正常かどうかをチェックします。あれば正常なファイル名を返します。
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
@@ -542,7 +580,7 @@ namespace Avatar_Explorer.Classes
         }
 
         /// <summary>
-        /// Modify the UnityPackage file path.
+        /// パスを変更したUnityPackageファイルを作成します。
         /// </summary>
         /// <param name="file"></param>
         /// <param name="currentPath"></param>
@@ -662,6 +700,9 @@ namespace Avatar_Explorer.Classes
             }
         }
 
+        /// <summary>
+        /// 進捗状況を表示するフォーム
+        /// </summary>
         private sealed class ProgressForm : Form
         {
             private readonly ProgressBar _progressBar;
@@ -713,6 +754,12 @@ namespace Avatar_Explorer.Classes
             }
         }
 
+        /// <summary>
+        /// Tarファイルを作成します。
+        /// </summary>
+        /// <param name="sourceFolder"></param>
+        /// <param name="outputTarFile"></param>
+        /// <exception cref="DirectoryNotFoundException"></exception>
         private static void CreateTarArchive(string sourceFolder, string outputTarFile)
         {
             if (!Directory.Exists(sourceFolder))
@@ -733,7 +780,7 @@ namespace Avatar_Explorer.Classes
         }
 
         /// <summary>
-        /// Set the custom categories.
+        /// 指定されたパスからカスタムカテゴリーデータを取得します。
         /// </summary>
         /// <returns></returns>
         public static string[] LoadCustomCategoriesData(string path = "./Datas/CustomCategory.txt")
@@ -751,7 +798,7 @@ namespace Avatar_Explorer.Classes
         }
 
         /// <summary>
-        /// Save the custom categories.
+        /// カスタムカテゴリーデータを保存します。
         /// </summary>
         /// <param name="customCategories"></param>
         public static void SaveCustomCategoriesData(string[] customCategories)
@@ -764,7 +811,7 @@ namespace Avatar_Explorer.Classes
         }
 
         /// <summary>
-        /// Extract the zip file.
+        /// zipファイルを指定されたフォルダに展開します。
         /// </summary>
         /// <param name="zipPath"></param>
         /// <param name="extractPath"></param>
@@ -809,7 +856,7 @@ namespace Avatar_Explorer.Classes
         }
 
         /// <summary>
-        /// Copy the directory.
+        /// フォルダを指定されたパスにコピーします。
         /// </summary>
         /// <param name="sourceDirName"></param>
         /// <param name="destDirName"></param>
@@ -838,7 +885,7 @@ namespace Avatar_Explorer.Classes
         }
 
         /// <summary>
-        /// Add Escape characters to the CSV.
+        /// 文字列をCSV形式にエスケープします。
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -853,7 +900,7 @@ namespace Avatar_Explorer.Classes
         }
 
         /// <summary>
-        /// 空の登録日時と更新日時を現在の日時で埋める
+        /// 空の登録日時と更新日時を現在の日時で埋めます。
         /// </summary>
         /// <param name="items"></param>
         /// <returns></returns>

@@ -4,10 +4,25 @@ namespace Avatar_Explorer.Forms
 {
     public sealed partial class ManageCommonAvatars : Form
     {
+        /// <summary>
+        /// メインフォームを取得または設定します。
+        /// </summary>
         private readonly Main _mainForm;
+
+        /// <summary>
+        /// ファイルアイコンのイメージを取得します。
+        /// </summary>
         private static readonly Image FileImage = Image.FromStream(new MemoryStream(Properties.Resources.FileIcon));
+
+        /// <summary>
+        /// 共通素体のリストを取得または設定します。
+        /// </summary>
         private CommonAvatar[] _commonAvatars;
 
+        /// <summary>
+        /// 共通素体の管理フォームを初期化します。
+        /// </summary>
+        /// <param name="mainform"></param>
         public ManageCommonAvatars(Main mainform)
         {
             _mainForm = mainform;
@@ -43,7 +58,9 @@ namespace Avatar_Explorer.Forms
             RefleshCommonAvatarButtonColor();
         }
 
-        // 下のアバターリストの作成
+        /// <summary>
+        /// フォーム内のアバターリストを生成します。
+        /// </summary>
         private void GenerateAvatarList()
         {
             AvatarList.Controls.Clear();
@@ -71,7 +88,12 @@ namespace Avatar_Explorer.Forms
             }
         }
 
-        // アバターリストのボタン作成
+        /// <summary>
+        /// アバターのボタンを生成します。
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="language"></param>
+        /// <returns></returns>
         private static Button CreateAvatarButton(Item item, string language)
         {
             CustomItemButton button = new CustomItemButton(875);
@@ -91,15 +113,26 @@ namespace Avatar_Explorer.Forms
             return button;
         }
 
-        // 共通素体グループ名から共通素体を取得
+        /// <summary>
+        /// 共通素体グループ名から共通素体のリストを取得します。
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         private CommonAvatar? GetCommonAvatar(string? name) => string.IsNullOrWhiteSpace(name)
             ? null
             : _commonAvatars.FirstOrDefault(commonAvatar => commonAvatar.Name == name);
 
-        // 共通素体テキストボックス
+        /// <summary>
+        /// 共通素体コンボボックスのテキストが変更されたときに呼び出されます。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CommonAvatarsCombobox_TextChanged(object sender, EventArgs e) =>
             RefleshCommonAvatarButtonColor();
 
+        /// <summary>
+        /// 共通素体のボタンの色を現在の共通素体グループから更新します。
+        /// </summary>
         private void RefleshCommonAvatarButtonColor()
         {
 
@@ -118,7 +151,11 @@ namespace Avatar_Explorer.Forms
             }
         }
 
-        // 共通素体グループ削除ボタン
+        /// <summary>
+        /// 共通素体グループを削除します。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DeleteSelectedGroupButton_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(CommonAvatarsCombobox.Text))
@@ -147,7 +184,11 @@ namespace Avatar_Explorer.Forms
             RefleshCommonAvatarButtonColor();
         }
 
-        // 共通素体追加ボタン
+        /// <summary>
+        /// 共通素体グループを追加するボタンが押されたときに呼び出されます。
+        /// </summary>
+        /// <param name="o"></param>
+        /// <param name="e"></param>
         private void AddButton_Click(object o, EventArgs e)
         {
             var name = CommonAvatarsCombobox.Text;

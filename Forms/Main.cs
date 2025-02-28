@@ -11,53 +11,112 @@ namespace Avatar_Explorer.Forms
 {
     public sealed partial class Main : Form
     {
-        // Current Version
+
+        #region フォームのテキスト関連の変数
+        /// <summary>
+        /// ソフトの現在のバージョン
+        /// </summary>
         private const string CurrentVersion = "v1.0.5";
 
-        // Current Version Form Text
+        /// <summary>
+        /// デフォルトのフォームテキスト
+        /// </summary>
         private const string CurrentVersionFormText = $"VRChat Avatar Explorer {CurrentVersion} by ぷこるふ";
+        #endregion
 
-        // Min Resize Font Size
-        private const float MinFontSize = 8f;
-
-        // Backup Interval
-        private const int BackupInterval = 300000; // 5 Minutes
-
-        // Items Data
+        #region ソフトのデータベース関連の変数
+        /// <summary>
+        /// アイテムデータベース
+        /// </summary>
         public Item[] Items;
 
-        // Common Avatars
+        /// <summary>
+        /// 共通素体データベース
+        /// </summary>
         public CommonAvatar[] CommonAvatars;
 
-        // Custom Categories
+        /// <summary>
+        /// カスタムカテゴリーデータベース
+        /// </summary>
         public string[] CustomCategories;
+        #endregion
 
-        // Current Path
-        public CurrentPath CurrentPath = new();
+        #region フォント関連の変数
 
-        // Font
+        /// <summary>
+        /// フォントコレクション
+        /// </summary>
         private readonly PrivateFontCollection _fontCollection = new();
+
+        /// <summary>
+        /// フォントファミリー
+        /// </summary>
         private readonly Dictionary<string, FontFamily> _fontFamilies = new();
+
+        /// <summary>
+        /// フォームのGUIフォント
+        /// </summary>
         public FontFamily? GuiFont;
+        #endregion
 
-        // Language
-        public string CurrentLanguage = "ja-JP";
+        #region 現在のウィンドウの種類に関する変数
 
-        // Search Mode
+        /// <summary>
+        /// 現在開かれているウィンドウが作者モードかどうかを取得または設定します。
+        /// </summary>
         private bool _authorMode;
+
+        /// <summary>
+        /// 現在開かれているウィンドウがカテゴリーモードかどうかを取得または設定します。
+        /// </summary>
         private bool _categoryMode;
 
+        /// <summary>
+        /// 現在開いているメイン画面ウィンドウタイプ
+        /// </summary>
         private Window _openingWindow = Window.Nothing;
+        #endregion
 
-        // Dictionary For Resize Controls
+        #region フォームリサイズ関連の変数
+
+        /// <summary>
+        /// フォントを変更する際の最小フォントサイズ
+        /// </summary>
+        private const float MinFontSize = 8f;
+
+        /// <summary>
+        /// フォームリサイズ時に使用されるコントロール名のディクショナリー
+        /// </summary>
         private readonly Dictionary<string, string> _controlNames = new();
+
+        /// <summary>
+        /// フォームリサイズ時に使用されるコントロールのデフォルトサイズ
+        /// </summary>
         private readonly Dictionary<string, SizeF> _defaultControlSize = new();
+
+        /// <summary>
+        /// フォームリサイズ時に使用されるコントロールのデフォルト位置
+        /// </summary>
         private readonly Dictionary<string, PointF> _defaultControlLocation = new();
+
+        /// <summary>
+        /// フォームリサイズ時に使用されるコントロールのデフォルトフォントサイズ
+        /// </summary>
         private readonly Dictionary<string, float> _defaultFontSize = new();
 
-        // Initial Form, AvatarSearchFilterList, AvatarItemExplorer Size
+        /// <summary>
+        /// フォームの初期サイズ
+        /// </summary>
         private readonly Size _initialFormSize;
+
+        /// <summary>
+        ///　メイン画面左のアバター欄の初期幅
+        /// </summary>
         private readonly int _baseAvatarSearchFilterListWidth;
+
+        /// <summary>
+        /// メイン画面右のアイテム欄の初期幅
+        /// </summary>
         private readonly int _baseAvatarItemExplorerListWidth;
 
         /// <summary>
@@ -71,19 +130,53 @@ namespace Avatar_Explorer.Forms
         /// </summary>
         /// <returns>ItemExplorerList Width</returns>
         private int GetItemExplorerListWidth() => AvatarItemExplorer.Width - _baseAvatarItemExplorerListWidth;
+        #endregion
 
-        // Last Backup Time
+        #region バックアップ関連の変数
+
+        /// <summary>
+        /// バックアップする間隔(ms)
+        /// </summary>
+        private const int BackupInterval = 300000; // 5 Minutes
+
+        /// <summary>
+        /// 最後のバックアップ時刻を取得または設定します。
+        /// </summary>
         private DateTime _lastBackupTime;
 
-        // Last Backup Error
+        /// <summary>
+        /// 最後のバックアップ時にエラーが発生したかどうかを取得または設定します。
+        /// </summary>
         private bool _lastBackupError;
+        #endregion
 
-        // Searching Bool
+        #region ソフトのステータスに関する変数
+        /// <summary>
+        /// 現在のソフトの言語
+        /// </summary>
+        public string CurrentLanguage = "ja-JP";
+
+        /// <summary>
+        /// 現在のパス
+        /// </summary>
+        public CurrentPath CurrentPath = new();
+
+        /// <summary>
+        /// 検索中かどうかを取得または設定します。
+        /// </summary>
         private bool _isSearching;
 
-        // Initialized Bool
+        /// <summary>
+        /// フォームが初期化されたかどうかを取得します。
+        /// </summary>
         private readonly bool _initialized;
+        #endregion
 
+        #region フォームの初期化
+
+        /// <summary>
+        /// メインフォームを初期化します。
+        /// </summary>
         public Main()
         {
             try
@@ -126,6 +219,9 @@ namespace Avatar_Explorer.Forms
             }
         }
 
+        /// <summary>
+        /// フォントファイルをソフトに追加します。
+        /// </summary>
         private void AddFontFile()
         {
             string[] fontFiles = Directory.GetFiles("./Datas/Fonts", "*.ttf");
@@ -153,8 +249,13 @@ namespace Avatar_Explorer.Forms
             var newFont = _fontFamilies.TryGetValue(CurrentLanguage, out var family) ? family : _fontFamilies["ja-JP"];
             GuiFont = newFont;
         }
+        #endregion
 
-        // Generate List (LEFT)
+        #region 左のリスト関連の処理
+
+        /// <summary>
+        /// メイン画面左のアバター欄を作成します。
+        /// </summary>
         private void GenerateAvatarList()
         {
             ResetAvatarPage(AvatarPage);
@@ -455,7 +556,7 @@ namespace Avatar_Explorer.Forms
                                 SearchBox.Text = "";
                                 SearchResultLabel.Text = "";
                                 _isSearching = false;
-                                ResetAvatarList(true);
+                                ResetAvatarExplorer(true);
                                 PathTextBox.Text = GeneratePath();
                                 Helper.SaveItemsData(Items);
                                 return;
@@ -487,7 +588,7 @@ namespace Avatar_Explorer.Forms
                         // アバターが選択された状態(CurrentSelectedAvatarPathとして設定されている時)
                         if (undo2)
                         {
-                            ResetAvatarList(true);
+                            ResetAvatarExplorer(true);
                             PathTextBox.Text = GeneratePath();
                             Helper.SaveItemsData(Items);
                             return;
@@ -532,6 +633,9 @@ namespace Avatar_Explorer.Forms
             }
         }
 
+        /// <summary>
+        /// メイン画面左の作者欄を作成します。
+        /// </summary>
         private void GenerateAuthorList()
         {
             ResetAvatarPage(AvatarAuthorPage);
@@ -619,6 +723,9 @@ namespace Avatar_Explorer.Forms
             }
         }
 
+        /// <summary>
+        /// メイン画面左のカテゴリー欄を作成します。
+        /// </summary>
         private void GenerateCategoryListLeft()
         {
             ResetAvatarPage(CategoryPage);
@@ -690,12 +797,16 @@ namespace Avatar_Explorer.Forms
                 index++;
             }
         }
+        #endregion
 
-        // Generate List (RIGHT)
+        #region 右のリスト関連の処理
+        /// <summary>
+        /// メイン画面右のカテゴリ欄を作成します。
+        /// </summary>
         private void GenerateCategoryList()
         {
             _openingWindow = Window.ItemCategoryList;
-            ResetAvatarList();
+            ResetAvatarExplorer();
 
             var index = 0;
             foreach (ItemType itemType in Enum.GetValues(typeof(ItemType)))
@@ -787,10 +898,13 @@ namespace Avatar_Explorer.Forms
             }
         }
 
+        /// <summary>
+        /// メイン画面右のアイテム欄を作成します。
+        /// </summary>
         private void GenerateItems()
         {
             _openingWindow = Window.ItemList;
-            ResetAvatarList();
+            ResetAvatarExplorer();
 
             var filteredItems = Items.AsEnumerable();
 
@@ -1168,7 +1282,7 @@ namespace Avatar_Explorer.Forms
                         GenerateAvatarList();
                         GenerateAuthorList();
                         GenerateCategoryListLeft();
-                        ResetAvatarList(true);
+                        ResetAvatarExplorer(true);
                     }
                     else
                     {
@@ -1192,6 +1306,9 @@ namespace Avatar_Explorer.Forms
             }
         }
 
+        /// <summary>
+        /// メイン画面右のアイテム内のフォルダーカテゴリ欄を作成します。
+        /// </summary>
         private void GenerateItemCategoryList()
         {
             _openingWindow = Window.ItemFolderCategoryList;
@@ -1209,7 +1326,7 @@ namespace Avatar_Explorer.Forms
                 CurrentPath.CurrentSelectedItem.MaterialPath);
             CurrentPath.CurrentSelectedItemFolderInfo = itemFolderInfo;
 
-            ResetAvatarList();
+            ResetAvatarExplorer();
 
             var index = 0;
             foreach (var itemType in types)
@@ -1236,10 +1353,13 @@ namespace Avatar_Explorer.Forms
             }
         }
 
+        /// <summary>
+        /// メイン画面右のアイテム内のファイル欄を作成します。
+        /// </summary>
         private void GenerateItemFiles()
         {
             _openingWindow = Window.ItemFolderItemsList;
-            ResetAvatarList();
+            ResetAvatarExplorer();
 
             var files = CurrentPath.CurrentSelectedItemFolderInfo.GetItems(CurrentPath.CurrentSelectedItemCategory);
             if (files.Length == 0) return;
@@ -1349,10 +1469,16 @@ namespace Avatar_Explorer.Forms
                 index++;
             }
         }
+        #endregion
 
+        #region 検索関連の処理
+        /// <summary>
+        /// 検索ボックスに入力された文字列を元にアイテムを検索します。
+        /// </summary>
+        /// <param name="searchFilter"></param>
         private void GenerateFilteredItem(SearchFilter searchFilter)
         {
-            ResetAvatarList();
+            ResetAvatarExplorer();
 
             var filteredItems = Items.Where(item =>
             {
@@ -1764,9 +1890,13 @@ namespace Avatar_Explorer.Forms
             }
         }
 
+        /// <summary>
+        /// 検索ボックスに入力された文字列を元にアイテムフォルダー内を検索します。
+        /// </summary>
+        /// <param name="searchWords"></param>
         private void GenerateFilteredFolderItems(SearchFilter searchWords)
         {
-            ResetAvatarList();
+            ResetAvatarExplorer();
 
             var fileDatas = _openingWindow switch
             {
@@ -1889,8 +2019,15 @@ namespace Avatar_Explorer.Forms
                 index++;
             }
         }
+        #endregion
 
-        // Add Item Form
+        #region アイテム追加関連の処理
+
+        /// <summary>
+        /// アイテム追加ボタンが押された際の処理を行います。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void AddItemButton_Click(object sender, EventArgs e)
         {
             AddItem addItem = new AddItem(this, CurrentPath.CurrentSelectedCategory, CurrentPath.CurrentSelectedCustomCategory, false, null, null);
@@ -1898,8 +2035,14 @@ namespace Avatar_Explorer.Forms
             RefleshWindow();
             Helper.SaveItemsData(Items);
         }
+        #endregion
 
-        // Generate Path
+        #region パス関連の処理
+
+        /// <summary>
+        /// 現在のパスを生成します。
+        /// </summary>
+        /// <returns></returns>
         private string GeneratePath()
         {
             var categoryName = Helper.GetCategoryName(CurrentPath.CurrentSelectedCategory, CurrentLanguage, CurrentPath.CurrentSelectedCustomCategory);
@@ -1956,6 +2099,10 @@ namespace Avatar_Explorer.Forms
                    Helper.Translate(CurrentPath.CurrentSelectedItemCategory, CurrentLanguage);
         }
 
+        /// <summary>
+        /// 選択されたアイテムからパスを生成します。
+        /// </summary>
+        /// <param name="item"></param>
         private void GeneratePathFromItem(Item item)
         {
             var avatarPath = item.SupportedAvatar.FirstOrDefault();
@@ -1967,8 +2114,15 @@ namespace Avatar_Explorer.Forms
                 CurrentPath.CurrentSelectedCustomCategory = item.CustomCategory;
             CurrentPath.CurrentSelectedItem = item;
         }
+        #endregion
 
-        // Undo Button
+        #region 戻るボタンの処理
+
+        /// <summary>
+        /// 戻るボタンが押された際の処理を行います。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void UndoButton_Click(object sender, EventArgs e)
         {
             //検索中だった場合は前の画面までとりあえず戻してあげる
@@ -2005,7 +2159,7 @@ namespace Avatar_Explorer.Forms
                     return;
                 }
 
-                ResetAvatarList(true);
+                ResetAvatarExplorer(true);
                 PathTextBox.Text = GeneratePath();
                 return;
             }
@@ -2063,17 +2217,24 @@ namespace Avatar_Explorer.Forms
                 {
                     CurrentPath.CurrentSelectedAvatar = null;
                     CurrentPath.CurrentSelectedAvatarPath = null;
-                    ResetAvatarList(true);
+                    ResetAvatarExplorer(true);
                     PathTextBox.Text = GeneratePath();
                     return;
                 }
             }
 
-            ResetAvatarList(true);
+            ResetAvatarExplorer(true);
             PathTextBox.Text = GeneratePath();
         }
+        #endregion
 
-        // Search Box
+        #region 検索ボックスの処理
+
+        /// <summary>
+        /// 検索ボックスで検索対象キーが押された際の処理を行います。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SearchBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode is Keys.Enter or Keys.Space)
@@ -2082,6 +2243,9 @@ namespace Avatar_Explorer.Forms
             }
         }
 
+        /// <summary>
+        /// 検索ボックス内のテキストを元に検索処理を行います。
+        /// </summary>
         private void SearchItems()
         {
             if (string.IsNullOrEmpty(SearchBox.Text))
@@ -2112,7 +2276,7 @@ namespace Avatar_Explorer.Forms
                     return;
                 }
 
-                ResetAvatarList(true);
+                ResetAvatarExplorer(true);
                 return;
             }
 
@@ -2173,9 +2337,15 @@ namespace Avatar_Explorer.Forms
 
             PathTextBox.Text = Helper.Translate("検索中... - ", CurrentLanguage) + string.Join(" / ", pathTextArr);
         }
+        #endregion
 
-        // ResetAvatarList
-        private void ResetAvatarList(bool startLabelVisible = false)
+        #region リセット関連の処理
+
+        /// <summary>
+        /// メイン画面右の画面をリセットします。
+        /// </summary>
+        /// <param name="startLabelVisible"></param>
+        private void ResetAvatarExplorer(bool startLabelVisible = false)
         {
             if (startLabelVisible)
             {
@@ -2199,7 +2369,10 @@ namespace Avatar_Explorer.Forms
             }
         }
 
-        // ResetAvatarPage
+        /// <summary>
+        /// メイン画面左の画面をリセットします。
+        /// </summary>
+        /// <param name="page"></param>
         private static void ResetAvatarPage(Control page)
         {
             for (int i = page.Controls.Count - 1; i >= 0; i--)
@@ -2210,7 +2383,56 @@ namespace Avatar_Explorer.Forms
             }
         }
 
-        // Drag and Drop Item Folder
+        /// <summary>
+        /// メイン画面の全ての画面を読み込み直します。
+        /// </summary>
+        /// <param name="reloadLeft"></param>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        private void RefleshWindow(bool reloadLeft = true)
+        {
+            if (_isSearching)
+            {
+                SearchItems();
+                GenerateAvatarList();
+                GenerateAuthorList();
+                GenerateCategoryListLeft();
+                return;
+            }
+
+            switch (_openingWindow)
+            {
+                case Window.ItemList:
+                    GenerateItems();
+                    break;
+                case Window.ItemCategoryList:
+                    GenerateCategoryList();
+                    break;
+                case Window.ItemFolderCategoryList:
+                    GenerateItemCategoryList();
+                    break;
+                case Window.ItemFolderItemsList:
+                    GenerateItemFiles();
+                    break;
+                case Window.Nothing:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            if (!reloadLeft) return;
+            GenerateAvatarList();
+            GenerateAuthorList();
+            GenerateCategoryListLeft();
+        }
+        #endregion
+
+        #region ドラッグアンドドロップ関連の処理
+
+        /// <summary>
+        /// メイン画面右の欄にドラッグされた際の処理を行います。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void AvatarItemExplorer_DragDrop(object sender, DragEventArgs e)
         {
             if (e.Data == null) return;
@@ -2240,6 +2462,11 @@ namespace Avatar_Explorer.Forms
             Enabled = false;
         }
 
+        /// <summary>
+        /// メイン画面左の欄にドラッグされた際の処理を行います。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void AvatarPage_DragDrop(object sender, DragEventArgs e)
         {
             if (e.Data == null) return;
@@ -2265,8 +2492,15 @@ namespace Avatar_Explorer.Forms
             addItem.Show();
             Enabled = false;
         }
+        #endregion
 
-        // Export to CSV
+        #region 画面下部のボタン関連の処理
+
+        /// <summary>
+        /// CSVエクスポートボタンが押された際の処理を行います。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ExportButton_Click(object sender, EventArgs e)
         {
             try
@@ -2327,7 +2561,11 @@ namespace Avatar_Explorer.Forms
             }
         }
 
-        // Make Backup
+        /// <summary>
+        /// バックアップボタンが押された際の処理を行います。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MakeBackupButton_Click(object sender, EventArgs e)
         {
             try
@@ -2367,7 +2605,11 @@ namespace Avatar_Explorer.Forms
             }
         }
 
-        // Change Language
+        /// <summary>
+        /// 言語変更ボックスの選択状況が更新された際の処理を行います。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void LanguageBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             CurrentLanguage = LanguageBox.SelectedIndex switch
@@ -2424,69 +2666,23 @@ namespace Avatar_Explorer.Forms
             RefleshWindow();
         }
 
+        /// <summary>
+        /// 並び替え順の選択状況が更新された際の処理を行います。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SortingBox_SelectedIndexChanged(object sender, EventArgs e) => RefleshWindow();
 
-        private void ChangeControlFont(Control control)
-        {
-            if (GuiFont == null) return;
-            var previousFont = control.Font;
-            var familyName = previousFont.FontFamily.Name;
-            if (familyName == "Yu Gothic UI") return;
-            var previousSize = control.Font.Size;
-            if (previousSize is < 0 or >= float.MaxValue) return;
-            control.Font = new Font(GuiFont, previousSize);
-        }
-
-        private void RefleshWindow(bool reloadLeft = true)
-        {
-            if (_isSearching)
-            {
-                SearchItems();
-                GenerateAvatarList();
-                GenerateAuthorList();
-                GenerateCategoryListLeft();
-                return;
-            }
-
-            switch (_openingWindow)
-            {
-                case Window.ItemList:
-                    GenerateItems();
-                    break;
-                case Window.ItemCategoryList:
-                    GenerateCategoryList();
-                    break;
-                case Window.ItemFolderCategoryList:
-                    GenerateItemCategoryList();
-                    break;
-                case Window.ItemFolderItemsList:
-                    GenerateItemFiles();
-                    break;
-                case Window.Nothing:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
-            if (!reloadLeft) return;
-            GenerateAvatarList();
-            GenerateAuthorList();
-            GenerateCategoryListLeft();
-        }
-
-        private void ManageCommonAvatarButton_Click(object sender, EventArgs e)
-        {
-            ManageCommonAvatars manageCommonAvatar = new(this);
-            manageCommonAvatar.ShowDialog();
-            RefleshWindow();
-            PathTextBox.Text = GeneratePath();
-            Helper.SaveCommonAvatarData(CommonAvatars);
-        }
-
-        // Load Data Button
+        /// <summary>
+        /// データを読み込むボタンが押された際の処理を行います。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void LoadData_Click(object sender, EventArgs e) => LoadDataFromFolder();
 
-        // Load Data From Folder
+        /// <summary>
+        /// フォルダ選択ダイアログを表示し、選択されたフォルダからデータを読み込みます。
+        /// </summary>
         private void LoadDataFromFolder()
         {
             //自動バックアップフォルダから復元するか聞く
@@ -2639,7 +2835,7 @@ namespace Avatar_Explorer.Forms
                         GenerateAvatarList();
                         GenerateAuthorList();
                         GenerateCategoryListLeft();
-                        ResetAvatarList(true);
+                        ResetAvatarExplorer(true);
                         PathTextBox.Text = GeneratePath();
                         MessageBox.Show(Helper.Translate("コピーが完了しました。", CurrentLanguage),
                             Helper.Translate("完了", CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -2720,13 +2916,52 @@ namespace Avatar_Explorer.Forms
             GenerateAvatarList();
             GenerateAuthorList();
             GenerateCategoryListLeft();
-            ResetAvatarList(true);
+            ResetAvatarExplorer(true);
             PathTextBox.Text = GeneratePath();
         }
 
-        // Resize Form
+        /// <summary>
+        /// 共通素体管理ボタンが押された際の処理を行います。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ManageCommonAvatarButton_Click(object sender, EventArgs e)
+        {
+            ManageCommonAvatars manageCommonAvatar = new(this);
+            manageCommonAvatar.ShowDialog();
+            RefleshWindow();
+            PathTextBox.Text = GeneratePath();
+            Helper.SaveCommonAvatarData(CommonAvatars);
+        }
+        #endregion
+
+        #region リサイズ関連の処理
+
+        /// <summary>
+        /// フォームのコントロールのフォントを変更します。
+        /// </summary>
+        /// <param name="control"></param>
+        private void ChangeControlFont(Control control)
+        {
+            if (GuiFont == null) return;
+            var previousFont = control.Font;
+            var familyName = previousFont.FontFamily.Name;
+            if (familyName == "Yu Gothic UI") return;
+            var previousSize = control.Font.Size;
+            if (previousSize is < 0 or >= float.MaxValue) return;
+            control.Font = new Font(GuiFont, previousSize);
+        }
+
+        /// <summary>
+        /// フォームのリサイズ時にコントロールのサイズや位置を変更します。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Main_Resize(object sender, EventArgs e) => ResizeControl();
 
+        /// <summary>
+        /// コントロールのサイズや位置を変更します。
+        /// </summary>
         private void ResizeControl()
         {
             if (!_initialized) return;
@@ -2836,6 +3071,9 @@ namespace Avatar_Explorer.Forms
             ScaleItemButtons();
         }
 
+        /// <summary>
+        /// メインフォーム内のボタンサイズを変更します。
+        /// </summary>
         private void ScaleItemButtons()
         {
             const int avatarItemExplorerBaseWidth = 874;
@@ -2870,8 +3108,13 @@ namespace Avatar_Explorer.Forms
                 }
             }
         }
+        #endregion
 
-        // Backup
+        #region バックアップ関連の処理
+
+        /// <summary>
+        /// ファイルの自動バックアップを行います。
+        /// </summary>
         private void AutoBackup()
         {
             BackupFile();
@@ -2884,6 +3127,9 @@ namespace Avatar_Explorer.Forms
             timer.Start();
         }
 
+        /// <summary>
+        /// 最終バックアップ時刻をフォームタイトルに表示します。
+        /// </summary>
         private void BackupTimeTitle()
         {
             Timer timer = new()
@@ -2910,6 +3156,9 @@ namespace Avatar_Explorer.Forms
             timer.Start();
         }
 
+        /// <summary>
+        /// ファイルのバックアップを行います。
+        /// </summary>
         private void BackupFile()
         {
             try
@@ -2931,8 +3180,15 @@ namespace Avatar_Explorer.Forms
                 Helper.ErrorLogger("自動バックアップに失敗しました。", ex);
             }
         }
+        #endregion
 
-        // Form Closing
+        #region フォルダーが閉じれれる際の処理
+
+        /// <summary>
+        /// フォームが閉じられる際に一時フォルダを削除します。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
             try
@@ -2945,5 +3201,6 @@ namespace Avatar_Explorer.Forms
                 Helper.ErrorLogger("一時フォルダの削除に失敗しました。", ex);
             }
         }
+        #endregion
     }
 }

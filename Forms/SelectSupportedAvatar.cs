@@ -4,10 +4,26 @@ namespace Avatar_Explorer.Forms
 {
     public sealed partial class SelectSupportedAvatar : Form
     {
+        /// <summary>
+        /// メインフォームを取得または設定します。
+        /// </summary>
         private readonly Main _mainForm;
+
+        /// <summary>
+        /// アイテムを追加するフォームを取得または設定します。
+        /// </summary>
         private readonly AddItem _addItem;
+
+        /// <summary>
+        /// ファイルアイコンのイメージを取得します。
+        /// </summary>
         private static readonly Image FileImage = SharedImages.GetImage(SharedImages.Images.FileIcon);
 
+        /// <summary>
+        /// 対応アバターの選択フォームを初期化します。
+        /// </summary>
+        /// <param name="mainForm"></param>
+        /// <param name="addItem"></param>
         public SelectSupportedAvatar(Main mainForm, AddItem addItem)
         {
             _mainForm = mainForm;
@@ -32,6 +48,9 @@ namespace Avatar_Explorer.Forms
             GenerateAvatarList();
         }
 
+        /// <summary>
+        /// アバターのリストを生成します。
+        /// </summary>
         private void GenerateAvatarList()
         {
             AvatarList.Controls.Clear();
@@ -52,6 +71,12 @@ namespace Avatar_Explorer.Forms
             }
         }
 
+        /// <summary>
+        /// フォーム内のアバターのボタンを生成します。
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="language"></param>
+        /// <returns></returns>
         private static Button CreateAvatarButton(Item item, string language)
         {
             CustomItemButton button = new CustomItemButton(1009);
@@ -70,6 +95,11 @@ namespace Avatar_Explorer.Forms
             return button;
         }
 
+        /// <summary>
+        /// 選択を確定し、フォームを閉じます。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ConfirmButton_Click(object sender, EventArgs e)
         {
             var selectedItems = AvatarList.Controls.OfType<Button>()

@@ -4,17 +4,50 @@ namespace Avatar_Explorer.Forms
 {
     public sealed partial class AddItem : Form
     {
+        /// <summary>
+        /// メインフォームを取得または設定します。
+        /// </summary>
         private readonly Main _mainForm;
+
+        /// <summary>
+        /// 編集モードで開かれているかどうかを取得または設定します。
+        /// </summary>
         private readonly bool _edit;
+
+        /// <summary>
+        /// HTTPクライアントを取得または設定します。
+        /// </summary>
         private static readonly HttpClient HttpClient = new();
+
+        /// <summary>
+        /// 追加ボタンが有効になれるかどうかを取得または設定します。
+        /// </summary>
         private bool _addButtonEnabled;
 
+        /// <summary>
+        /// アイテムが追加されたときに発生するイベントです。
+        /// </summary>
         public event EventHandler? ItemAdded;
 
+        /// <summary>
+        /// メインフォームに反映される予定のアイテムファイルです。
+        /// </summary>
         public Item Item = new();
 
+        /// <summary>
+        /// 対応しているアバターのリストを取得または設定します。
+        /// </summary>
         public string[] SupportedAvatar = Array.Empty<string>();
 
+        /// <summary>
+        /// アイテムを追加または編集するフォームを初期化します。
+        /// </summary>
+        /// <param name="mainForm"></param>
+        /// <param name="type"></param>
+        /// <param name="customCategory"></param>
+        /// <param name="edit"></param>
+        /// <param name="item"></param>
+        /// <param name="folderPath"></param>
         public AddItem(Main mainForm, ItemType type, string? customCategory, bool edit, Item? item, string? folderPath)
         {
             _edit = edit;
@@ -107,6 +140,11 @@ namespace Avatar_Explorer.Forms
             openFolderButton.Enabled = true;
         }
 
+        /// <summary>
+        /// カスタムで追加するボタンがクリックされたときの処理です。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CustomButton_Click(object sender, EventArgs e)
         {
             BoothURLTextBox.Text = "";
@@ -117,6 +155,11 @@ namespace Avatar_Explorer.Forms
             _addButtonEnabled = true;
         }
 
+        /// <summary>
+        /// Boothのアイテム情報を取得するボタンがクリックされたときの処理です。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void GetButton_Click(object sender, EventArgs e)
         {
             var boothId = BoothURLTextBox.Text.Split('/').Last();
@@ -160,6 +203,11 @@ namespace Avatar_Explorer.Forms
             _addButtonEnabled = true;
         }
 
+        /// <summary>
+        /// 対応アバターを選択するボタンがクリックされたときの処理です。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SelectAvatar_Click(object sender, EventArgs e)
         {
             SelectSupportedAvatar selectSupportedAvatar = new(_mainForm, this);
@@ -168,11 +216,21 @@ namespace Avatar_Explorer.Forms
                                 Helper.Translate("個", _mainForm.CurrentLanguage);
         }
 
+        /// <summary>
+        /// アイテムのタイプのコンボボックスが変更されたときの処理です。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             SelectAvatar.Enabled = TypeComboBox.SelectedIndex != (int)ItemType.Avatar;
         }
 
+        /// <summary>
+        /// アイテムを追加または編集します。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void AddButton_Click(object sender, EventArgs e)
         {
             ItemType type;
@@ -320,7 +378,12 @@ namespace Avatar_Explorer.Forms
             Close();
         }
 
-        // Extract Zip
+        /// <summary>
+        /// zipファイルを指定されたフォルダに展開します。
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="destination"></param>
+        /// <returns></returns>
         private string? ExtractZipWithHandling(string path, string destination)
         {
             if (!string.IsNullOrEmpty(path) && path.EndsWith(".zip"))
@@ -346,7 +409,11 @@ namespace Avatar_Explorer.Forms
             return path;
         }
 
-        // Open Folder Button
+        /// <summary>
+        /// アイテムフォルダを開くボタンがクリックされたときの処理です。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void openFolderButton_Click(object sender, EventArgs e)
         {
             var result = folderBrowserDialog.ShowDialog();
@@ -356,6 +423,11 @@ namespace Avatar_Explorer.Forms
             }
         }
 
+        /// <summary>
+        /// マテリアルフォルダを開くボタンがクリックされたときの処理です。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void openMaterialFolderButton_Click(object sender, EventArgs e)
         {
             var result = folderBrowserDialog.ShowDialog();
@@ -365,7 +437,11 @@ namespace Avatar_Explorer.Forms
             }
         }
 
-        // Drag & Drop
+        /// <summary>
+        /// アイテムフォルダ欄にドラッグされたときの処理です。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void FolderTextBox_DragDrop(object sender, DragEventArgs e)
         {
             if (e.Data == null) return;
@@ -384,6 +460,11 @@ namespace Avatar_Explorer.Forms
             FolderTextBox.Text = folderPath;
         }
 
+        /// <summary>
+        /// マテリアルフォルダ欄にドラッグされたときの処理です。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MaterialTextBox_DragDrop(object sender, DragEventArgs e)
         {
             if (e.Data == null) return;
@@ -402,22 +483,35 @@ namespace Avatar_Explorer.Forms
             MaterialTextBox.Text = folderPath;
         }
 
-        // Error Label
+        /// <summary>
+        /// エラー状態を設定します。
+        /// </summary>
+        /// <param name="errorMessage"></param>
         private void SetErrorState(string errorMessage)
         {
             AddButton.Enabled = false;
             ErrorLabel.Text = errorMessage;
         }
 
+        /// <summary>
+        /// エラー状態を解除します。
+        /// </summary>
         private void ClearErrorState()
         {
             if (_addButtonEnabled) AddButton.Enabled = true;
             ErrorLabel.Text = "";
         }
 
-        // Check Text
+        /// <summary>
+        /// フォルダパスのテキストボックスが変更されたときの処理です。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CheckText(object sender, EventArgs e) => ValidCheck();
 
+        /// <summary>
+        /// パスなどのテキストボックス内のテキストが有効かどうかをチェックします。
+        /// </summary>
         private void ValidCheck()
         {
             if (!(File.Exists(FolderTextBox.Text) && FolderTextBox.Text.EndsWith(".zip")) && !Directory.Exists(FolderTextBox.Text))
@@ -477,6 +571,11 @@ namespace Avatar_Explorer.Forms
             ClearErrorState();
         }
 
+        /// <summary>
+        /// フォームが閉じられるときの処理です。イベントを発火します。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void AddItem_FormClosing(object sender, FormClosingEventArgs e) => ItemAdded?.Invoke(this, EventArgs.Empty);
     }
 }
