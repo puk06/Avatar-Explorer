@@ -3182,7 +3182,7 @@ namespace Avatar_Explorer.Forms
         }
         #endregion
 
-        #region フォルダーが閉じれれる際の処理
+        #region フォルダーが閉じられる際の処理
 
         /// <summary>
         /// フォームが閉じられる際に一時フォルダを削除します。
