@@ -48,11 +48,12 @@ namespace Avatar_Explorer.Forms
         /// <param name="edit"></param>
         /// <param name="item"></param>
         /// <param name="folderPath"></param>
-        public AddItem(Main mainForm, ItemType type, string? customCategory, bool edit, Item? item, string? folderPath)
+        public AddItem(Main mainForm, ItemType type, string? customCategory, bool edit, Item? item, string? folderPath, string boothId = "")
         {
             _edit = edit;
             _mainForm = mainForm;
             InitializeComponent();
+
             ValidCheck();
 
             if (_mainForm.CurrentLanguage != "ja-JP")
@@ -79,6 +80,7 @@ namespace Avatar_Explorer.Forms
             }
 
             if (folderPath != null) FolderTextBox.Text = folderPath;
+            if (boothId != "") BoothURLTextBox.Text = "https://booth.pm/ja/items/" + boothId;
 
             ItemType itemType = type;
 

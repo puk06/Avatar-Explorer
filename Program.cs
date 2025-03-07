@@ -1,4 +1,5 @@
 using Avatar_Explorer.Forms;
+using Avatar_Explorer.Classes;
 
 namespace Avatar_Explorer
 {
@@ -8,7 +9,7 @@ namespace Avatar_Explorer
         ///  The main entry point for the application.
         /// </summary>
         [STAThread]
-        private static void Main()
+        private static void Main(string[] args)
         {
             try
             {
@@ -24,8 +25,10 @@ namespace Avatar_Explorer
                     return;
                 }
 
+                var launchInfo = args.Length > 0 ? Helper.GetLaunchInfo(args[0]) : new LaunchInfo();
+
                 ApplicationConfiguration.Initialize();
-                Application.Run(new Main());
+                Application.Run(new Main(launchInfo));
             }
             catch (Exception ex)
             {

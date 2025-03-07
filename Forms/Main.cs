@@ -177,7 +177,7 @@ namespace Avatar_Explorer.Forms
         /// <summary>
         /// メインフォームを初期化します。
         /// </summary>
-        public Main()
+        public Main(LaunchInfo launchInfo)
         {
             try
             {
@@ -210,6 +210,16 @@ namespace Avatar_Explorer.Forms
                 BackupTimeTitle();
 
                 Text = $"VRChat Avatar Explorer {CurrentVersion} by ぷこるふ";
+
+                // Check if the software is launched with a URL
+                if (launchInfo.launchedWithUrl)
+                {
+                    if (!string.IsNullOrEmpty(launchInfo.assetDir) && !string.IsNullOrEmpty(launchInfo.assetId))
+                    {
+                        AddItem addItem = new(this, ItemType.Avatar, null, false, null, launchInfo.assetDir, launchInfo.assetId);
+                        addItem.ShowDialog();
+                    }
+                }
             }
             catch (Exception ex)
             {

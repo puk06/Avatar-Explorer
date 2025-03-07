@@ -4,6 +4,7 @@ using System.IO.Compression;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Web;
 using Newtonsoft.Json.Linq;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Tar;
@@ -923,6 +924,26 @@ namespace Avatar_Explorer.Classes
             }
 
             return items;
+        }
+
+        /// <summary>
+        /// 起動時の引数から起動情報を取得します。
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public static LaunchInfo GetLaunchInfo(string url)
+        {
+            var uri = new Uri(url);
+            var query = HttpUtility.ParseQueryString(uri.Query);
+            var dir = query.Get("dir") ?? "";
+            var id = query.Get("id") ?? "";
+
+            return new LaunchInfo
+            {
+                launchedWithUrl = true,
+                assetDir = dir,
+                assetId = id
+            };
         }
     }
 }
