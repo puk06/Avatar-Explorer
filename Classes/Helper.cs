@@ -50,7 +50,7 @@ namespace Avatar_Explorer.Classes
 
         private static string GetAuthorId(string url)
         {
-            var match = Regex.Match(url, @"https://(.*).booth.pm/");
+            var match = Regex.Match(url, @"https://(.*)\.booth\.pm/");
             return match.Success ? match.Groups[1].Value : "";
         }
 
@@ -96,6 +96,7 @@ namespace Avatar_Explorer.Classes
                     FileName = Path.GetFileName(file),
                     FilePath = file
                 };
+
                 switch (extension)
                 {
                     case ".psd":

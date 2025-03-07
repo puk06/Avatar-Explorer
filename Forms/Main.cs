@@ -2367,6 +2367,8 @@ namespace Avatar_Explorer.Forms
                     AvatarItemExplorer.Controls[i].Visible = startLabelVisible;
                 }
             }
+
+            _openingWindow = Window.Nothing;
         }
 
         /// <summary>
