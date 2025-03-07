@@ -1,10 +1,12 @@
 ﻿using System.Diagnostics;
 using System.Formats.Tar;
 using System.IO.Compression;
+using System.Security.Principal;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Web;
+using Microsoft.Win32;
 using Newtonsoft.Json.Linq;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Tar;
@@ -944,6 +946,68 @@ namespace Avatar_Explorer.Classes
                 assetDir = dir,
                 assetId = id
             };
+        }
+
+        /// <summary>
+        /// カスタムスキームを登録します。
+        /// </summary>
+        /// <param name="protocol"></param>
+        /// <param name="exePath"></param>
+        public static void RegisterCustomScheme(string protocol, string exePath)
+        {
+            using (RegistryKey key = Registry.ClassesRoot.CreateSubKey(protocol))
+            {
+                key.SetValue("", "URL:" + protocol + " Protocol");
+                key.SetValue("URL Protocol", "");
+            }
+
+            string commandKey = $@"{protocol}\shell\open\command";
+            using (RegistryKey key = Registry.ClassesRoot.CreateSubKey(commandKey))
+            {
+                key.SetValue("", $"\"{exePath}\" \"%1\"");
+            }
+        }
+
+        /// <summary>
+        /// ソフトを管理者権限で起動しているかどうかを取得します。
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsRunAsAdmin()
+        {
+            using WindowsIdentity identity = WindowsIdentity.GetCurrent();
+            WindowsPrincipal principal = new WindowsPrincipal(identity);
+            return principal.IsInRole(WindowsBuiltInRole.Administrator);
+        }
+
+        /// <summary>
+        /// 管理者権限で再起動します。
+        /// </summary>
+        public static void RestartAsAdmin()
+        {
+            var exePath = Process.GetCurrentProcess()?.MainModule?.FileName;
+            if (string.IsNullOrEmpty(exePath))
+            {
+                MessageBox.Show("再起動に失敗しました。手動で管理者としてソフトを実行してください！", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            ProcessStartInfo proc = new()
+            {
+                FileName = exePath,
+                UseShellExecute = true,
+                Verb = "runas"
+            };
+
+            try
+            {
+                Process.Start(proc);
+                Environment.Exit(0);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("再起動に失敗しました。手動で管理者としてソフトを実行してください。\n" + ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
         }
     }
 }
