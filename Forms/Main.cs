@@ -218,6 +218,8 @@ namespace Avatar_Explorer.Forms
                     {
                         AddItem addItem = new(this, ItemType.Avatar, null, false, null, launchInfo.assetDir, launchInfo.assetId);
                         addItem.ShowDialog();
+
+                        Helper.SaveItemsData(Items);
                     }
                 }
             }
