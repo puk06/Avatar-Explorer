@@ -48,6 +48,7 @@ namespace Avatar_Explorer.Forms
         /// <param name="edit"></param>
         /// <param name="item"></param>
         /// <param name="folderPath"></param>
+        /// <param name="boothId"></param>
         public AddItem(Main mainForm, ItemType type, string? customCategory, bool edit, Item? item, string? folderPath, string boothId = "")
         {
             _edit = edit;
