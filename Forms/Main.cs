@@ -219,6 +219,7 @@ namespace Avatar_Explorer.Forms
                         AddItem addItem = new(this, ItemType.Avatar, null, false, null, launchInfo.assetDir, launchInfo.assetId);
                         addItem.ShowDialog();
 
+                        RefleshWindow();
                         Helper.SaveItemsData(Items);
                     }
                 }
@@ -1060,7 +1061,8 @@ namespace Avatar_Explorer.Forms
 
                         try
                         {
-                            Process.Start("explorer.exe", item.ItemPath);
+                            var itemFullFolderPath = Path.GetFullPath(item.ItemPath);
+                            Process.Start("explorer.exe", itemFullFolderPath);
                         }
                         catch
                         {
@@ -1674,7 +1676,8 @@ namespace Avatar_Explorer.Forms
 
                         try
                         {
-                            Process.Start("explorer.exe", item.ItemPath);
+                            var itemFullFolderPath = Path.GetFullPath(item.ItemPath);
+                            Process.Start("explorer.exe", itemFullFolderPath);
                         }
                         catch
                         {

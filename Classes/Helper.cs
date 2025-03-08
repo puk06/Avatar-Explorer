@@ -19,6 +19,8 @@ namespace Avatar_Explorer.Classes
     {
         private static readonly HttpClient HttpClient = new();
         private static readonly Dictionary<string, Dictionary<string, string>> TranslateData = new();
+        private static readonly string REG_PROTCOL = "VRCAE";
+        private static readonly string SCHEME_FILE_PATH = "./Datas/VRCAESCHEME.txt";
 
         /// <summary>
         ///　Boothのアイテム情報を取得します。
@@ -949,11 +951,161 @@ namespace Avatar_Explorer.Classes
         }
 
         /// <summary>
+        /// カスタムURLスキームの登録用のヘルパー関数です。
+        /// </summary>
+        public static void CheckScheme()
+        {
+            var isSchemeRegistered = IsSchemeRegistered(REG_PROTCOL);
+            if (!File.Exists(SCHEME_FILE_PATH) && !isSchemeRegistered)
+            {
+                var result = MessageBox.Show("カスタムURLスキームを登録しますか？\n\n" +
+                                             "登録すると、ブラウザから「" + REG_PROTCOL + "://」でこのソフトを起動できます。\n" +
+                                             "登録しない場合は、URLスキームでの起動はできませんが、通常の起動は可能です。",
+                    "カスタムURLスキーム登録", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+
+                if (result == DialogResult.Yes)
+                {
+                    string? exePath = Process.GetCurrentProcess()?.MainModule?.FileName;
+
+                    if (exePath != null)
+                    {
+                        try
+                        {
+                            if (!IsRunAsAdmin())
+                            {
+                                var result2 = MessageBox.Show("カスタムURLスキームの登録には管理者権限が必要です。\n" +
+                                                              "再起動して管理者権限で起動しますか？", "確認", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                                if (result2 == DialogResult.Yes)
+                                    RestartAsAdmin();
+                                return;
+                            }
+
+                            RegisterCustomScheme(REG_PROTCOL, exePath);
+                            File.WriteAllText(SCHEME_FILE_PATH, exePath);
+
+                            var result3 = MessageBox.Show("カスタムURLスキームの登録に成功しました。\n" +
+                                                           "ソフトを終了して、通常のユーザーとして起動することをおすすめします！\n\n" +
+                                                              "終了しないと、ソフト内のD&Dなどが正常に動作しない場合があります。\n" +
+                                                              "終了しますか？", "確認", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                            if (result3 == DialogResult.Yes)
+                                Environment.Exit(0);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show("カスタムURLスキームの登録に失敗しました。\n\n" + ex,
+                                "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("カスタムURLスキームの登録をスキップしました。\nもし登録したければ、Datasフォルダ内のVRCAESCHEME.txtを削除してもう一度起動してください！", "情報", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    File.WriteAllText(SCHEME_FILE_PATH, "false");
+                }
+            }
+            else if (!File.Exists(SCHEME_FILE_PATH) && isSchemeRegistered)
+            {
+                var result = MessageBox.Show("カスタムURLスキームは既に登録されていますが、ソフト内の登録先が不明です。再登録しますか？\n" +
+                                             "再登録を行うことで、誤って前のバージョンが参照されたりすることを防げます。\n\n" +
+                                             "登録すると、ブラウザから「" + REG_PROTCOL + "://」でこのソフトを起動できます。\n" +
+                                             "登録しない場合は、URLスキームでの起動はできませんが、通常の起動は可能です。",
+                    "カスタムURLスキーム登録", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+
+                if (result == DialogResult.Yes)
+                {
+                    string? exePath = Process.GetCurrentProcess()?.MainModule?.FileName;
+                    if (exePath != null)
+                    {
+                        try
+                        {
+                            if (!IsRunAsAdmin())
+                            {
+                                var result2 = MessageBox.Show("カスタムURLスキームの登録には管理者権限が必要です。\n" +
+                                                              "再起動して管理者権限で起動しますか？", "確認", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                                if (result2 == DialogResult.Yes)
+                                    RestartAsAdmin();
+                                return;
+                            }
+
+                            RegisterCustomScheme(REG_PROTCOL, exePath);
+                            File.WriteAllText(SCHEME_FILE_PATH, exePath);
+
+                            var result3 = MessageBox.Show("カスタムURLスキームの登録に成功しました。\n" +
+                                                           "ソフトを終了して、通常のユーザーとして起動することをおすすめします！\n\n" +
+                                                              "終了しないと、ソフト内のD&Dなどが正常に動作しない場合があります。\n" +
+                                                              "終了しますか？", "確認", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                            if (result3 == DialogResult.Yes)
+                                Environment.Exit(0);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show("カスタムURLスキームの登録に失敗しました。\n\n" + ex,
+                                "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("カスタムURLスキームの再登録をスキップしました。\nもしもう一度登録したければ、Datasフォルダ内のVRCAESCHEME.txtを削除してもう一度起動してください！", "情報", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    File.WriteAllText(SCHEME_FILE_PATH, "false");
+                }
+            }
+            else
+            {
+                string path = File.ReadAllText(SCHEME_FILE_PATH);
+
+                string? exePath = Process.GetCurrentProcess()?.MainModule?.FileName;
+
+                if (path != "false" && exePath != null && path != exePath)
+                {
+                    var result = MessageBox.Show("カスタムURLスキームの登録先が変更されているため、再登録しますか？\n\n" +
+                                                 "登録すると、ブラウザから「" + REG_PROTCOL + "://」でこのソフトを起動できます。\n" +
+                                                 "登録しない場合は、URLスキームでの起動はできませんが、通常の起動は可能です。",
+                        "カスタムURLスキーム登録", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                    if (result == DialogResult.Yes)
+                    {
+                        try
+                        {
+                            if (!IsRunAsAdmin())
+                            {
+                                var result2 = MessageBox.Show("カスタムURLスキームの登録には管理者権限が必要です。\n" +
+                                                              "再起動して管理者権限で起動しますか？", "確認", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                                if (result2 == DialogResult.Yes)
+                                    RestartAsAdmin();
+                                return;
+                            }
+
+                            RegisterCustomScheme(REG_PROTCOL, exePath);
+                            File.WriteAllText(SCHEME_FILE_PATH, exePath);
+
+                            var result3 = MessageBox.Show("カスタムURLスキームの登録に成功しました。\n" +
+                                                           "ソフトを終了して、通常のユーザーとして起動することをおすすめします！\n\n" +
+                                                              "終了しないと、ソフト内のD&Dなどが正常に動作しない場合があります。\n" +
+                                                              "終了しますか？", "確認", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                            if (result3 == DialogResult.Yes)
+                                Environment.Exit(0);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show("カスタムURLスキームの登録に失敗しました。\n\n" + ex,
+                                "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                    else if (result == DialogResult.No)
+                    {
+                        MessageBox.Show("カスタムURLスキームの再登録をスキップしました。\nもしもう一度登録したければ、Datasフォルダ内のVRCAESCHEME.txtを削除してもう一度起動してください！", "情報", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        File.WriteAllText(SCHEME_FILE_PATH, "false");
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// カスタムスキームを登録します。
         /// </summary>
         /// <param name="protocol"></param>
         /// <param name="exePath"></param>
-        public static void RegisterCustomScheme(string protocol, string exePath)
+        private static void RegisterCustomScheme(string protocol, string exePath)
         {
             using (RegistryKey key = Registry.ClassesRoot.CreateSubKey(protocol))
             {
@@ -969,10 +1121,21 @@ namespace Avatar_Explorer.Classes
         }
 
         /// <summary>
+        /// 既にカスタムスキームが登録されているかどうかを取得します。
+        /// </summary>
+        /// <param name="protocol"></param>
+        /// <returns></returns>
+        private static bool IsSchemeRegistered(string protocol)
+        {
+            using RegistryKey? key = Registry.ClassesRoot.OpenSubKey(protocol);
+            return key != null;
+        }
+
+        /// <summary>
         /// ソフトを管理者権限で起動しているかどうかを取得します。
         /// </summary>
         /// <returns></returns>
-        public static bool IsRunAsAdmin()
+        private static bool IsRunAsAdmin()
         {
             using WindowsIdentity identity = WindowsIdentity.GetCurrent();
             WindowsPrincipal principal = new WindowsPrincipal(identity);
@@ -982,7 +1145,7 @@ namespace Avatar_Explorer.Classes
         /// <summary>
         /// 管理者権限で再起動します。
         /// </summary>
-        public static void RestartAsAdmin()
+        private static void RestartAsAdmin()
         {
             var exePath = Process.GetCurrentProcess()?.MainModule?.FileName;
             if (string.IsNullOrEmpty(exePath))
