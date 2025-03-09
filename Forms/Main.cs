@@ -16,7 +16,7 @@ namespace Avatar_Explorer.Forms
         /// <summary>
         /// ソフトの現在のバージョン
         /// </summary>
-        private const string CurrentVersion = "v1.0.6";
+        private const string CurrentVersion = "v1.0.7";
 
         /// <summary>
         /// デフォルトのフォームテキスト
