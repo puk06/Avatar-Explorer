@@ -2367,6 +2367,7 @@ namespace Avatar_Explorer.Forms
                 _authorMode = false;
                 _categoryMode = false;
                 CurrentPath = new CurrentPath();
+                _openingWindow = Window.Nothing;
             }
 
             for (int i = AvatarItemExplorer.Controls.Count - 1; i >= 0; i--)
@@ -2382,8 +2383,6 @@ namespace Avatar_Explorer.Forms
                     AvatarItemExplorer.Controls[i].Visible = startLabelVisible;
                 }
             }
-
-            _openingWindow = Window.Nothing;
         }
 
         /// <summary>
