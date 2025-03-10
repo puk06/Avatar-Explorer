@@ -255,7 +255,7 @@ namespace Avatar_Explorer.Forms
                 Item.CustomCategory = TypeComboBox.Text;
             }
 
-            var folderPath = ExtractZipWithHandling(FolderTextBox.Text, Path.Combine("Datas", "Items", Item.Title));
+            var folderPath = ExtractZipWithHandling(FolderTextBox.Text, Path.Combine("Datas", "Items"), Item.Title);
             if (folderPath == null) return;
             Item.ItemPath = folderPath;
 
@@ -389,13 +389,13 @@ namespace Avatar_Explorer.Forms
         /// <param name="path"></param>
         /// <param name="destination"></param>
         /// <returns></returns>
-        private string? ExtractZipWithHandling(string path, string destination)
+        private string? ExtractZipWithHandling(string path, string destination, string folderName = "")
         {
             if (!string.IsNullOrEmpty(path) && path.EndsWith(".zip"))
             {
                 try
                 {
-                    return Helper.ExtractZip(path, destination);
+                    return Helper.ExtractZip(path, destination, folderName);
                 }
                 catch (Exception ex)
                 {

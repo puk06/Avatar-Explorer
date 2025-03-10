@@ -822,10 +822,14 @@ namespace Avatar_Explorer.Classes
         /// <param name="zipPath"></param>
         /// <param name="extractPath"></param>
         /// <returns></returns>
-        public static string ExtractZip(string zipPath, string extractPath)
+        public static string ExtractZip(string zipPath, string extractPath, string folderName)
         {
-            var invalidChars = Path.GetInvalidFileNameChars();
-            extractPath = string.Concat(extractPath.Where(c => !invalidChars.Contains(c)));
+            if (!string.IsNullOrWhiteSpace(folderName))
+            {
+                var invalidChars = Path.GetInvalidFileNameChars();
+                folderName = string.Concat(folderName.Where(c => !invalidChars.Contains(c)));
+                extractPath = Path.Combine(extractPath, folderName);
+            }
 
             var extractFolder = Path.Combine(extractPath, Path.GetFileNameWithoutExtension(zipPath));
             if (!Directory.Exists(extractFolder))
