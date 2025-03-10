@@ -1411,7 +1411,8 @@ namespace Avatar_Explorer.Forms
                     {
                         try
                         {
-                            Process.Start("explorer.exe", "/select," + file.FilePath);
+                            var itemFullFolderPath = Path.GetFullPath(file.FilePath);
+                            Process.Start("explorer.exe", "/select," + itemFullFolderPath);
                         }
                         catch
                         {
@@ -1431,7 +1432,8 @@ namespace Avatar_Explorer.Forms
                 {
                     try
                     {
-                        Process.Start("explorer.exe", "/select," + file.FilePath);
+                        var itemFullFolderPath = Path.GetFullPath(file.FilePath);
+                        Process.Start("explorer.exe", "/select," + itemFullFolderPath);
                     }
                     catch
                     {
@@ -1469,7 +1471,8 @@ namespace Avatar_Explorer.Forms
                     {
                         try
                         {
-                            Process.Start("explorer.exe", "/select," + file.FilePath);
+                            var itemFullFolderPath = Path.GetFullPath(file.FilePath);
+                            Process.Start("explorer.exe", "/select," + itemFullFolderPath);
                         }
                         catch
                         {
@@ -1969,7 +1972,8 @@ namespace Avatar_Explorer.Forms
                     {
                         try
                         {
-                            Process.Start("explorer.exe", "/select," + file.FilePath);
+                            var itemFullFolderPath = Path.GetFullPath(file.FilePath);
+                            Process.Start("explorer.exe", "/select," + itemFullFolderPath);
                         }
                         catch
                         {
@@ -1989,7 +1993,8 @@ namespace Avatar_Explorer.Forms
                 {
                     try
                     {
-                        Process.Start("explorer.exe", "/select," + file.FilePath);
+                        var itemFullFolderPath = Path.GetFullPath(file.FilePath);
+                        Process.Start("explorer.exe", "/select," + itemFullFolderPath);
                     }
                     catch
                     {
@@ -2020,7 +2025,8 @@ namespace Avatar_Explorer.Forms
                     {
                         try
                         {
-                            Process.Start("explorer.exe", "/select," + file.FilePath);
+                            var itemFullFolderPath = Path.GetFullPath(file.FilePath);
+                            Process.Start("explorer.exe", "/select," + itemFullFolderPath);
                         }
                         catch
                         {
