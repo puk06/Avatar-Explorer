@@ -367,8 +367,12 @@ namespace Avatar_Explorer.Forms
                     {
                         try
                         {
-                            Process.Start($"https://booth.pm/{Helper.GetCurrentLanguageCode(CurrentLanguage)}/items/" +
-                                          item.BoothId);
+                            Process.Start(new ProcessStartInfo
+                            {
+                                FileName = $"https://booth.pm/{Helper.GetCurrentLanguageCode(CurrentLanguage)}/items/" +
+                                           item.BoothId,
+                                UseShellExecute = true
+                            });
                         }
                         catch
                         {
