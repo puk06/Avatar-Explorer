@@ -255,11 +255,11 @@ namespace Avatar_Explorer.Forms
                 Item.CustomCategory = TypeComboBox.Text;
             }
 
-            var folderPath = ExtractZipWithHandling(FolderTextBox.Text, "./Datas/Items");
+            var folderPath = ExtractZipWithHandling(FolderTextBox.Text, Path.Combine("Datas", "Items", Item.Title));
             if (folderPath == null) return;
             Item.ItemPath = folderPath;
 
-            var materialPath = ExtractZipWithHandling(MaterialTextBox.Text, "./Datas/Items");
+            var materialPath = ExtractZipWithHandling(MaterialTextBox.Text, Path.Combine(folderPath, "Materials"));
             if (materialPath == null) return;
             Item.MaterialPath = materialPath;
 
@@ -276,12 +276,13 @@ namespace Avatar_Explorer.Forms
 
             if (Item.BoothId != -1)
             {
-                if (!Directory.Exists("./Datas/Thumbnail"))
+                var thumbnailFolderPath = Path.Combine("Datas", "Thumbnail");
+                if (!Directory.Exists(thumbnailFolderPath))
                 {
-                    Directory.CreateDirectory("./Datas/Thumbnail");
+                    Directory.CreateDirectory(thumbnailFolderPath);
                 }
 
-                var thumbnailPath = Path.Combine("./Datas", "Thumbnail", $"{Item.BoothId}.png");
+                var thumbnailPath = Path.Combine(thumbnailFolderPath, $"{Item.BoothId}.png");
                 if (!File.Exists(thumbnailPath))
                 {
                     if (!string.IsNullOrEmpty(Item.ThumbnailUrl))
@@ -310,12 +311,13 @@ namespace Avatar_Explorer.Forms
 
             if (!string.IsNullOrEmpty(Item.AuthorId))
             {
-                if (!Directory.Exists(Path.Combine("./Datas", "AuthorImage")))
+                var authorImageFolderPath = Path.Combine("Datas", "AuthorImage");
+                if (!Directory.Exists(authorImageFolderPath))
                 {
-                    Directory.CreateDirectory(Path.Combine("./Datas", "AuthorImage"));
+                    Directory.CreateDirectory(authorImageFolderPath);
                 }
 
-                var authorImagePath = Path.Combine("./Datas", "AuthorImage", $"{Item.AuthorId}.png");
+                var authorImagePath = Path.Combine(authorImageFolderPath, $"{Item.AuthorId}.png");
                 if (!File.Exists(authorImagePath))
                 {
                     if (!string.IsNullOrEmpty(Item.AuthorImageUrl))
