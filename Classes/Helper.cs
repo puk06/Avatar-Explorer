@@ -92,6 +92,7 @@ namespace Avatar_Explorer.Classes
         public static ItemFolderInfo GetItemFolderInfo(string path, string materialPath)
         {
             var itemFolderInfo = new ItemFolderInfo();
+            if (!Directory.Exists(path)) return itemFolderInfo;
             var files = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
             foreach (var file in files)
             {
