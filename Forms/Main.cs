@@ -190,6 +190,9 @@ namespace Avatar_Explorer.Forms
                 // Update Empty Dates
                 Items = Helper.UpdateEmptyDates(Items);
 
+                // Fix Current Path Escape
+                Items = Helper.FixCurrentPathEscape(Items);
+
                 AddFontFile();
                 CustomCategories = Helper.LoadCustomCategoriesData();
                 InitializeComponent();
@@ -2756,6 +2759,7 @@ namespace Avatar_Explorer.Forms
                         Items = Helper.LoadItemsData(filePath);
                         Items = Helper.FixSupportedAvatarPath(Items);
                         Items = Helper.UpdateEmptyDates(Items);
+                        Items = Helper.FixCurrentPathEscape(Items);
                         Helper.SaveItemsData(Items);
                     }
 
@@ -2823,6 +2827,7 @@ namespace Avatar_Explorer.Forms
                         Items = Helper.LoadItemsData(filePath);
                         Items = Helper.FixSupportedAvatarPath(Items);
                         Items = Helper.UpdateEmptyDates(Items);
+                        Items = Helper.FixCurrentPathEscape(Items);
                         Helper.SaveItemsData(Items);
                     }
 
@@ -3211,7 +3216,7 @@ namespace Avatar_Explorer.Forms
         #region フォルダーが閉じられる際の処理
 
         /// <summary>
-        /// フォームが閉じられる際に一時フォルダを削除します。
+        /// フォームが閉じられる際にデータを保存し、一時フォルダを削除します。
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -3219,6 +3224,14 @@ namespace Avatar_Explorer.Forms
         {
             try
             {
+                Items = Helper.FixSupportedAvatarPath(Items);
+                Items = Helper.UpdateEmptyDates(Items);
+                Items = Helper.FixCurrentPathEscape(Items);
+
+                Helper.SaveItemsData(Items);
+                Helper.SaveCommonAvatarData(CommonAvatars);
+                Helper.SaveCustomCategoriesData(CustomCategories);
+
                 if (!Directory.Exists("./Datas/Temp")) return;
                 Directory.Delete("./Datas/Temp", true);
             }

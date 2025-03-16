@@ -938,6 +938,19 @@ namespace Avatar_Explorer.Classes
             return items;
         }
 
+        public static Item[] FixCurrentPathEscape(Item[] items)
+        {
+            foreach (var item in items)
+            {
+                item.ItemPath = item.ItemPath.Replace("./Datas", "Datas").Replace("/", "\\");
+                item.MaterialPath = item.MaterialPath.Replace("./Datas", "Datas").Replace("/", "\\");
+                item.ImagePath = item.ImagePath.Replace("./Datas", "Datas").Replace("/", "\\");
+                item.AuthorImageFilePath = item.AuthorImageFilePath.Replace("./Datas", "Datas").Replace("/", "\\");
+            }
+
+            return items;
+        }
+
         /// <summary>
         /// 起動時の引数から起動情報を取得します。
         /// </summary>
