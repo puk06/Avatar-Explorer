@@ -102,12 +102,13 @@ namespace Avatar_Explorer.Forms
         /// <param name="e"></param>
         private void ConfirmButton_Click(object sender, EventArgs e)
         {
-            var selectedItems = AvatarList.Controls.OfType<Button>()
+#pragma warning disable CS8619 // 値における参照型の Null 許容性が、対象の型と一致しません。
+            _addItem.SupportedAvatar = AvatarList.Controls.OfType<Button>()
                 .Where(button => button.BackColor == Color.LightGreen)
                 .Select(button => button.Tag as string)
                 .Where(tag => !string.IsNullOrWhiteSpace(tag))
                 .ToArray();
-            _addItem.SupportedAvatar = selectedItems;
+#pragma warning restore CS8619 // 値における参照型の Null 許容性が、対象の型と一致しません。
             Close();
         }
     }

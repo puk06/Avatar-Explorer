@@ -203,15 +203,17 @@ namespace Avatar_Explorer.Forms
 
             if (commonAvatar == null)
             {
+#pragma warning disable CS8619 // 値における参照型の Null 許容性が、対象の型と一致しません。
                 _commonAvatars = _commonAvatars.Append(new CommonAvatar
                 {
                     Name = name,
                     Avatars = AvatarList.Controls.OfType<Button>()
                         .Where(button => button.BackColor == Color.LightGreen)
-                        .Select(button => button.Tag.ToString())
+                        .Select(button => button.Tag as string)
                         .Where(tag => !string.IsNullOrWhiteSpace(tag))
                         .ToArray()
                 }).ToArray();
+#pragma warning restore CS8619 // 値における参照型の Null 許容性が、対象の型と一致しません。
 
                 MessageBox.Show(Helper.Translate("共通素体名: ", _mainForm.CurrentLanguage) + name + "\n\n" + Helper.Translate("共通素体データの追加が完了しました。", _mainForm.CurrentLanguage),
                     Helper.Translate("完了", _mainForm.CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -219,11 +221,13 @@ namespace Avatar_Explorer.Forms
             }
             else
             {
+#pragma warning disable CS8619 // 値における参照型の Null 許容性が、対象の型と一致しません。
                 commonAvatar.Avatars = AvatarList.Controls.OfType<Button>()
                     .Where(button => button.BackColor == Color.LightGreen)
-                    .Select(button => button.Tag.ToString())
+                    .Select(button => button.Tag as string)
                     .Where(tag => !string.IsNullOrWhiteSpace(tag))
                     .ToArray();
+#pragma warning restore CS8619 // 値における参照型の Null 許容性が、対象の型と一致しません。
 
                 MessageBox.Show(Helper.Translate("共通素体名: ", _mainForm.CurrentLanguage) + name + "\n\n" + Helper.Translate("共通素体データの更新が完了しました。", _mainForm.CurrentLanguage),
                     Helper.Translate("完了", _mainForm.CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Information);
