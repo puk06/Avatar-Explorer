@@ -3231,7 +3231,14 @@ namespace Avatar_Explorer.Forms
                 Helper.SaveItemsData(Items);
                 Helper.SaveCommonAvatarData(CommonAvatars);
                 Helper.SaveCustomCategoriesData(CustomCategories);
+            }
+            catch (Exception ex)
+            {
+                Helper.ErrorLogger("データの保存に失敗しました。", ex);
+            }
 
+            try
+            {
                 if (!Directory.Exists("./Datas/Temp")) return;
                 Directory.Delete("./Datas/Temp", true);
             }
