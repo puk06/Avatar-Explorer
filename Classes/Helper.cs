@@ -21,6 +21,22 @@ namespace Avatar_Explorer.Classes
         private static readonly Dictionary<string, Dictionary<string, string>> TranslateData = new();
         private static readonly string REG_PROTCOL = "VRCAE";
         private static readonly string SCHEME_FILE_PATH = "./Datas/VRCAESCHEME.txt";
+        private static readonly Dictionary<string[], ItemType> TITLE_MAPPINGS = new()
+        {
+            { new[] { "オリジナル3Dモデル", "オリジナル", "Avatar", "Original" }, ItemType.Avatar },
+            { new[] { "アニメーション", "Animation" }, ItemType.Animation },
+            { new[] { "衣装", "Clothing" }, ItemType.Clothing },
+            { new[] { "ギミック", "Gimmick" }, ItemType.Gimmick },
+            { new[] { "アクセサリ", "Accessory" }, ItemType.Accessory },
+            { new[] { "髪", "Hair" }, ItemType.HairStyle },
+            { new[] { "テクスチャ", "Eye", "Texture" }, ItemType.Texture },
+            { new[] { "ツール", "システム", "Tool", "System" }, ItemType.Tool },
+            { new[] { "シェーダー", "Shader" }, ItemType.Shader }
+        };
+        private static readonly JsonSerializerOptions jsonSerializerOptions = new()
+        {
+            WriteIndented = true
+        };
 
         /// <summary>
         ///　Boothのアイテム情報を取得します。
@@ -162,7 +178,7 @@ namespace Avatar_Explorer.Classes
             var buttonWidth = @short ? 303 : 874;
             if (listWidthDiff != 0)
                 buttonWidth += listWidthDiff;
-            CustomItemButton button = new CustomItemButton(buttonWidth);
+            CustomItemButton button = new(buttonWidth);
 
             if (imagePath == null)
             {
@@ -193,19 +209,6 @@ namespace Avatar_Explorer.Classes
         /// <returns></returns>
         public static ItemType GetItemType(string title, string type)
         {
-            var titleMappings = new Dictionary<string[], ItemType>
-            {
-                { new[] { "オリジナル3Dモデル", "オリジナル", "Avatar", "Original" }, ItemType.Avatar },
-                { new[] { "アニメーション", "Animation" }, ItemType.Animation },
-                { new[] { "衣装", "Clothing" }, ItemType.Clothing },
-                { new[] { "ギミック", "Gimmick" }, ItemType.Gimmick },
-                { new[] { "アクセサリ", "Accessory" }, ItemType.Accessory },
-                { new[] { "髪", "Hair" }, ItemType.HairStyle },
-                { new[] { "テクスチャ", "Eye", "Texture" }, ItemType.Texture },
-                { new[] { "ツール", "システム", "Tool", "System" }, ItemType.Tool },
-                { new[] { "シェーダー", "Shader" }, ItemType.Shader }
-            };
-
             var suggestType = type switch
             {
                 "3Dキャラクター" => ItemType.Avatar,
@@ -219,7 +222,7 @@ namespace Avatar_Explorer.Classes
                 _ => ItemType.Unknown
             };
 
-            foreach (var mapping in titleMappings)
+            foreach (var mapping in TITLE_MAPPINGS)
             {
                 if (mapping.Key.Any(title.Contains))
                 {
@@ -264,7 +267,7 @@ namespace Avatar_Explorer.Classes
         public static void SaveItemsData(Item[] items)
         {
             using var sw = new StreamWriter("./Datas/ItemsData.json");
-            sw.Write(JsonSerializer.Serialize(items, new JsonSerializerOptions { WriteIndented = true }));
+            sw.Write(JsonSerializer.Serialize(items, jsonSerializerOptions));
         }
 
         /// <summary>
@@ -294,7 +297,7 @@ namespace Avatar_Explorer.Classes
         public static void SaveCommonAvatarData(CommonAvatar[] commonAvatars)
         {
             using var sw = new StreamWriter("./Datas/CommonAvatar.json");
-            sw.Write(JsonSerializer.Serialize(commonAvatars, new JsonSerializerOptions { WriteIndented = true }));
+            sw.Write(JsonSerializer.Serialize(commonAvatars, jsonSerializerOptions));
         }
 
         /// <summary>
@@ -595,7 +598,7 @@ namespace Avatar_Explorer.Classes
         /// <returns></returns>
         public static async Task ModifyUnityPackageFilePathAsync(FileData file, CurrentPath currentPath, string currentLanguage)
         {
-            ProgressForm progressForm = new ProgressForm(currentLanguage);
+            ProgressForm progressForm = new(currentLanguage);
             progressForm.Show();
 
             try
@@ -644,7 +647,7 @@ namespace Avatar_Explorer.Classes
                 {
                     if (Path.GetFileName(entry.Name) == "pathname" && entry.DataStream != null)
                     {
-                        using StreamReader reader = new StreamReader(entry.DataStream);
+                        using StreamReader reader = new(entry.DataStream);
                         string assetPath = await reader.ReadToEndAsync();
 
                         assetPath = assetPath.Insert(7, $"{category}/");
@@ -913,7 +916,7 @@ namespace Avatar_Explorer.Classes
         /// <returns></returns>
         public static Item[] UpdateEmptyDates(Item[] items)
         {
-            string now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            string now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
 
             foreach (var item in items)
             {
@@ -931,17 +934,81 @@ namespace Avatar_Explorer.Classes
             return items;
         }
 
+        public static Item[] FixItemDates(Item[] items)
+        {
+            foreach (var item in items)
+            {
+                if (!string.IsNullOrEmpty(item.CreatedDate))
+                {
+                    var unixTime = new DateTimeOffset(GetDate(item.CreatedDate)).ToUnixTimeMilliseconds();
+                    item.CreatedDate = unixTime.ToString();
+                }
+
+                if (!string.IsNullOrEmpty(item.UpdatedDate))
+                {
+                    var unixTime = new DateTimeOffset(GetDate(item.UpdatedDate)).ToUnixTimeMilliseconds();
+                    item.UpdatedDate = unixTime.ToString();
+                }
+            }
+
+            return items;
+        }
+
+        private static DateTime GetDate(string date)
+        {
+            try
+            {
+                if (date.All(char.IsDigit)) return DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(date)).UtcDateTime;
+
+                var allDigits = "";
+                foreach (var c in date)
+                {
+                    if (char.IsDigit(c)) allDigits += c;
+                }
+
+                if (allDigits.Length != 14) return DateTime.Now;
+
+                var year = allDigits.Substring(0, 4);
+                var month = allDigits.Substring(4, 2);
+                var day = allDigits.Substring(6, 2);
+                var hour = allDigits.Substring(8, 2);
+                var minute = allDigits.Substring(10, 2);
+                var second = allDigits.Substring(12, 2);
+
+                var dateTime = new DateTime(int.Parse(year), int.Parse(month), int.Parse(day), int.Parse(hour), int.Parse(minute),
+                    int.Parse(second));
+
+                var utcDateTime = TimeZoneInfo.ConvertTimeToUtc(dateTime, TimeZoneInfo.Local);
+
+                return utcDateTime;
+            }
+            catch
+            {
+                return TimeZoneInfo.ConvertTimeToUtc(DateTime.Now, TimeZoneInfo.Local);
+            }
+        }
+
         public static Item[] FixCurrentPathEscape(Item[] items)
         {
             foreach (var item in items)
             {
-                item.ItemPath = item.ItemPath.Replace("./Datas", "Datas").Replace("/", "\\");
-                item.MaterialPath = item.MaterialPath.Replace("./Datas", "Datas").Replace("/", "\\");
-                item.ImagePath = item.ImagePath.Replace("./Datas", "Datas").Replace("/", "\\");
-                item.AuthorImageFilePath = item.AuthorImageFilePath.Replace("./Datas", "Datas").Replace("/", "\\");
+                item.ItemPath = FixPath(item.ItemPath);
+                item.MaterialPath = FixPath(item.MaterialPath);
+                item.ImagePath = FixPath(item.ImagePath);
+                item.AuthorImageFilePath = FixPath(item.AuthorImageFilePath);
             }
 
             return items;
+        }
+
+        private static string FixPath(string path)
+        {
+            if (string.IsNullOrEmpty(path)) return "";
+
+            return path
+                .Replace("./Datas", "Datas")
+                .Replace("/", "\\")
+                .Replace(".\\Datas", "Datas");
         }
 
         /// <summary>
@@ -1152,7 +1219,7 @@ namespace Avatar_Explorer.Classes
         private static bool IsRunAsAdmin()
         {
             using WindowsIdentity identity = WindowsIdentity.GetCurrent();
-            WindowsPrincipal principal = new WindowsPrincipal(identity);
+            WindowsPrincipal principal = new(identity);
             return principal.IsInRole(WindowsBuiltInRole.Administrator);
         }
 
@@ -1185,6 +1252,26 @@ namespace Avatar_Explorer.Classes
                 MessageBox.Show("再起動に失敗しました。手動で管理者としてソフトを実行してください。\n" + ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+        }
+
+        public static string GetDateStringFromUnixTime(string unixTime)
+        {
+            if (string.IsNullOrEmpty(unixTime)) return "Invalid Date";
+
+            if (long.TryParse(unixTime, out var unixTimeLong))
+            {
+                var dateTime = DateTimeOffset.FromUnixTimeMilliseconds(unixTimeLong)
+                                                 .ToLocalTime()
+                                                 .DateTime;
+                return dateTime.ToString("yyyy/MM/dd HH:mm:ss");
+            }
+
+            return "Invalid Date";
+        }
+
+        public static string GetUnixTime()
+        {
+            return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
         }
     }
 }

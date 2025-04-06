@@ -15,6 +15,11 @@ namespace Avatar_Explorer.Forms
         private readonly bool _edit;
 
         /// <summary>
+        /// 最後にBoothの情報を取得した時間を取得または設定します。
+        /// </summary>
+        private DateTime _lastGetTime;
+
+        /// <summary>
         /// HTTPクライアントを取得または設定します。
         /// </summary>
         private static readonly HttpClient HttpClient = new();
@@ -82,8 +87,6 @@ namespace Avatar_Explorer.Forms
 
             if (folderPath != null) FolderTextBox.Text = folderPath;
             if (boothId != "") BoothURLTextBox.Text = "https://booth.pm/ja/items/" + boothId;
-
-            ItemType itemType = type;
 
             if (type == ItemType.Custom)
             {
@@ -172,6 +175,16 @@ namespace Avatar_Explorer.Forms
                     Helper.Translate("エラー", _mainForm.CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+
+            var currentTime = DateTime.Now;
+            if (_lastGetTime.AddSeconds(5) > currentTime)
+            {
+                MessageBox.Show(Helper.Translate("情報取得の間隔が短すぎます。前回の取得から5秒以上空けてください", _mainForm.CurrentLanguage),
+                    Helper.Translate("エラー", _mainForm.CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            _lastGetTime = currentTime;
 
             try
             {
@@ -273,7 +286,6 @@ namespace Avatar_Explorer.Forms
                 return;
             }
 
-
             if (Item.BoothId != -1)
             {
                 var thumbnailFolderPath = Path.Combine("Datas", "Thumbnail");
@@ -344,8 +356,8 @@ namespace Avatar_Explorer.Forms
                 }
             }
 
-            // 日付更新
-            string now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            // アイテムの更新日付の更新
+            var now = Helper.GetUnixTime();
 
             if (_edit)
             {

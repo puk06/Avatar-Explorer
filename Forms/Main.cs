@@ -16,7 +16,7 @@ namespace Avatar_Explorer.Forms
         /// <summary>
         /// ソフトの現在のバージョン
         /// </summary>
-        private const string CurrentVersion = "v1.0.8";
+        private const string CurrentVersion = "v1.0.9";
 
         /// <summary>
         /// デフォルトのフォームテキスト
@@ -190,6 +190,9 @@ namespace Avatar_Explorer.Forms
                 // Update Empty Dates
                 Items = Helper.UpdateEmptyDates(Items);
 
+                // Fix Item Dates
+                Items = Helper.FixItemDates(Items);
+
                 // Fix Current Path Escape
                 Items = Helper.FixCurrentPathEscape(Items);
 
@@ -295,12 +298,12 @@ namespace Avatar_Explorer.Forms
 
                 if (!string.IsNullOrEmpty(item.CreatedDate))
                 {
-                    description += "\n" + Helper.Translate("登録日時", CurrentLanguage) + ": " + item.CreatedDate;
+                    description += "\n" + Helper.Translate("登録日時", CurrentLanguage) + ": " + Helper.GetDateStringFromUnixTime(item.CreatedDate);
                 }
 
                 if (!string.IsNullOrEmpty(item.UpdatedDate))
                 {
-                    description += "\n" + Helper.Translate("更新日時", CurrentLanguage) + ": " + item.UpdatedDate;
+                    description += "\n" + Helper.Translate("更新日時", CurrentLanguage) + ": " + Helper.GetDateStringFromUnixTime(item.UpdatedDate);
                 }
 
                 if (!string.IsNullOrEmpty(item.ItemMemo))
@@ -489,6 +492,7 @@ namespace Avatar_Explorer.Forms
                     if (string.IsNullOrEmpty(memo) || memo == previouseMemo) return;
 
                     item.ItemMemo = memo;
+                    item.UpdatedDate = Helper.GetUnixTime();
 
                     RefleshWindow();
                     Helper.SaveItemsData(Items);
@@ -986,12 +990,12 @@ namespace Avatar_Explorer.Forms
 
                 if (!string.IsNullOrEmpty(item.CreatedDate))
                 {
-                    description += "\n" + Helper.Translate("登録日時", CurrentLanguage) + ": " + item.CreatedDate;
+                    description += "\n" + Helper.Translate("登録日時", CurrentLanguage) + ": " + Helper.GetDateStringFromUnixTime(item.CreatedDate);
                 }
 
                 if (!string.IsNullOrEmpty(item.UpdatedDate))
                 {
-                    description += "\n" + Helper.Translate("更新日時", CurrentLanguage) + ": " + item.UpdatedDate;
+                    description += "\n" + Helper.Translate("更新日時", CurrentLanguage) + ": " + Helper.GetDateStringFromUnixTime(item.UpdatedDate);
                 }
 
                 if (!string.IsNullOrEmpty(item.ItemMemo))
@@ -1597,12 +1601,12 @@ namespace Avatar_Explorer.Forms
 
                 if (!string.IsNullOrEmpty(item.CreatedDate))
                 {
-                    description += "\n" + Helper.Translate("登録日時", CurrentLanguage) + ": " + item.CreatedDate;
+                    description += "\n" + Helper.Translate("登録日時", CurrentLanguage) + ": " + Helper.GetDateStringFromUnixTime(item.CreatedDate);
                 }
 
                 if (!string.IsNullOrEmpty(item.UpdatedDate))
                 {
-                    description += "\n" + Helper.Translate("更新日時", CurrentLanguage) + ": " + item.UpdatedDate;
+                    description += "\n" + Helper.Translate("更新日時", CurrentLanguage) + ": " + Helper.GetDateStringFromUnixTime(item.UpdatedDate);
                 }
 
                 if (!string.IsNullOrEmpty(item.ItemMemo))
@@ -1946,7 +1950,7 @@ namespace Avatar_Explorer.Forms
             SearchResultLabel.Text = Helper.Translate("フォルダー内検索結果: ", CurrentLanguage) + filteredItems.Count +
                                      Helper.Translate("件", CurrentLanguage) + Helper.Translate(" (全", CurrentLanguage) +
                                      fileDatas.Length + Helper.Translate("件)", CurrentLanguage);
-            if (!filteredItems.Any()) return;
+            if (filteredItems.Count == 0) return;
 
             var index = 0;
             foreach (var file in filteredItems)
@@ -2058,7 +2062,7 @@ namespace Avatar_Explorer.Forms
         /// <param name="e"></param>
         private void AddItemButton_Click(object sender, EventArgs e)
         {
-            AddItem addItem = new AddItem(this, CurrentPath.CurrentSelectedCategory, CurrentPath.CurrentSelectedCustomCategory, false, null, null);
+            AddItem addItem = new(this, CurrentPath.CurrentSelectedCategory, CurrentPath.CurrentSelectedCustomCategory, false, null, null);
             addItem.ShowDialog();
             RefleshWindow();
             Helper.SaveItemsData(Items);
@@ -2445,7 +2449,7 @@ namespace Avatar_Explorer.Forms
                 case Window.Nothing:
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    break;
             }
 
             if (!reloadLeft) return;
@@ -2661,7 +2665,7 @@ namespace Avatar_Explorer.Forms
                 ChangeControlFont(control);
             }
 
-            string[] sortingItems = { "タイトル", "作者", "登録日時", "更新日時" };
+            string[] sortingItems = ["タイトル", "作者", "登録日時", "更新日時"];
             var selected = SortingBox.SelectedIndex;
             SortingBox.Items.Clear();
             SortingBox.Items.AddRange(sortingItems.Select(item => Helper.Translate(item, CurrentLanguage)).ToArray());
@@ -2759,6 +2763,7 @@ namespace Avatar_Explorer.Forms
                         Items = Helper.LoadItemsData(filePath);
                         Items = Helper.FixSupportedAvatarPath(Items);
                         Items = Helper.UpdateEmptyDates(Items);
+                        Items = Helper.FixItemDates(Items);
                         Items = Helper.FixCurrentPathEscape(Items);
                         Helper.SaveItemsData(Items);
                     }
@@ -2827,6 +2832,7 @@ namespace Avatar_Explorer.Forms
                         Items = Helper.LoadItemsData(filePath);
                         Items = Helper.FixSupportedAvatarPath(Items);
                         Items = Helper.UpdateEmptyDates(Items);
+                        Items = Helper.FixItemDates(Items);
                         Items = Helper.FixCurrentPathEscape(Items);
                         Helper.SaveItemsData(Items);
                     }
