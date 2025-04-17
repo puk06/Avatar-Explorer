@@ -994,7 +994,7 @@ namespace Avatar_Explorer.Classes
             }
         }
 
-        public static Item[] FixCurrentPathEscape(Item[] items)
+        public static Item[] FixRelativePathEscape(Item[] items)
         {
             foreach (var item in items)
             {
@@ -1011,10 +1011,12 @@ namespace Avatar_Explorer.Classes
         {
             if (string.IsNullOrEmpty(path)) return "";
 
-            return path
-                .Replace("./Datas", "Datas")
-                .Replace("/", "\\")
-                .Replace(".\\Datas", "Datas");
+            if (path.StartsWith("./"))
+            {
+                path = path.Substring(2);
+            }
+
+            return path.Replace('/', '\\');
         }
 
         /// <summary>

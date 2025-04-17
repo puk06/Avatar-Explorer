@@ -193,8 +193,8 @@ namespace Avatar_Explorer.Forms
                 // Fix Item Dates
                 Items = Helper.FixItemDates(Items);
 
-                // Fix Current Path Escape
-                Items = Helper.FixCurrentPathEscape(Items);
+                // Fix Relative Path Escape
+                Items = Helper.FixRelativePathEscape(Items);
 
                 AddFontFile();
                 CustomCategories = Helper.LoadCustomCategoriesData();
@@ -2798,7 +2798,7 @@ namespace Avatar_Explorer.Forms
                         Items = Helper.FixSupportedAvatarPath(Items);
                         Items = Helper.UpdateEmptyDates(Items);
                         Items = Helper.FixItemDates(Items);
-                        Items = Helper.FixCurrentPathEscape(Items);
+                        Items = Helper.FixRelativePathEscape(Items);
                         Helper.SaveItemsData(Items);
                     }
 
@@ -2867,7 +2867,7 @@ namespace Avatar_Explorer.Forms
                         Items = Helper.FixSupportedAvatarPath(Items);
                         Items = Helper.UpdateEmptyDates(Items);
                         Items = Helper.FixItemDates(Items);
-                        Items = Helper.FixCurrentPathEscape(Items);
+                        Items = Helper.FixRelativePathEscape(Items);
                         Helper.SaveItemsData(Items);
                     }
 

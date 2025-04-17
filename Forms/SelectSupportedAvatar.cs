@@ -77,7 +77,7 @@ namespace Avatar_Explorer.Forms
         /// <param name="item"></param>
         /// <param name="language"></param>
         /// <returns></returns>
-        private static Button CreateAvatarButton(Item item, string language)
+        private static CustomItemButton CreateAvatarButton(Item item, string language)
         {
             CustomItemButton button = new CustomItemButton(1009);
             button.ImagePath = item.ImagePath;
