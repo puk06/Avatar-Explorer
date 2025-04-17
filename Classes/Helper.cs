@@ -474,7 +474,7 @@ namespace Avatar_Explorer.Classes
         public static SearchFilter GetSearchFilter(string searchWord)
         {
             var searchFilter = new SearchFilter();
-            var regex = new Regex(@"(?<key>Author|Title|Booth|Avatar|Category|Memo)=(?:""(?<value>.*?)""|(?<value>[^\s]+))|(?<word>[^\s]+)");
+            var regex = new Regex(@"(?<key>Author|Title|Booth|Avatar|Category|Memo|Folder|File)=(?:""(?<value>.*?)""|(?<value>[^\s]+))|(?<word>[^\s]+)");
             var matches = regex.Matches(searchWord);
 
             foreach (Match match in matches)
@@ -503,6 +503,12 @@ namespace Avatar_Explorer.Classes
                             break;
                         case "Memo":
                             searchFilter.ItemMemo = searchFilter.ItemMemo.Append(value).ToArray();
+                            break;
+                        case "Folder":
+                            searchFilter.FolderName = searchFilter.FolderName.Append(value).ToArray();
+                            break;
+                        case "File":
+                            searchFilter.FileName = searchFilter.FileName.Append(value).ToArray();
                             break;
                     }
                 }

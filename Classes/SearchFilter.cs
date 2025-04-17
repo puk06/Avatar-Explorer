@@ -37,6 +37,16 @@
         public string[] ItemMemo { get; set; } = Array.Empty<string>();
 
         /// <summary>
+        /// 検索するアイテムのフォルダ名を取得または設定します。
+        /// </summary>
+        public string[] FolderName { get; set; } = Array.Empty<string>();
+
+        /// <summary>
+        /// 検索するアイテムのファイル名を取得または設定します。
+        /// </summary>
+        public string[] FileName { get; set; } = Array.Empty<string>();
+
+        /// <summary>
         /// 検索するアイテムの文字列を取得または設定します。
         /// </summary>
         public string[] SearchWords { get; set; } = Array.Empty<string>();

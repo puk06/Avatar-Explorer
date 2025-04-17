@@ -1550,6 +1550,26 @@ namespace Avatar_Explorer.Forms
                     return false;
                 }
 
+                if (searchFilter.FolderName.Length != 0 && !searchFilter.FolderName.Any(folderName =>
+                {
+                    return Path.GetFileName(item.ItemPath).ToLower().Contains(folderName.ToLower()) ||
+                            Path.GetFileName(item.MaterialPath).ToLower().Contains(folderName.ToLower());
+                }))
+                {
+                    return false;
+                }
+
+                if (searchFilter.FileName.Length != 0 && !searchFilter.FileName.Any(fileName =>
+                {
+                    return Helper.GetItemFolderInfo(item.ItemPath, item.MaterialPath).GetAllItem()
+                        .Any(file =>
+                            file.FileName.ToLower().Contains(fileName.ToLower()) ||
+                            file.FileExtension.ToLower().Contains(fileName.ToLower()));
+                }))
+                {
+                    return false;
+                }
+
                 return true;
             });
 
@@ -2362,6 +2382,20 @@ namespace Avatar_Explorer.Forms
             {
                 pathTextArr = pathTextArr.Append(Helper.Translate("メモ", CurrentLanguage) + ": " +
                                                  string.Join(", ", searchFilter.ItemMemo))
+                    .ToArray();
+            }
+
+            if (searchFilter.FolderName.Length != 0)
+            {
+                pathTextArr = pathTextArr.Append(Helper.Translate("フォルダ名", CurrentLanguage) + ": " +
+                                                 string.Join(", ", searchFilter.FolderName))
+                    .ToArray();
+            }
+
+            if (searchFilter.FileName.Length != 0)
+            {
+                pathTextArr = pathTextArr.Append(Helper.Translate("ファイル名", CurrentLanguage) + ": " +
+                                                 string.Join(", ", searchFilter.FileName))
                     .ToArray();
             }
 

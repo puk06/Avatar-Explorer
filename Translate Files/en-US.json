@@ -148,5 +148,7 @@
   "開く": "Open",
   "登録日時": "CreatedDate",
   "更新日時": "UpdatedDate",
-  "情報取得の間隔が短すぎます。前回の取得から5秒以上空けてください": "Interval between information retrieval is too short. Please wait more than 5 seconds since the last retrieval."
+  "情報取得の間隔が短すぎます。前回の取得から5秒以上空けてください": "Interval between information retrieval is too short. Please wait more than 5 seconds since the last retrieval.",
+  "フォルダ名": "Folder Name",
+  "ファイル名": "File Name"
 }

@@ -105,6 +105,7 @@ namespace Avatar_Explorer.Forms
             BoothURLTextBox.Name = "BoothURLTextBox";
             BoothURLTextBox.Size = new Size(415, 31);
             BoothURLTextBox.TabIndex = 4;
+            BoothURLTextBox.KeyDown += BoothURLTextBox_KeyDown;
             // 
             // GetButton
             // 

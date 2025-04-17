@@ -589,6 +589,19 @@ namespace Avatar_Explorer.Forms
         }
 
         /// <summary>
+        /// BoothのURL欄でEnterキーが押されたときの処理です。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BoothURLTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                GetButton_Click(this, EventArgs.Empty);
+            }
+        }
+
+        /// <summary>
         /// フォームが閉じられるときの処理です。イベントを発火します。
         /// </summary>
         /// <param name="sender"></param>
