@@ -21,7 +21,7 @@
   " (全": " (Total ",
   "件)": " item(s))",
   "フォルダー内検索結果: ": "Folder search results: ",
-  "フォルダを選択してください": "Please select a folder.",
+  "有効なフォルダ、またはzipファイルを選択してください": "Please select a valid folder or zip file.",
   "Outputフォルダにエクスポートが完了しました！\nファイル名: ": "Export to Output folder completed!\nFile name: ",
   "バックアップに失敗しました": "Backup failed.",
   "Backupフォルダにバックアップが完了しました！\n\n復元したい場合は、\"データを読み込む\"ボタンで現在作成されたファイルを展開したものを選択してください。\n\nファイル名: ": "Backup to Backup folder completed!\n\nIf you want to restore, select the extracted file created by the \"Load Data\" button.\n\nFile name: ",
@@ -150,5 +150,9 @@
   "更新日時": "UpdatedDate",
   "情報取得の間隔が短すぎます。前回の取得から5秒以上空けてください": "Interval between information retrieval is too short. Please wait more than 5 seconds since the last retrieval.",
   "フォルダ名": "Folder Name",
-  "ファイル名": "File Name"
+  "ファイル名": "File Name",
+  "以下のアイテムは対応していない、もしくは存在しないため追加されません": "Following items are not supported or do not exist, so they will not be added",
+  "追加可能なフォルダ、またはファイルがありません": "There are no folders or files that can be added.",
+  "アイテムフォルダを選択してください": "Please select the item folder.",
+  "マテリアルフォルダを選択してください": "Please select the material folder."
 }

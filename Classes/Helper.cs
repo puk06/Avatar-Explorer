@@ -841,12 +841,12 @@ namespace Avatar_Explorer.Classes
             }
             else
             {
-                int i = 2;
-                while (Directory.Exists(extractFolder + i))
+                int i = 1;
+                while (Directory.Exists(extractFolder + " - " + i))
                 {
                     i++;
                 }
-                extractFolder += i;
+                extractFolder += " - " + i;
                 Directory.CreateDirectory(extractFolder);
             }
 
@@ -889,7 +889,7 @@ namespace Avatar_Explorer.Classes
             foreach (var file in files)
             {
                 var temppath = Path.Combine(destDirName, file.Name);
-                file.CopyTo(temppath, false);
+                file.CopyTo(temppath, true);
             }
 
             var dirs = dir.GetDirectories();
@@ -1028,13 +1028,14 @@ namespace Avatar_Explorer.Classes
         {
             var uri = new Uri(url);
             var query = HttpUtility.ParseQueryString(uri.Query);
-            var dir = query.Get("dir") ?? "";
+
+            var dir = query.GetValues("dir") ?? Array.Empty<string>();
             var id = query.Get("id") ?? "";
 
             return new LaunchInfo
             {
                 launchedWithUrl = true,
-                assetDir = dir,
+                assetDirs = dir,
                 assetId = id
             };
         }

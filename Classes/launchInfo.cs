@@ -3,7 +3,7 @@
     public class LaunchInfo
     {
         public bool launchedWithUrl;
-        public string assetDir = "";
+        public string[] assetDirs = Array.Empty<string>();
         public string assetId = "";
     }
 }

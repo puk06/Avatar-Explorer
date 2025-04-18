@@ -220,9 +220,9 @@ namespace Avatar_Explorer.Forms
                 // Check if the software is launched with a URL
                 if (launchInfo.launchedWithUrl)
                 {
-                    if (!string.IsNullOrEmpty(launchInfo.assetDir) && !string.IsNullOrEmpty(launchInfo.assetId))
+                    if (launchInfo.assetDirs.Length != 0 && !string.IsNullOrEmpty(launchInfo.assetId))
                     {
-                        AddItem addItem = new(this, ItemType.Avatar, null, false, null, launchInfo.assetDir, launchInfo.assetId);
+                        AddItem addItem = new(this, ItemType.Avatar, null, false, null, launchInfo.assetDirs, launchInfo.assetId);
                         addItem.ShowDialog();
 
                         RefleshWindow();
@@ -1346,6 +1346,7 @@ namespace Avatar_Explorer.Forms
                 "マテリアル",
                 "不明"
             };
+
             if (CurrentPath.CurrentSelectedItem == null) return;
             ItemFolderInfo itemFolderInfo = Helper.GetItemFolderInfo(CurrentPath.CurrentSelectedItem.ItemPath,
                 CurrentPath.CurrentSelectedItem.MaterialPath);
@@ -2506,16 +2507,8 @@ namespace Avatar_Explorer.Forms
             if (!e.Data.GetDataPresent(DataFormats.FileDrop)) return;
             string[]? dragFilePathArr = (string[]?)e.Data.GetData(DataFormats.FileDrop, false);
             if (dragFilePathArr == null) return;
-            var folderPath = dragFilePathArr[0];
 
-            if (!(File.Exists(folderPath) && folderPath.EndsWith(".zip")) && !Directory.Exists(folderPath))
-            {
-                MessageBox.Show(Helper.Translate("フォルダを選択してください", CurrentLanguage),
-                    Helper.Translate("エラー", CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            AddItem addItem = new(this, CurrentPath.CurrentSelectedCategory, CurrentPath.CurrentSelectedCustomCategory, false, null, folderPath);
+            AddItem addItem = new(this, CurrentPath.CurrentSelectedCategory, CurrentPath.CurrentSelectedCustomCategory, false, null, dragFilePathArr);
             EventHandler itemAdded = (_, _) =>
             {
                 RefleshWindow();
@@ -2540,16 +2533,8 @@ namespace Avatar_Explorer.Forms
             if (!e.Data.GetDataPresent(DataFormats.FileDrop)) return;
             string[]? dragFilePathArr = (string[]?)e.Data.GetData(DataFormats.FileDrop, false);
             if (dragFilePathArr == null) return;
-            var folderPath = dragFilePathArr[0];
 
-            if (!(File.Exists(folderPath) && folderPath.EndsWith(".zip")) && !Directory.Exists(folderPath))
-            {
-                MessageBox.Show(Helper.Translate("フォルダを選択してください", CurrentLanguage),
-                    Helper.Translate("エラー", CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            AddItem addItem = new(this, ItemType.Avatar, null, false, null, folderPath);
+            AddItem addItem = new(this, ItemType.Avatar, null, false, null, dragFilePathArr);
             addItem.ItemAdded += (_, _) =>
             {
                 RefleshWindow();

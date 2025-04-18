@@ -48,12 +48,12 @@ namespace Avatar_Explorer.Forms
             ErrorLabel = new Label();
             AddButton = new Button();
             CustomButton = new Button();
-            folderBrowserDialog = new FolderBrowserDialog();
             openFolderButton = new Button();
             label9 = new Label();
             openMaterialFolderButton = new Button();
             MaterialTextBox = new TextBox();
             label10 = new Label();
+            otherFolderCount = new Label();
             SuspendLayout();
             // 
             // label1
@@ -92,7 +92,7 @@ namespace Avatar_Explorer.Forms
             FolderTextBox.Font = new Font(_mainForm.GuiFont, 12F);
             FolderTextBox.Location = new Point(121, 82);
             FolderTextBox.Name = "FolderTextBox";
-            FolderTextBox.Size = new Size(326, 31);
+            FolderTextBox.Size = new Size(227, 31);
             FolderTextBox.TabIndex = 3;
             FolderTextBox.TextChanged += CheckText;
             FolderTextBox.DragDrop += FolderTextBox_DragDrop;
@@ -294,11 +294,21 @@ namespace Avatar_Explorer.Forms
             label10.TabIndex = 21;
             label10.Text = "マテリアル";
             // 
+            // otherFolderCount
+            // 
+            otherFolderCount.AutoSize = true;
+            otherFolderCount.Font = new Font(_mainForm.GuiFont, 12F);
+            otherFolderCount.Location = new Point(350, 85);
+            otherFolderCount.Name = "otherFolderCount";
+            otherFolderCount.Size = new Size(0, 23);
+            otherFolderCount.TabIndex = 24;
+            // 
             // AddItem
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(550, 490);
+            Controls.Add(otherFolderCount);
             Controls.Add(openMaterialFolderButton);
             Controls.Add(MaterialTextBox);
             Controls.Add(label10);
@@ -353,11 +363,11 @@ namespace Avatar_Explorer.Forms
         private Label ErrorLabel;
         private Button AddButton;
         private Button CustomButton;
-        private FolderBrowserDialog folderBrowserDialog;
         private Button openFolderButton;
         private Label label9;
         private Button openMaterialFolderButton;
         private TextBox MaterialTextBox;
         private Label label10;
+        private Label otherFolderCount;
     }
 }

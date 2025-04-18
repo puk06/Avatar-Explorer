@@ -45,6 +45,78 @@ namespace Avatar_Explorer.Forms
         public string[] SupportedAvatar = Array.Empty<string>();
 
         /// <summary>
+        /// アイテムのその他のフォルダのパスを取得または設定します。
+        /// </summary>
+        private string[] _itemFolderPaths = Array.Empty<string>();
+
+        /// <summary>
+        /// アイテムフォルダのパスを取得または設定します。
+        /// </summary>
+        private string[] ItemFolderPaths
+        {
+            get => _itemFolderPaths;
+            set
+            {
+                var (validPaths, invalidPaths) = ValidatePaths(value);
+                _itemFolderPaths = validPaths;
+
+                // 不正なパスがある場合は通知
+                if (invalidPaths.Length > 0)
+                {
+                    ShowInvalidPathsMessage(invalidPaths, value.Length);
+                }
+
+                // UI 更新
+                UpdateFolderUI();
+            }
+        }
+
+        /// <summary>
+        /// パスの検証を行います。
+        /// </summary>
+        /// <param name="paths">検証するパスの配列</param>
+        /// <returns>有効なパスと無効なパスのタプル</returns>
+        private (string[] validPaths, string[] invalidPaths) ValidatePaths(string[] paths)
+        {
+            var validPaths = paths.Where(file => (File.Exists(file) && file.EndsWith(".zip")) || Directory.Exists(file)).ToArray();
+            var invalidPaths = paths.Except(validPaths).ToArray();
+            return (validPaths, invalidPaths);
+        }
+
+        /// <summary>
+        /// 不正なパスのメッセージを表示します。
+        /// </summary>
+        /// <param name="invalidPaths">不正なパスの配列</param>
+        /// <param name="totalPaths">全パスの数</param>
+        private void ShowInvalidPathsMessage(string[] invalidPaths, int totalPaths)
+        {
+            var invalidItems = invalidPaths.Select(file => "- " + Path.GetFileName(file)).ToArray();
+            MessageBox.Show(
+                Helper.Translate("以下のアイテムは対応していない、もしくは存在しないため追加されません", _mainForm.CurrentLanguage) +
+                $" {invalidPaths.Length}/{totalPaths}\n\n" + string.Join("\n", invalidItems),
+                Helper.Translate("エラー", _mainForm.CurrentLanguage),
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error
+            );
+        }
+
+        /// <summary>
+        /// フォルダ関連のUIを更新します。
+        /// </summary>
+        private void UpdateFolderUI()
+        {
+            if (ItemFolderPaths.Length > 0)
+            {
+                FolderTextBox.Text = ItemFolderPaths[0];
+                otherFolderCount.Text = "+" + " " + (ItemFolderPaths.Length - 1) + " " + Helper.Translate("個", _mainForm.CurrentLanguage);
+            }
+            else
+            {
+                otherFolderCount.Text = "+" + " " + 0 + " " + Helper.Translate("個", _mainForm.CurrentLanguage);
+            }
+        }
+
+        /// <summary>
         /// アイテムを追加または編集するフォームを初期化します。
         /// </summary>
         /// <param name="mainForm"></param>
@@ -52,9 +124,9 @@ namespace Avatar_Explorer.Forms
         /// <param name="customCategory"></param>
         /// <param name="edit"></param>
         /// <param name="item"></param>
-        /// <param name="folderPath"></param>
+        /// <param name="itemFolderPaths"></param>
         /// <param name="boothId"></param>
-        public AddItem(Main mainForm, ItemType type, string? customCategory, bool edit, Item? item, string? folderPath, string boothId = "")
+        public AddItem(Main mainForm, ItemType type, string? customCategory, bool edit, Item? item, string[]? itemFolderPaths, string boothId = "")
         {
             _edit = edit;
             _mainForm = mainForm;
@@ -85,7 +157,7 @@ namespace Avatar_Explorer.Forms
                 TypeComboBox.Items.Add(mainForm.CustomCategories[i]);
             }
 
-            if (folderPath != null) FolderTextBox.Text = folderPath;
+            ItemFolderPaths = itemFolderPaths ?? Array.Empty<string>();
             if (boothId != "") BoothURLTextBox.Text = "https://booth.pm/ja/items/" + boothId;
 
             if (type == ItemType.Custom)
@@ -249,42 +321,60 @@ namespace Avatar_Explorer.Forms
         /// <param name="e"></param>
         private async void AddButton_Click(object sender, EventArgs e)
         {
-            ItemType type;
-            if (TypeComboBox.SelectedIndex >= 9)
+            if (ItemFolderPaths.Length == 0)
             {
-                type = ItemType.Custom;
+                ItemFolderPaths = ItemFolderPaths.Append(FolderTextBox.Text).ToArray();
             }
             else
             {
-                type = (ItemType)TypeComboBox.SelectedIndex;
+                ItemFolderPaths[0] = FolderTextBox.Text;
             }
+
+            if (ItemFolderPaths.Length == 0)
+            {
+                MessageBox.Show(
+                    Helper.Translate("追加可能なフォルダ、またはファイルがありません", _mainForm.CurrentLanguage),
+                    Helper.Translate("エラー", _mainForm.CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ValidCheck();
+                return;
+            }
+
+            ItemType type = TypeComboBox.SelectedIndex >= 9 ? ItemType.Custom : (ItemType)TypeComboBox.SelectedIndex;
 
             AddButton.Enabled = false;
             Item.Title = TitleTextBox.Text;
             Item.AuthorName = AuthorTextBox.Text;
             Item.Type = type;
-            if (type == ItemType.Custom)
+            if (type == ItemType.Custom) Item.CustomCategory = TypeComboBox.Text;
+
+            var itemFolderArray = Array.Empty<string>();
+            foreach (var itemFolderPath in ItemFolderPaths)
             {
-                Item.CustomCategory = TypeComboBox.Text;
+                var result = ExtractZipWithHandling(itemFolderPath, Path.Combine("Datas", "Items"));
+                if (result == null) return;
+                itemFolderArray = itemFolderArray.Append(result).ToArray();
             }
 
-            var folderPath = ExtractZipWithHandling(FolderTextBox.Text, Path.Combine("Datas", "Items"));
-            if (folderPath == null) return;
-            Item.ItemPath = folderPath;
+            var parentFolder = itemFolderArray[0];
+            if (itemFolderArray.Length > 1)
+            {
+                for (var i = 1; i < itemFolderArray.Length; i++)
+                {
+                    var folderName = Path.GetFileName(itemFolderArray[i]);
+                    var newPath = Path.Combine(parentFolder, "Others", folderName);
 
-            var materialPath = ExtractZipWithHandling(MaterialTextBox.Text, Path.Combine(folderPath, "Materials"));
+                    Helper.CopyDirectory(Path.GetFullPath(itemFolderArray[i]), newPath);
+                }
+            }
+
+            Item.ItemPath = parentFolder;
+
+            var materialPath = ExtractZipWithHandling(MaterialTextBox.Text, Path.Combine(Item.ItemPath, "Materials"));
             if (materialPath == null) return;
+
             Item.MaterialPath = materialPath;
 
             if (Item.Type != ItemType.Avatar) Item.SupportedAvatar = SupportedAvatar;
-
-            if (string.IsNullOrEmpty(Item.Title) || string.IsNullOrEmpty(Item.AuthorName) || string.IsNullOrEmpty(Item.ItemPath))
-            {
-                MessageBox.Show(Helper.Translate("タイトル、作者、フォルダパスのどれかが入力されていません", _mainForm.CurrentLanguage),
-                    Helper.Translate("エラー", _mainForm.CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Error);
-                AddButton.Enabled = true;
-                return;
-            }
 
             if (Item.BoothId != -1)
             {
@@ -433,10 +523,19 @@ namespace Avatar_Explorer.Forms
         /// <param name="e"></param>
         private void openFolderButton_Click(object sender, EventArgs e)
         {
-            var result = folderBrowserDialog.ShowDialog();
+            var fbd = new FolderBrowserDialog
+            {
+                Description = Helper.Translate("アイテムフォルダを選択してください", _mainForm.CurrentLanguage),
+                UseDescriptionForTitle = true,
+                ShowNewFolderButton = true
+            };
+
+            var result = fbd.ShowDialog();
             if (result == DialogResult.OK)
             {
-                FolderTextBox.Text = folderBrowserDialog.SelectedPath;
+                ItemFolderPaths = [fbd.SelectedPath];
+                FolderTextBox.Text = fbd.SelectedPath;
+                otherFolderCount.Text = "+" + " " + (ItemFolderPaths.Length - 1) + " " + Helper.Translate("個", _mainForm.CurrentLanguage);
             }
         }
 
@@ -447,10 +546,17 @@ namespace Avatar_Explorer.Forms
         /// <param name="e"></param>
         private void openMaterialFolderButton_Click(object sender, EventArgs e)
         {
-            var result = folderBrowserDialog.ShowDialog();
+            var fbd = new FolderBrowserDialog
+            {
+                Description = Helper.Translate("マテリアルフォルダを選択してください", _mainForm.CurrentLanguage),
+                UseDescriptionForTitle = true,
+                ShowNewFolderButton = true
+            };
+
+            var result = fbd.ShowDialog();
             if (result == DialogResult.OK)
             {
-                MaterialTextBox.Text = folderBrowserDialog.SelectedPath;
+                MaterialTextBox.Text = fbd.SelectedPath;
             }
         }
 
@@ -465,16 +571,8 @@ namespace Avatar_Explorer.Forms
             if (!e.Data.GetDataPresent(DataFormats.FileDrop)) return;
             string[]? dragFilePathArr = (string[]?)e.Data.GetData(DataFormats.FileDrop, false);
             if (dragFilePathArr == null) return;
-            var folderPath = dragFilePathArr[0];
 
-            if (!(File.Exists(folderPath) && folderPath.EndsWith(".zip")) && !Directory.Exists(folderPath))
-            {
-                MessageBox.Show(Helper.Translate("フォルダを選択してください", _mainForm.CurrentLanguage),
-                    Helper.Translate("エラー", _mainForm.CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            FolderTextBox.Text = folderPath;
+            ItemFolderPaths = dragFilePathArr;
         }
 
         /// <summary>
@@ -492,7 +590,7 @@ namespace Avatar_Explorer.Forms
 
             if (!(File.Exists(folderPath) && folderPath.EndsWith(".zip")) && !Directory.Exists(folderPath))
             {
-                MessageBox.Show(Helper.Translate("フォルダを選択してください", _mainForm.CurrentLanguage),
+                MessageBox.Show(Helper.Translate("有効なフォルダ、またはzipファイルを選択してください", _mainForm.CurrentLanguage),
                     Helper.Translate("エラー", _mainForm.CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
