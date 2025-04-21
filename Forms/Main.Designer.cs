@@ -99,6 +99,8 @@ namespace Avatar_Explorer.Forms
             AvatarPage.UseVisualStyleBackColor = true;
             AvatarPage.DragDrop += AvatarPage_DragDrop;
             AvatarPage.DragEnter += Helper.DragEnter;
+            AvatarPage.MouseWheel += Helper.OnScroll;
+            AvatarPage.Scroll += Helper.OnScroll;
             // 
             // AvatarAuthorPage
             // 
@@ -110,6 +112,8 @@ namespace Avatar_Explorer.Forms
             AvatarAuthorPage.TabIndex = 1;
             AvatarAuthorPage.Text = "作者";
             AvatarAuthorPage.UseVisualStyleBackColor = true;
+            AvatarAuthorPage.MouseWheel += Helper.OnScroll;
+            AvatarAuthorPage.Scroll += Helper.OnScroll;
             // 
             // CategoryPage
             // 
@@ -120,6 +124,8 @@ namespace Avatar_Explorer.Forms
             CategoryPage.TabIndex = 2;
             CategoryPage.Text = "カテゴリ別";
             CategoryPage.UseVisualStyleBackColor = true;
+            CategoryPage.MouseWheel += Helper.OnScroll;
+            CategoryPage.Scroll += Helper.OnScroll;
             // 
             // AddItemButton
             // 
@@ -154,6 +160,8 @@ namespace Avatar_Explorer.Forms
             AvatarItemExplorer.UseVisualStyleBackColor = true;
             AvatarItemExplorer.DragDrop += AvatarItemExplorer_DragDrop;
             AvatarItemExplorer.DragEnter += Helper.DragEnter;
+            AvatarItemExplorer.MouseWheel += Helper.OnScroll;
+            AvatarItemExplorer.Scroll += Helper.OnScroll;
             // 
             // StartLabel
             // 

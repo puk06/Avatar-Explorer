@@ -9,11 +9,43 @@
         private string _toolTipText;
         private Form? _previewForm;
         private PictureBox? _previewPictureBox;
+        private Image? loadedPicture;
 
-        public Image Picture
+        public void CheckThmbnail(Point location, Size size, Rectangle scrollArea)
         {
-            get => _pictureBox.Image;
-            set => _pictureBox.Image = value;
+            if ((location.Y >= scrollArea.Y && location.Y <= scrollArea.Y + scrollArea.Height) ||
+                (location.Y + size.Height >= scrollArea.Y && location.Y + size.Height <= scrollArea.Y + scrollArea.Height))
+            {
+                if (_pictureBox.Image != null) return;
+
+                if (ImagePath == null)
+                {
+                    _pictureBox.Image = SharedImages.GetImage(SharedImages.Images.FolderIcon);
+                }
+                else
+                {
+                    if (loadedPicture == null && File.Exists(ImagePath))
+                    {
+                        try
+                        {
+                            var image = Image.FromFile(ImagePath);
+                            loadedPicture = new Bitmap(image, new Size(56, 56));
+                            image.Dispose();
+                            image = null;
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Failed to load image: {ex.Message}");
+                        }
+                    }
+
+                    _pictureBox.Image = loadedPicture ?? SharedImages.GetImage(SharedImages.Images.FileIcon);
+                }
+            }
+            else if (_pictureBox.Image != null)
+            {
+                _pictureBox.Image = null;
+            }
         }
 
         public string? ImagePath { get; set; }
@@ -117,23 +149,30 @@
                 _previewPictureBox = new PictureBox
                 {
                     Dock = DockStyle.Fill,
-                    Image = Image.FromFile(ImagePath),
                     SizeMode = PictureBoxSizeMode.StretchImage
                 };
 
-                if (_previewPictureBox.Image is { Width: > 0, Height: > 0 })
+                var image = Image.FromFile(ImagePath);
+                var imageHeight = image.Height;
+                var imageWidth = image.Width;
+
+                if (imageHeight > 0 && imageWidth > 0)
                 {
-                    if (_previewPictureBox.Image.Width > _previewPictureBox.Image.Height)
+                    if (imageWidth > imageHeight)
                     {
-                        var aspectRatio = (double)_previewPictureBox.Image.Width / _previewPictureBox.Image.Height;
+                        var aspectRatio = (double)imageWidth / imageHeight;
                         _previewForm.Width = (int)(_previewForm.Height * aspectRatio);
                     }
                     else
                     {
-                        var aspectRatio = (double)_previewPictureBox.Image.Height / _previewPictureBox.Image.Width;
+                        var aspectRatio = (double)imageHeight / imageWidth;
                         _previewForm.Height = (int)(_previewForm.Width * aspectRatio);
                     }
                 }
+
+                _previewPictureBox.Image = new Bitmap(image, new Size(_previewForm.Width, _previewForm.Height));
+                image.Dispose();
+                image = null;
 
                 _previewForm.Controls.Add(_previewPictureBox);
 
@@ -210,11 +249,21 @@
                 }
                 _pictureBox.Image = null;
 
+                foreach (Control control in Controls)
+                {
+                    control.MouseEnter -= (_, e) => OnMouseEnter(e);
+                    control.MouseLeave -= (_, e) => OnMouseLeave(e);
+                    control.MouseMove -= (_, e) => OnMouseMove(e);
+                    control.MouseDown -= (_, e) => OnMouseDown(e);
+                    control.MouseClick -= (_, e) => OnMouseClick(e);
+                }
+
                 _pictureBox.Dispose();
                 _title.Dispose();
                 _authorName.Dispose();
                 _toolTip.Dispose();
                 _previewForm?.Dispose();
+                loadedPicture?.Dispose();
             }
 
             base.Dispose(disposing);

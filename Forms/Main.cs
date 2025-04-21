@@ -92,12 +92,12 @@ namespace Avatar_Explorer.Forms
         /// <summary>
         /// フォームリサイズ時に使用されるコントロールのデフォルトサイズ
         /// </summary>
-        private readonly Dictionary<string, SizeF> _defaultControlSize = new();
+        private readonly Dictionary<string, Size> _defaultControlSize = new();
 
         /// <summary>
         /// フォームリサイズ時に使用されるコントロールのデフォルト位置
         /// </summary>
-        private readonly Dictionary<string, PointF> _defaultControlLocation = new();
+        private readonly Dictionary<string, Point> _defaultControlLocation = new();
 
         /// <summary>
         /// フォームリサイズ時に使用されるコントロールのデフォルトフォントサイズ
@@ -290,6 +290,9 @@ namespace Avatar_Explorer.Forms
                 3 => items.OrderByDescending(item => item.UpdatedDate).ToArray(),
                 _ => items.OrderBy(item => item.Title).ToArray(),
             };
+
+            AvatarPage.SuspendLayout();
+            AvatarPage.AutoScroll = false;
 
             var index = 0;
             foreach (Item item in items)
@@ -655,6 +658,11 @@ namespace Avatar_Explorer.Forms
                 AvatarPage.Controls.Add(button);
                 index++;
             }
+
+            AvatarPage.ResumeLayout();
+            AvatarPage.AutoScroll = true;
+
+            Helper.UpdateExplorerThumbnails(AvatarPage);
         }
 
         /// <summary>
@@ -679,6 +687,9 @@ namespace Avatar_Explorer.Forms
 
             if (authors.Length == 0) return;
             authors = authors.OrderBy(author => author.AuthorName).ToArray();
+
+            AvatarAuthorPage.SuspendLayout();
+            AvatarAuthorPage.AutoScroll = false;
 
             foreach (var author in authors)
             {
@@ -745,6 +756,11 @@ namespace Avatar_Explorer.Forms
                 AvatarAuthorPage.Controls.Add(button);
                 index++;
             }
+
+            AvatarAuthorPage.ResumeLayout();
+            AvatarAuthorPage.AutoScroll = true;
+
+            Helper.UpdateExplorerThumbnails(AvatarAuthorPage);
         }
 
         /// <summary>
@@ -753,6 +769,9 @@ namespace Avatar_Explorer.Forms
         private void GenerateCategoryListLeft()
         {
             ResetAvatarPage(CategoryPage);
+
+            CategoryPage.SuspendLayout();
+            CategoryPage.AutoScroll = false;
 
             var index = 0;
             foreach (ItemType itemType in Enum.GetValues(typeof(ItemType)))
@@ -788,38 +807,44 @@ namespace Avatar_Explorer.Forms
                 index++;
             }
 
-            if (CustomCategories.Length == 0) return;
-
-            foreach (var customCategory in CustomCategories)
+            if (CustomCategories.Length != 0)
             {
-                var items = Items.Where(item => item.CustomCategory == customCategory);
-                var itemCount = items.Count();
-
-                Button button = Helper.CreateButton(null, customCategory,
-                    itemCount + Helper.Translate("個の項目", CurrentLanguage), true, "", GetAvatarListWidth());
-                button.Location = new Point(0, (70 * index) + 2);
-                EventHandler clickEvent = (_, _) =>
+                foreach (var customCategory in CustomCategories)
                 {
-                    CurrentPath = new CurrentPath
+                    var items = Items.Where(item => item.CustomCategory == customCategory);
+                    var itemCount = items.Count();
+
+                    Button button = Helper.CreateButton(null, customCategory,
+                        itemCount + Helper.Translate("個の項目", CurrentLanguage), true, "", GetAvatarListWidth());
+                    button.Location = new Point(0, (70 * index) + 2);
+                    EventHandler clickEvent = (_, _) =>
                     {
-                        CurrentSelectedCategory = ItemType.Custom,
-                        CurrentSelectedCustomCategory = customCategory
+                        CurrentPath = new CurrentPath
+                        {
+                            CurrentSelectedCategory = ItemType.Custom,
+                            CurrentSelectedCustomCategory = customCategory
+                        };
+                        _authorMode = false;
+                        _categoryMode = true;
+                        SearchBox.Text = "";
+                        SearchResultLabel.Text = "";
+                        _isSearching = false;
+                        GenerateItems();
+                        PathTextBox.Text = GeneratePath();
                     };
-                    _authorMode = false;
-                    _categoryMode = true;
-                    SearchBox.Text = "";
-                    SearchResultLabel.Text = "";
-                    _isSearching = false;
-                    GenerateItems();
-                    PathTextBox.Text = GeneratePath();
-                };
 
-                button.Click += clickEvent;
-                button.Disposed += (_, _) => button.Click -= clickEvent;
+                    button.Click += clickEvent;
+                    button.Disposed += (_, _) => button.Click -= clickEvent;
 
-                CategoryPage.Controls.Add(button);
-                index++;
+                    CategoryPage.Controls.Add(button);
+                    index++;
+                }
             }
+
+            CategoryPage.ResumeLayout();
+            CategoryPage.AutoScroll = true;
+
+            Helper.UpdateExplorerThumbnails(CategoryPage);
         }
         #endregion
 
@@ -831,6 +856,9 @@ namespace Avatar_Explorer.Forms
         {
             _openingWindow = Window.ItemCategoryList;
             ResetAvatarExplorer();
+
+            AvatarItemExplorer.SuspendLayout();
+            AvatarItemExplorer.AutoScroll = false;
 
             var index = 0;
             foreach (ItemType itemType in Enum.GetValues(typeof(ItemType)))
@@ -878,48 +906,55 @@ namespace Avatar_Explorer.Forms
                 index++;
             }
 
-            if (CustomCategories.Length == 0) return;
-            foreach (var customCategory in CustomCategories)
+            if (CustomCategories.Length != 0)
             {
-                var itemCount = 0;
-                if (_authorMode)
+                foreach (var customCategory in CustomCategories)
                 {
-                    itemCount = Items.Count(item =>
-                        item.CustomCategory == customCategory &&
-                        item.AuthorName == CurrentPath.CurrentSelectedAuthor?.AuthorName
-                    );
+                    var itemCount = 0;
+                    if (_authorMode)
+                    {
+                        itemCount = Items.Count(item =>
+                            item.CustomCategory == customCategory &&
+                            item.AuthorName == CurrentPath.CurrentSelectedAuthor?.AuthorName
+                        );
+                    }
+                    else
+                    {
+                        itemCount = Items.Count(item =>
+                            item.CustomCategory == customCategory &&
+                            (
+                                Helper.IsSupportedAvatarOrCommon(item, CommonAvatars, CurrentPath.CurrentSelectedAvatarPath)
+                                    .IsSupportedOrCommon ||
+                                item.SupportedAvatar.Length == 0 || CurrentPath.CurrentSelectedAvatar == "*"
+                            )
+                        );
+                    }
+
+                    if (itemCount == 0) continue;
+
+                    Button button = Helper.CreateButton(null, customCategory,
+                        itemCount + Helper.Translate("個の項目", CurrentLanguage), false, "", GetItemExplorerListWidth());
+                    button.Location = new Point(0, (70 * index) + 2);
+                    EventHandler clickEvent = (_, _) =>
+                    {
+                        CurrentPath.CurrentSelectedCategory = ItemType.Custom;
+                        CurrentPath.CurrentSelectedCustomCategory = customCategory;
+                        GenerateItems();
+                        PathTextBox.Text = GeneratePath();
+                    };
+
+                    button.Click += clickEvent;
+                    button.Disposed += (_, _) => button.Click -= clickEvent;
+
+                    AvatarItemExplorer.Controls.Add(button);
+                    index++;
                 }
-                else
-                {
-                    itemCount = Items.Count(item =>
-                        item.CustomCategory == customCategory &&
-                        (
-                            Helper.IsSupportedAvatarOrCommon(item, CommonAvatars, CurrentPath.CurrentSelectedAvatarPath)
-                                .IsSupportedOrCommon ||
-                            item.SupportedAvatar.Length == 0 || CurrentPath.CurrentSelectedAvatar == "*"
-                        )
-                    );
-                }
-
-                if (itemCount == 0) continue;
-
-                Button button = Helper.CreateButton(null, customCategory,
-                    itemCount + Helper.Translate("個の項目", CurrentLanguage), false, "", GetItemExplorerListWidth());
-                button.Location = new Point(0, (70 * index) + 2);
-                EventHandler clickEvent = (_, _) =>
-                {
-                    CurrentPath.CurrentSelectedCategory = ItemType.Custom;
-                    CurrentPath.CurrentSelectedCustomCategory = customCategory;
-                    GenerateItems();
-                    PathTextBox.Text = GeneratePath();
-                };
-
-                button.Click += clickEvent;
-                button.Disposed += (_, _) => button.Click -= clickEvent;
-
-                AvatarItemExplorer.Controls.Add(button);
-                index++;
             }
+
+            AvatarItemExplorer.ResumeLayout();
+            AvatarItemExplorer.AutoScroll = true;
+
+            Helper.UpdateExplorerThumbnails(AvatarItemExplorer);
         }
 
         /// <summary>
@@ -967,6 +1002,9 @@ namespace Avatar_Explorer.Forms
             };
 
             if (!filteredItems.Any()) return;
+
+            AvatarItemExplorer.SuspendLayout();
+            AvatarItemExplorer.AutoScroll = false;
 
             var index = 0;
             foreach (Item item in filteredItems)
@@ -1329,6 +1367,11 @@ namespace Avatar_Explorer.Forms
                 AvatarItemExplorer.Controls.Add(button);
                 index++;
             }
+
+            AvatarItemExplorer.ResumeLayout();
+            AvatarItemExplorer.AutoScroll = true;
+
+            Helper.UpdateExplorerThumbnails(AvatarItemExplorer);
         }
 
         /// <summary>
@@ -1354,6 +1397,9 @@ namespace Avatar_Explorer.Forms
 
             ResetAvatarExplorer();
 
+            AvatarItemExplorer.SuspendLayout();
+            AvatarItemExplorer.AutoScroll = false;
+
             var index = 0;
             foreach (var itemType in types)
             {
@@ -1377,6 +1423,11 @@ namespace Avatar_Explorer.Forms
                 AvatarItemExplorer.Controls.Add(button);
                 index++;
             }
+
+            AvatarItemExplorer.ResumeLayout();
+            AvatarItemExplorer.AutoScroll = true;
+
+            Helper.UpdateExplorerThumbnails(AvatarItemExplorer);
         }
 
         /// <summary>
@@ -1391,6 +1442,9 @@ namespace Avatar_Explorer.Forms
             if (files.Length == 0) return;
 
             files = files.OrderBy(file => file.FileName).ToArray();
+
+            AvatarItemExplorer.SuspendLayout();
+            AvatarItemExplorer.AutoScroll = false;
 
             var index = 0;
             foreach (var file in files)
@@ -1497,6 +1551,11 @@ namespace Avatar_Explorer.Forms
                 AvatarItemExplorer.Controls.Add(button);
                 index++;
             }
+
+            AvatarItemExplorer.ResumeLayout();
+            AvatarItemExplorer.AutoScroll = true;
+
+            Helper.UpdateExplorerThumbnails(AvatarItemExplorer);
         }
         #endregion
 
@@ -1614,6 +1673,9 @@ namespace Avatar_Explorer.Forms
                                      Helper.Translate("件", CurrentLanguage) + Helper.Translate(" (全", CurrentLanguage) +
                                      Items.Length + Helper.Translate("件)", CurrentLanguage);
             if (!filteredItems.Any()) return;
+
+            AvatarItemExplorer.SuspendLayout();
+            AvatarItemExplorer.AutoScroll = false;
 
             var index = 0;
             foreach (Item item in filteredItems)
@@ -1938,6 +2000,11 @@ namespace Avatar_Explorer.Forms
                 AvatarItemExplorer.Controls.Add(button);
                 index++;
             }
+
+            AvatarItemExplorer.ResumeLayout();
+            AvatarItemExplorer.AutoScroll = true;
+
+            Helper.UpdateExplorerThumbnails(AvatarItemExplorer);
         }
 
         /// <summary>
@@ -1972,6 +2039,9 @@ namespace Avatar_Explorer.Forms
                                      Helper.Translate("件", CurrentLanguage) + Helper.Translate(" (全", CurrentLanguage) +
                                      fileDatas.Length + Helper.Translate("件)", CurrentLanguage);
             if (filteredItems.Count == 0) return;
+
+            AvatarItemExplorer.SuspendLayout();
+            AvatarItemExplorer.AutoScroll = false;
 
             var index = 0;
             foreach (var file in filteredItems)
@@ -2071,6 +2141,11 @@ namespace Avatar_Explorer.Forms
                 AvatarItemExplorer.Controls.Add(button);
                 index++;
             }
+
+            AvatarItemExplorer.ResumeLayout();
+            AvatarItemExplorer.AutoScroll = true;
+
+            Helper.UpdateExplorerThumbnails(AvatarItemExplorer);
         }
         #endregion
 
@@ -2422,33 +2497,47 @@ namespace Avatar_Explorer.Forms
                 _openingWindow = Window.Nothing;
             }
 
-            for (int i = AvatarItemExplorer.Controls.Count - 1; i >= 0; i--)
+            var controls = AvatarItemExplorer.Controls.Cast<Control>().ToList();
+            controls.Reverse();
+
+            AvatarItemExplorer.SuspendLayout();
+            AvatarItemExplorer.AutoScroll = false;
+
+            controls.ForEach(control =>
             {
-                if (AvatarItemExplorer.Controls[i].Name != "StartLabel")
+                if (control is Label label)
                 {
-                    var control = AvatarItemExplorer.Controls[i];
-                    AvatarItemExplorer.Controls.RemoveAt(i);
-                    control.Dispose();
+                    label.Visible = startLabelVisible;
+                    return;
                 }
-                else
-                {
-                    AvatarItemExplorer.Controls[i].Visible = startLabelVisible;
-                }
-            }
+                control.Visible = false;
+                control.Dispose();
+            });
+
+            AvatarItemExplorer.ResumeLayout();
+            AvatarItemExplorer.AutoScroll = true;
         }
 
         /// <summary>
         /// メイン画面左の画面をリセットします。
         /// </summary>
         /// <param name="page"></param>
-        private static void ResetAvatarPage(Control page)
+        private static void ResetAvatarPage(TabPage page)
         {
-            for (int i = page.Controls.Count - 1; i >= 0; i--)
+            var controls = page.Controls.Cast<Control>().ToList();
+            controls.Reverse();
+
+            page.SuspendLayout();
+            page.AutoScroll = false;
+
+            controls.ForEach(control =>
             {
-                var control = page.Controls[i];
-                page.Controls.RemoveAt(i);
+                control.Visible = false;
                 control.Dispose();
-            }
+            });
+
+            page.ResumeLayout();
+            page.AutoScroll = true;
         }
 
         /// <summary>
@@ -3029,7 +3118,7 @@ namespace Avatar_Explorer.Forms
                 // サイズのスケーリング
                 if (!_defaultControlSize.TryGetValue(control.Name, out var defaultSize))
                 {
-                    defaultSize = new SizeF(control.Size.Width, control.Size.Height);
+                    defaultSize = new Size(control.Size.Width, control.Size.Height);
                     _defaultControlSize.Add(control.Name, defaultSize);
                 }
 
@@ -3045,7 +3134,7 @@ namespace Avatar_Explorer.Forms
                 // 位置のスケーリング
                 if (!_defaultControlLocation.TryGetValue(control.Name, out var defaultLocation))
                 {
-                    defaultLocation = new PointF(control.Location.X, control.Location.Y);
+                    defaultLocation = new Point(control.Location.X, control.Location.Y);
                     _defaultControlLocation.Add(control.Name, defaultLocation);
                 }
 

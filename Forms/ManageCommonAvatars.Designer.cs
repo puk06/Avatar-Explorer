@@ -1,4 +1,6 @@
-﻿namespace Avatar_Explorer.Forms
+﻿using Avatar_Explorer.Classes;
+
+namespace Avatar_Explorer.Forms
 {
     partial class ManageCommonAvatars
     {
@@ -101,6 +103,8 @@
             AvatarList.TabIndex = 0;
             AvatarList.Text = "アバターリスト";
             AvatarList.UseVisualStyleBackColor = true;
+            AvatarList.MouseWheel += Helper.OnScroll;
+            AvatarList.Scroll += Helper.OnScroll;
             // 
             // AvatarListTab
             // 
