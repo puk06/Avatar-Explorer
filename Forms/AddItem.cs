@@ -57,7 +57,8 @@ namespace Avatar_Explorer.Forms
             get => _itemFolderPaths;
             set
             {
-                var (validPaths, invalidPaths) = ValidatePaths(value);
+                var validPaths = value.Where(file => (File.Exists(file) && file.EndsWith(".zip")) || Directory.Exists(file)).ToArray();
+                var invalidPaths = value.Except(validPaths).ToArray();
                 _itemFolderPaths = validPaths;
 
                 // 不正なパスがある場合は通知
@@ -69,18 +70,6 @@ namespace Avatar_Explorer.Forms
                 // UI 更新
                 UpdateFolderUI();
             }
-        }
-
-        /// <summary>
-        /// パスの検証を行います。
-        /// </summary>
-        /// <param name="paths">検証するパスの配列</param>
-        /// <returns>有効なパスと無効なパスのタプル</returns>
-        private (string[] validPaths, string[] invalidPaths) ValidatePaths(string[] paths)
-        {
-            var validPaths = paths.Where(file => (File.Exists(file) && file.EndsWith(".zip")) || Directory.Exists(file)).ToArray();
-            var invalidPaths = paths.Except(validPaths).ToArray();
-            return (validPaths, invalidPaths);
         }
 
         /// <summary>

@@ -15,11 +15,6 @@ namespace Avatar_Explorer.Forms
         private readonly AddItem _addItem;
 
         /// <summary>
-        /// ファイルアイコンのイメージを取得します。
-        /// </summary>
-        private static readonly Image FileImage = SharedImages.GetImage(SharedImages.Images.FileIcon);
-
-        /// <summary>
         /// 対応アバターの選択フォームを初期化します。
         /// </summary>
         /// <param name="mainForm"></param>
@@ -59,6 +54,9 @@ namespace Avatar_Explorer.Forms
             if (items.Count == 0) return;
             items = items.OrderBy(item => item.Title).ToList();
 
+            AvatarList.SuspendLayout();
+            AvatarList.AutoScroll = false;
+
             var index = 0;
             foreach (Item item in items)
             {
@@ -69,6 +67,11 @@ namespace Avatar_Explorer.Forms
                 AvatarList.Controls.Add(button);
                 index++;
             }
+
+            AvatarList.ResumeLayout();
+            AvatarList.AutoScroll = true;
+
+            Helper.UpdateExplorerThumbnails(AvatarList);
         }
 
         /// <summary>
@@ -81,7 +84,6 @@ namespace Avatar_Explorer.Forms
         {
             CustomItemButton button = new CustomItemButton(1009);
             button.ImagePath = item.ImagePath;
-            button.Picture = File.Exists(item.ImagePath) ? Image.FromFile(item.ImagePath) : FileImage;
             button.TitleText = item.Title;
             button.AuthorName = Helper.Translate("作者: ", language) + item.AuthorName;
             button.ToolTipText = item.Title;

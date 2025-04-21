@@ -1,4 +1,6 @@
-﻿namespace Avatar_Explorer.Forms
+﻿using Avatar_Explorer.Classes;
+
+namespace Avatar_Explorer.Forms
 {
     sealed partial class SelectSupportedAvatar
     {
@@ -74,6 +76,8 @@
             AvatarList.TabIndex = 0;
             AvatarList.Text = "アバターリスト";
             AvatarList.UseVisualStyleBackColor = true;
+            AvatarList.MouseWheel += Helper.OnScroll;
+            AvatarList.Scroll += Helper.OnScroll;
             // 
             // SelectSupportedAvatar
             // 

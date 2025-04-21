@@ -180,17 +180,6 @@ namespace Avatar_Explorer.Classes
                 buttonWidth += listWidthDiff;
             CustomItemButton button = new(buttonWidth);
 
-            if (imagePath == null)
-            {
-                button.Picture = SharedImages.GetImage(SharedImages.Images.FolderIcon);
-            }
-            else
-            {
-                button.Picture = File.Exists(imagePath)
-                    ? ResizeImage(imagePath, 100, 100)
-                    : SharedImages.GetImage(SharedImages.Images.FileIcon);
-            }
-
             button.ImagePath = imagePath;
             button.TitleText = labelTitle;
             if (description != null)
@@ -1263,6 +1252,11 @@ namespace Avatar_Explorer.Classes
             }
         }
 
+        /// <summary>
+        /// UnixTimeから日付文字列を取得します。
+        /// </summary>
+        /// <param name="unixTime"></param>
+        /// <returns></returns>
         public static string GetDateStringFromUnixTime(string unixTime)
         {
             if (string.IsNullOrEmpty(unixTime)) return "Invalid Date";
@@ -1278,9 +1272,43 @@ namespace Avatar_Explorer.Classes
             return "Invalid Date";
         }
 
+        /// <summary>
+        /// UnixTimeを取得します。
+        /// </summary>
+        /// <returns></returns>
         public static string GetUnixTime()
         {
             return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
         }
+
+        /// <summary>
+        /// 指定されたTabPageのサムネイルを更新します。
+        /// </summary>
+        /// <param name="senderObject"></param>
+        public static void UpdateExplorerThumbnails(object senderObject)
+        {
+            if (senderObject is TabPage tabPage)
+            {
+                var visibleArea = new Rectangle(0, tabPage.VerticalScroll.Value,
+                    tabPage.ClientSize.Width, tabPage.ClientSize.Height);
+
+                foreach (Control control in tabPage.Controls)
+                {
+                    if (control is CustomItemButton button)
+                    {
+                        var buttonAbsoluteLocation = button.Location;
+                        buttonAbsoluteLocation.Y += tabPage.VerticalScroll.Value;
+                        button.CheckThmbnail(buttonAbsoluteLocation, button.Size, visibleArea);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// スクロールイベントを処理します。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public static void OnScroll(object sender, EventArgs e) => UpdateExplorerThumbnails(sender);
     }
 }

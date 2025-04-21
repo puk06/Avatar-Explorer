@@ -68,6 +68,9 @@ namespace Avatar_Explorer.Forms
             if (items.Count == 0) return;
             items = items.OrderBy(item => item.Title).ToList();
 
+            AvatarList.SuspendLayout();
+            AvatarList.AutoScroll = false;
+
             var index = 0;
             foreach (Item item in _mainForm.Items.Where(item => item.Type == ItemType.Avatar))
             {
@@ -86,6 +89,11 @@ namespace Avatar_Explorer.Forms
                 AvatarList.Controls.Add(button);
                 index++;
             }
+
+            AvatarList.ResumeLayout();
+            AvatarList.AutoScroll = true;
+
+            Helper.UpdateExplorerThumbnails(AvatarList);
         }
 
         /// <summary>
@@ -94,11 +102,10 @@ namespace Avatar_Explorer.Forms
         /// <param name="item"></param>
         /// <param name="language"></param>
         /// <returns></returns>
-        private static Button CreateAvatarButton(Item item, string language)
+        private static CustomItemButton CreateAvatarButton(Item item, string language)
         {
             CustomItemButton button = new CustomItemButton(875);
             button.ImagePath = item.ImagePath;
-            button.Picture = File.Exists(item.ImagePath) ? Image.FromFile(item.ImagePath) : FileImage;
             button.TitleText = item.Title;
             button.AuthorName = Helper.Translate("作者: ", language) + item.AuthorName;
             button.ToolTipText = item.Title;

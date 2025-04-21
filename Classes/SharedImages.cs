@@ -8,32 +8,32 @@
         /// <summary>
         /// ファイルの画像を取得します。
         /// </summary>
-        private static readonly Image FileImage = Image.FromStream(new MemoryStream(Properties.Resources.FileIcon));
+        private static readonly Image FileImage = new Bitmap(Image.FromStream(new MemoryStream(Properties.Resources.FileIcon)), new Size(56, 56));
 
         /// <summary>
         /// フォルダの画像を取得します。
         /// </summary>
-        private static readonly Image FolderImage = Image.FromStream(new MemoryStream(Properties.Resources.FolderIcon));
+        private static readonly Image FolderImage = new Bitmap(Image.FromStream(new MemoryStream(Properties.Resources.FolderIcon)), new Size(56, 56));
 
         /// <summary>
         /// コピーの画像を取得します。
         /// </summary>
-        private static readonly Image CopyImage = Image.FromStream(new MemoryStream(Properties.Resources.CopyIcon));
+        private static readonly Image CopyImage = new Bitmap(Image.FromStream(new MemoryStream(Properties.Resources.CopyIcon)), new Size(56, 56));
 
         /// <summary>
         /// ゴミ箱の画像を取得します。
         /// </summary>
-        private static readonly Image TrashImage = Image.FromStream(new MemoryStream(Properties.Resources.TrashIcon));
+        private static readonly Image TrashImage = new Bitmap(Image.FromStream(new MemoryStream(Properties.Resources.TrashIcon)), new Size(56, 56));
 
         /// <summary>
         /// 編集の画像を取得します。
         /// </summary>
-        private static readonly Image EditImage = Image.FromStream(new MemoryStream(Properties.Resources.EditIcon));
+        private static readonly Image EditImage = new Bitmap(Image.FromStream(new MemoryStream(Properties.Resources.EditIcon)), new Size(56, 56));
 
         /// <summary>
         /// 開くの画像を取得します。
         /// </summary>
-        private static readonly Image OpenImage = Image.FromStream(new MemoryStream(Properties.Resources.OpenIcon));
+        private static readonly Image OpenImage = new Bitmap(Image.FromStream(new MemoryStream(Properties.Resources.OpenIcon)), new Size(56, 56));
 
         /// <summary>
         /// 共有画像を取得します。
