@@ -3089,7 +3089,7 @@ namespace Avatar_Explorer.Forms
             var familyName = previousFont.FontFamily.Name;
             if (familyName == "Yu Gothic UI") return;
             var previousSize = control.Font.Size;
-            if (previousSize is < 0 or >= float.MaxValue) return;
+            if (previousSize is <= 0 or >= float.MaxValue) return;
             control.Font = new Font(GuiFont, previousSize);
         }
 
@@ -3145,7 +3145,7 @@ namespace Avatar_Explorer.Forms
                 if (control is Label or TextBox or ComboBox)
                 {
                     var newFontSize = defaultSize.ScreenFontSize * ClientSize.Height;
-                    if (newFontSize < 0 || newFontSize >= float.MaxValue) continue;
+                    if (newFontSize <= 0 || newFontSize >= float.MaxValue) continue;
                     control.Font = new Font(control.Font.FontFamily, newFontSize, control.Font.Style);
                 }
             }
