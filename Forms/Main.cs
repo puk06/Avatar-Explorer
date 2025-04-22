@@ -237,6 +237,18 @@ namespace Avatar_Explorer.Forms
                     X = SortingBox.Location.X + SortingBox.Width / 2 - SortingLabel.Width / 2,
                     Y = SortingLabel.Location.Y
                 };
+
+                label1.Location = label1.Location with
+                {
+                    X = SearchBox.Location.X - label1.Width - 5,
+                    Y = SearchBox.Location.Y + SearchBox.Height / 2 - label1.Height / 2
+                };
+
+                SearchResultLabel.Location = SearchResultLabel.Location with
+                {
+                    X = label1.Location.X,
+                    Y = SearchResultLabel.Location.Y
+                };
             }
             catch (Exception ex)
             {
@@ -2811,6 +2823,8 @@ namespace Avatar_Explorer.Forms
                 ChangeControlFont(control);
             }
 
+            ResizeControl();
+
             PathTextBox.Text = GeneratePath();
             RefleshWindow();
         }
@@ -3172,6 +3186,18 @@ namespace Avatar_Explorer.Forms
             {
                 X = SortingBox.Location.X + SortingBox.Width / 2 - SortingLabel.Width / 2,
                 Y = SortingLabel.Location.Y
+            };
+
+            label1.Location = label1.Location with
+            {
+                X = SearchBox.Location.X - label1.Width - 5,
+                Y = SearchBox.Location.Y + SearchBox.Height / 2 - label1.Height / 2
+            };
+
+            SearchResultLabel.Location = SearchResultLabel.Location with
+            {
+                X = label1.Location.X,
+                Y = SearchResultLabel.Location.Y
             };
 
             labelControl.Location = labelControl.Location with
