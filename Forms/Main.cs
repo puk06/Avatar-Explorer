@@ -225,6 +225,18 @@ namespace Avatar_Explorer.Forms
                         Helper.SaveItemsData(Items);
                     }
                 }
+
+                label2.Location = label2.Location with
+                {
+                    X = LanguageBox.Location.X + LanguageBox.Width / 2 - label2.Width / 2,
+                    Y = label2.Location.Y
+                };
+
+                SortingLabel.Location = SortingLabel.Location with
+                {
+                    X = SortingBox.Location.X + SortingBox.Width / 2 - SortingLabel.Width / 2,
+                    Y = SortingLabel.Location.Y
+                };
             }
             catch (Exception ex)
             {
@@ -3142,13 +3154,25 @@ namespace Avatar_Explorer.Forms
 
                 control.Location = new Point(newX, newY);
 
-                if (control is Label or TextBox or ComboBox)
+                if (control is Label or TextBox or ComboBox or Button)
                 {
                     var newFontSize = defaultSize.ScreenFontSize * ClientSize.Height;
                     if (newFontSize <= 0 || newFontSize >= float.MaxValue) continue;
                     control.Font = new Font(control.Font.FontFamily, newFontSize, control.Font.Style);
                 }
             }
+
+            label2.Location = label2.Location with
+            {
+                X = LanguageBox.Location.X + LanguageBox.Width / 2 - label2.Width / 2,
+                Y = label2.Location.Y
+            };
+
+            SortingLabel.Location = SortingLabel.Location with
+            {
+                X = SortingBox.Location.X + SortingBox.Width / 2 - SortingLabel.Width / 2,
+                Y = SortingLabel.Location.Y
+            };
 
             labelControl.Location = labelControl.Location with
             {

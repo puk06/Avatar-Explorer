@@ -229,7 +229,7 @@ namespace Avatar_Explorer.Forms
             // 
             label2.AutoSize = true;
             label2.Font = new Font("Yu Gothic UI", 13F);
-            label2.Location = new Point(775, 634);
+            label2.Location = new Point(774, 634);
             label2.Name = "label2";
             label2.Size = new Size(142, 25);
             label2.TabIndex = 12;
@@ -287,7 +287,7 @@ namespace Avatar_Explorer.Forms
             // 
             SortingLabel.AutoSize = true;
             SortingLabel.Font = new Font("Yu Gothic UI", 13F);
-            SortingLabel.Location = new Point(955, 634);
+            SortingLabel.Location = new Point(956, 634);
             SortingLabel.Name = "SortingLabel";
             SortingLabel.Size = new Size(77, 25);
             SortingLabel.TabIndex = 16;
