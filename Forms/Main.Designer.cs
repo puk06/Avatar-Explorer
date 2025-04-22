@@ -73,6 +73,7 @@ namespace Avatar_Explorer.Forms
             PathTextBox.Name = "PathTextBox";
             PathTextBox.Size = new Size(733, 25);
             PathTextBox.TabIndex = 2;
+            PathTextBox.ReadOnly = true;
             PathTextBox.Text = "ここには現在のパスが表示されます";
             // 
             // AvatarSearchFilterList
@@ -187,7 +188,7 @@ namespace Avatar_Explorer.Forms
             // 
             label1.AutoSize = true;
             label1.Font = new Font(GuiFont, 12F);
-            label1.Location = new Point(917, 20);
+            label1.Location = new Point(917, 16);
             label1.Name = "label1";
             label1.Size = new Size(42, 23);
             label1.TabIndex = 8;

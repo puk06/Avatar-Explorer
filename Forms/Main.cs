@@ -1,10 +1,10 @@
+using Avatar_Explorer.Classes;
 using System.Diagnostics;
 using System.Drawing.Text;
 using System.IO.Compression;
 using System.Media;
 using System.Runtime.InteropServices;
 using System.Text;
-using Avatar_Explorer.Classes;
 using Timer = System.Windows.Forms.Timer;
 
 namespace Avatar_Explorer.Forms
@@ -80,11 +80,6 @@ namespace Avatar_Explorer.Forms
         #region フォームリサイズ関連の変数
 
         /// <summary>
-        /// フォントを変更する際の最小フォントサイズ
-        /// </summary>
-        private const float MinFontSize = 8f;
-
-        /// <summary>
         /// フォームリサイズ時に使用されるコントロール名のディクショナリー
         /// </summary>
         private readonly Dictionary<string, string> _controlNames = new();
@@ -92,17 +87,7 @@ namespace Avatar_Explorer.Forms
         /// <summary>
         /// フォームリサイズ時に使用されるコントロールのデフォルトサイズ
         /// </summary>
-        private readonly Dictionary<string, Size> _defaultControlSize = new();
-
-        /// <summary>
-        /// フォームリサイズ時に使用されるコントロールのデフォルト位置
-        /// </summary>
-        private readonly Dictionary<string, Point> _defaultControlLocation = new();
-
-        /// <summary>
-        /// フォームリサイズ時に使用されるコントロールのデフォルトフォントサイズ
-        /// </summary>
-        private readonly Dictionary<string, float> _defaultFontSize = new();
+        private readonly Dictionary<string, ControlScale> _defaultControlSize = new();
 
         /// <summary>
         /// フォームの初期サイズ
@@ -118,6 +103,11 @@ namespace Avatar_Explorer.Forms
         /// メイン画面右のアイテム欄の初期幅
         /// </summary>
         private readonly int _baseAvatarItemExplorerListWidth;
+
+        /// <summary>
+        /// リサイズ用のタイマー
+        /// </summary>
+        private readonly Timer _resizeTimer = new();
 
         /// <summary>
         /// Get AvatarList Width
@@ -204,6 +194,12 @@ namespace Avatar_Explorer.Forms
                 _initialFormSize = ClientSize;
                 _baseAvatarSearchFilterListWidth = AvatarSearchFilterList.Width;
                 _baseAvatarItemExplorerListWidth = AvatarItemExplorer.Width;
+                _resizeTimer.Interval = 100; // 100ms 後に ResizeControl を呼ぶ
+                _resizeTimer.Tick += (s, ev) =>
+                {
+                    _resizeTimer.Stop();
+                    ResizeControl();
+                };
                 _initialized = true;
 
                 // Render Window
@@ -3102,7 +3098,11 @@ namespace Avatar_Explorer.Forms
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Main_Resize(object sender, EventArgs e) => ResizeControl();
+        private void Main_Resize(object sender, EventArgs e)
+        {
+            _resizeTimer.Stop();
+            _resizeTimer.Start();
+        }
 
         /// <summary>
         /// コントロールのサイズや位置を変更します。
@@ -3110,108 +3110,51 @@ namespace Avatar_Explorer.Forms
         private void ResizeControl()
         {
             if (!_initialized) return;
-            var widthRatio = (float)ClientSize.Width / _initialFormSize.Width;
-            var heightRatio = (float)ClientSize.Height / _initialFormSize.Height;
 
-            foreach (Control control in Controls)
+            var labelControl = AvatarItemExplorer.Controls.OfType<Label>().First();
+            var allControls = Controls.OfType<Control>().ToList();
+            allControls.Add(labelControl);
+
+            foreach (Control control in allControls)
             {
                 // サイズのスケーリング
                 if (!_defaultControlSize.TryGetValue(control.Name, out var defaultSize))
                 {
-                    defaultSize = new Size(control.Size.Width, control.Size.Height);
+                    defaultSize = new ControlScale()
+                    {
+                        ScreenLocationYRatio = (float)control.Location.Y / _initialFormSize.Height,
+                        ScreenLocationXRatio = (float)control.Location.X / _initialFormSize.Width,
+                        ScreenWidthRatio = (float)control.Size.Width / _initialFormSize.Width,
+                        ScreenHeightRatio = (float)control.Size.Height / _initialFormSize.Height,
+                        ScreenFontSize = control.Font.Size / _initialFormSize.Height
+                    };
+
                     _defaultControlSize.Add(control.Name, defaultSize);
                 }
 
-                var newWidth = (int)(defaultSize.Width * widthRatio);
-                var newHeight = (int)(defaultSize.Height * heightRatio);
-
-                // サイズがクライアント領域を超えないように制約
-                newWidth = Math.Min(newWidth, ClientSize.Width);
-                newHeight = Math.Min(newHeight, ClientSize.Height);
+                var newWidth = (int)(defaultSize.ScreenWidthRatio * ClientSize.Width);
+                var newHeight = (int)(defaultSize.ScreenHeightRatio * ClientSize.Height);
 
                 control.Size = new Size(newWidth, newHeight);
 
-                // 位置のスケーリング
-                if (!_defaultControlLocation.TryGetValue(control.Name, out var defaultLocation))
-                {
-                    defaultLocation = new Point(control.Location.X, control.Location.Y);
-                    _defaultControlLocation.Add(control.Name, defaultLocation);
-                }
-
-                var newX = (int)(defaultLocation.X * widthRatio);
-                var newY = (int)(defaultLocation.Y * heightRatio);
-
-                // 位置がクライアント領域を超えないように制約
-                newX = Math.Max(0, Math.Min(newX, ClientSize.Width - control.Width));
-                newY = Math.Max(0, Math.Min(newY, ClientSize.Height - control.Height));
+                var newX = (int)(defaultSize.ScreenLocationXRatio * ClientSize.Width);
+                var newY = (int)(defaultSize.ScreenLocationYRatio * ClientSize.Height);
 
                 control.Location = new Point(newX, newY);
 
-                switch (control)
+                if (control is Label or TextBox or ComboBox)
                 {
-                    // ラベル、テキストボックスのフォントサイズのスケーリング
-                    case Label { Name: "SearchResultLabel" } label:
-                        {
-                            if (!_defaultFontSize.TryGetValue(label.Name, out var defaultFontSize))
-                            {
-                                defaultFontSize = label.Font.Size;
-                                _defaultFontSize.Add(label.Name, defaultFontSize);
-                            }
-
-                            var scaleRatio = Math.Min(widthRatio, heightRatio);
-                            var newFontSize = defaultFontSize * scaleRatio;
-
-                            // 小さくなる場合のみフォントサイズを変更
-                            if (!(newFontSize < defaultFontSize)) continue;
-                            newFontSize = Math.Max(newFontSize, MinFontSize);
-                            if (newFontSize is < 0 or >= float.MaxValue) continue;
-                            label.Font = new Font(label.Font.FontFamily, newFontSize, label.Font.Style);
-                            break;
-                        }
-                    // SearchResultLabel以外
-                    case Label label:
-                        {
-                            if (!_defaultFontSize.TryGetValue(label.Name, out var defaultFontSize))
-                            {
-                                defaultFontSize = label.Font.Size;
-                                _defaultFontSize.Add(label.Name, defaultFontSize);
-                            }
-
-                            var scaleRatio = Math.Min(widthRatio, heightRatio);
-                            var newFontSize = defaultFontSize * scaleRatio;
-                            newFontSize = Math.Max(newFontSize, MinFontSize);
-                            if (newFontSize is < 0 or >= float.MaxValue) continue;
-                            label.Font = new Font(label.Font.FontFamily, newFontSize, label.Font.Style);
-                            break;
-                        }
-                    case TextBox:
-                        {
-                            if (!_defaultFontSize.TryGetValue(control.Name, out var defaultFontSize))
-                            {
-                                defaultFontSize = control.Font.Size;
-                                _defaultFontSize.Add(control.Name, defaultFontSize);
-                            }
-
-                            var scaleRatio = Math.Min(widthRatio, heightRatio);
-                            var newFontSize = defaultFontSize * scaleRatio;
-                            newFontSize = Math.Max(newFontSize, MinFontSize);
-                            if (newFontSize is < 0 or >= float.MaxValue) continue;
-                            control.Font = new Font(control.Font.FontFamily, newFontSize, control.Font.Style);
-                            break;
-                        }
+                    var newFontSize = defaultSize.ScreenFontSize * ClientSize.Height;
+                    if (newFontSize < 0 || newFontSize >= float.MaxValue) continue;
+                    control.Font = new Font(control.Font.FontFamily, newFontSize, control.Font.Style);
                 }
             }
 
-            for (int i = AvatarItemExplorer.Controls.Count - 1; i >= 0; i--)
+            labelControl.Location = labelControl.Location with
             {
-                if (AvatarItemExplorer.Controls[i].Name != "StartLabel") continue;
-                var control = AvatarItemExplorer.Controls[i];
-                control.Location = control.Location with
-                {
-                    X = (AvatarItemExplorer.Width - control.Width) / 2,
-                    Y = (AvatarItemExplorer.Height - control.Height) / 2
-                };
-            }
+                X = (AvatarItemExplorer.Width - labelControl.Width) / 2,
+                Y = (AvatarItemExplorer.Height - labelControl.Height) / 2
+            };
 
             ScaleItemButtons();
         }

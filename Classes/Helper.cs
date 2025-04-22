@@ -178,10 +178,12 @@ namespace Avatar_Explorer.Classes
             var buttonWidth = @short ? 303 : 874;
             if (listWidthDiff != 0)
                 buttonWidth += listWidthDiff;
-            CustomItemButton button = new(buttonWidth);
+            CustomItemButton button = new(buttonWidth)
+            {
+                ImagePath = imagePath,
+                TitleText = labelTitle
+            };
 
-            button.ImagePath = imagePath;
-            button.TitleText = labelTitle;
             if (description != null)
                 button.AuthorName = description;
             if (!string.IsNullOrEmpty(tooltip))
@@ -1002,7 +1004,7 @@ namespace Avatar_Explorer.Classes
 
             if (path.StartsWith("./"))
             {
-                path = path.Substring(2);
+                path = path[2..];
             }
 
             return path.Replace('/', '\\');
@@ -1018,7 +1020,7 @@ namespace Avatar_Explorer.Classes
             var uri = new Uri(url);
             var query = HttpUtility.ParseQueryString(uri.Query);
 
-            var dir = query.GetValues("dir") ?? Array.Empty<string>();
+            var dir = query.GetValues("dir") ?? [];
             var id = query.Get("id") ?? "";
 
             return new LaunchInfo
