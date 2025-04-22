@@ -240,14 +240,14 @@ namespace Avatar_Explorer.Forms
 
                 label1.Location = label1.Location with
                 {
-                    X = SearchBox.Location.X - label1.Width - 5,
+                    X = SearchBox.Location.X - label1.Width - 8,
                     Y = SearchBox.Location.Y + SearchBox.Height / 2 - label1.Height / 2
                 };
 
                 SearchResultLabel.Location = SearchResultLabel.Location with
                 {
                     X = label1.Location.X,
-                    Y = SearchResultLabel.Location.Y
+                    Y = SearchBox.Location.Y + SearchBox.Height + 2
                 };
             }
             catch (Exception ex)
@@ -3190,14 +3190,14 @@ namespace Avatar_Explorer.Forms
 
             label1.Location = label1.Location with
             {
-                X = SearchBox.Location.X - label1.Width - 5,
+                X = SearchBox.Location.X - label1.Width - 8,
                 Y = SearchBox.Location.Y + SearchBox.Height / 2 - label1.Height / 2
             };
 
             SearchResultLabel.Location = SearchResultLabel.Location with
             {
                 X = label1.Location.X,
-                Y = SearchResultLabel.Location.Y
+                Y = SearchBox.Location.Y + SearchBox.Height + 2
             };
 
             labelControl.Location = labelControl.Location with

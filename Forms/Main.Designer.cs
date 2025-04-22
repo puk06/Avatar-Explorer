@@ -188,7 +188,7 @@ namespace Avatar_Explorer.Forms
             // 
             label1.AutoSize = true;
             label1.Font = new Font(GuiFont, 12F);
-            label1.Location = new Point(933, 18);
+            label1.Location = new Point(930, 18);
             label1.Name = "label1";
             label1.Size = new Size(42, 23);
             label1.TabIndex = 8;
@@ -198,7 +198,7 @@ namespace Avatar_Explorer.Forms
             // 
             SearchResultLabel.AutoSize = true;
             SearchResultLabel.Font = new Font(GuiFont, 10F);
-            SearchResultLabel.Location = new Point(933, 43);
+            SearchResultLabel.Location = new Point(930, 45);
             SearchResultLabel.Name = "SearchResultLabel";
             SearchResultLabel.Size = new Size(0, 20);
             SearchResultLabel.TabIndex = 9;
