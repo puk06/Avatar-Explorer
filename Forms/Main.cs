@@ -3157,6 +3157,11 @@ namespace Avatar_Explorer.Forms
             };
 
             ScaleItemButtons();
+
+            Helper.UpdateExplorerThumbnails(AvatarItemExplorer);
+            Helper.UpdateExplorerThumbnails(AvatarPage);
+            Helper.UpdateExplorerThumbnails(AvatarAuthorPage);
+            Helper.UpdateExplorerThumbnails(CategoryPage);
         }
 
         /// <summary>
