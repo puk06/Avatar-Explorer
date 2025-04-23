@@ -2414,13 +2414,13 @@ namespace Avatar_Explorer.Forms
 
                     var itemTitle = Helper.EscapeCsv(item.Title);
                     var authorName = Helper.EscapeCsv(item.AuthorName);
-                    var authorImageFilePath = Helper.EscapeCsv(Path.GetFullPath(item.AuthorImageFilePath));
-                    var imagePath = Helper.EscapeCsv(Path.GetFullPath(item.ImagePath));
+                    var authorImageFilePath = Helper.EscapeCsv(item.AuthorImageFilePath);
+                    var imagePath = Helper.EscapeCsv(item.ImagePath);
                     var type = Helper.EscapeCsv(Helper.GetCategoryName(item.Type, CurrentLanguage, item.CustomCategory));
                     var memo = Helper.EscapeCsv(item.ItemMemo);
                     var supportedAvatar = Helper.EscapeCsv(string.Join(";", avatarNames));
                     var boothId = Helper.EscapeCsv(item.BoothId.ToString());
-                    var itemPath = Helper.EscapeCsv(Path.GetFullPath(item.ItemPath));
+                    var itemPath = Helper.EscapeCsv(item.ItemPath);
 
                     sw.WriteLine($"{itemTitle},{authorName},{authorImageFilePath},{imagePath},{type},{memo},{supportedAvatar},{boothId},{itemPath}");
                 }
