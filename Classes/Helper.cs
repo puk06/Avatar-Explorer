@@ -1313,6 +1313,11 @@ namespace Avatar_Explorer.Classes
         /// <param name="e"></param>
         public static void OnScroll(object sender, EventArgs e) => UpdateExplorerThumbnails(sender);
 
+        /// <summary>
+        /// 親のToolStripを表示します。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public static void ShowParentToolStrip(object? sender, EventArgs e)
         {
             if (sender == null) return;
