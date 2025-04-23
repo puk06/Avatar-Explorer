@@ -1017,6 +1017,18 @@ namespace Avatar_Explorer.Forms
                 1 => filteredItems.OrderBy(item => item.AuthorName).ToArray(),
                 2 => filteredItems.OrderByDescending(item => item.CreatedDate).ToArray(),
                 3 => filteredItems.OrderByDescending(item => item.UpdatedDate).ToArray(),
+                4 => filteredItems.OrderBy(item =>
+                {
+                    var currentAvatar = CurrentPath.CurrentSelectedAvatarPath;
+                    if (string.IsNullOrEmpty(currentAvatar)) return 0;
+                    return item.ImplementationAvatars.Contains(currentAvatar) ? 0 : 1;
+                }),
+                5 => filteredItems.OrderBy(item =>
+                {
+                    var currentAvatar = CurrentPath.CurrentSelectedAvatarPath;
+                    if (string.IsNullOrEmpty(currentAvatar)) return 0;
+                    return item.ImplementationAvatars.Contains(currentAvatar) ? 1 : 0;
+                }),
                 _ => filteredItems.OrderBy(item => item.Title).ToArray(),
             };
 
@@ -1063,6 +1075,17 @@ namespace Avatar_Explorer.Forms
                 Button button = Helper.CreateButton(item.ImagePath, item.Title, authorText, false, description,
                     GetItemExplorerListWidth());
                 button.Location = new Point(0, (70 * index) + 2);
+                if (SortingBox.SelectedIndex == 4 || SortingBox.SelectedIndex == 5)
+                {
+                    var currentAvatar = CurrentPath.CurrentSelectedAvatarPath;
+                    if (!string.IsNullOrEmpty(currentAvatar))
+                    {
+                        button.BackColor = item.ImplementationAvatars.Contains(currentAvatar)
+                            ? Color.LightGreen
+                            : Color.LightPink;
+                    }
+                }
+
                 EventHandler clickEvent = (_, _) =>
                 {
                     if (!Directory.Exists(item.ItemPath))
@@ -1300,9 +1323,57 @@ namespace Avatar_Explorer.Forms
                 toolStripMenuItem5.Click += clickEvent7;
                 toolStripMenuItem5.Disposed += (_, _) => toolStripMenuItem5.Click -= clickEvent7;
 
-                ToolStripMenuItem toolStripMenuItem6 = new(Helper.Translate("削除", CurrentLanguage),
+                ToolStripMenuItem toolStripMenuItem6 = new(Helper.Translate("実装/未実装", CurrentLanguage),
+                    SharedImages.GetImage(SharedImages.Images.EditIcon));
+
+                foreach (var avatar in Items.Where(i => i.Type == ItemType.Avatar))
+                {
+                    ToolStripMenuItem toolStripMenuItemTemp = new(Helper.GetAvatarNameFromPath(Items, avatar.ItemPath))
+                    {
+                        Tag = avatar.ItemPath,
+                        Checked = item.ImplementationAvatars.Contains(avatar.ItemPath)
+                    };
+
+                    EventHandler clickEvent8 = (_, _) =>
+                    {
+                        if (toolStripMenuItemTemp.Checked)
+                        {
+                            item.ImplementationAvatars = item.ImplementationAvatars.Where(avatarPath => avatarPath != (string)toolStripMenuItemTemp.Tag).ToArray();
+                            toolStripMenuItemTemp.Checked = false;
+                        }
+                        else
+                        {
+                            item.ImplementationAvatars = item.ImplementationAvatars.Append((string)toolStripMenuItemTemp.Tag).ToArray();
+                            toolStripMenuItemTemp.Checked = true;
+                        }
+
+                        if (SortingBox.SelectedIndex == 4 || SortingBox.SelectedIndex == 5)
+                        {
+                            var currentAvatar = CurrentPath.CurrentSelectedAvatarPath;
+                            if (!string.IsNullOrEmpty(currentAvatar))
+                            {
+                                button.BackColor = item.ImplementationAvatars.Contains(currentAvatar)
+                                    ? Color.LightGreen
+                                    : Color.LightPink;
+                            }
+                        }
+
+                        Helper.SaveItemsData(Items);
+                    };
+
+                    toolStripMenuItemTemp.Click += clickEvent8;
+                    toolStripMenuItemTemp.Click += Helper.ShowParentToolStrip;
+                    toolStripMenuItemTemp.Disposed += (_, _) =>
+                    {
+                        toolStripMenuItemTemp.Click -= clickEvent8;
+                        toolStripMenuItemTemp.Click -= Helper.ShowParentToolStrip;
+                    };
+                    toolStripMenuItem6.DropDownItems.Add(toolStripMenuItemTemp);
+                }
+
+                ToolStripMenuItem toolStripMenuItem7 = new(Helper.Translate("削除", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.TrashIcon));
-                EventHandler clickEvent8 = (_, _) =>
+                EventHandler clickEvent9 = (_, _) =>
                 {
                     DialogResult result = MessageBox.Show(Helper.Translate("本当に削除しますか？", CurrentLanguage),
                         Helper.Translate("確認", CurrentLanguage), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -1374,14 +1445,15 @@ namespace Avatar_Explorer.Forms
                     Helper.SaveItemsData(Items);
                 };
 
-                toolStripMenuItem6.Click += clickEvent8;
-                toolStripMenuItem6.Disposed += (_, _) => toolStripMenuItem6.Click -= clickEvent8;
+                toolStripMenuItem7.Click += clickEvent9;
+                toolStripMenuItem7.Disposed += (_, _) => toolStripMenuItem7.Click -= clickEvent9;
 
                 contextMenuStrip.Items.Add(toolStripMenuItem2);
                 contextMenuStrip.Items.Add(toolStripMenuItem3);
                 contextMenuStrip.Items.Add(toolStripMenuItem4);
                 contextMenuStrip.Items.Add(toolStripMenuItem5);
                 contextMenuStrip.Items.Add(toolStripMenuItem6);
+                contextMenuStrip.Items.Add(toolStripMenuItem7);
                 button.ContextMenuStrip = contextMenuStrip;
                 AvatarItemExplorer.Controls.Add(button);
                 index++;
@@ -1952,9 +2024,46 @@ namespace Avatar_Explorer.Forms
                     Helper.SaveItemsData(Items);
                 };
 
-                ToolStripMenuItem toolStripMenuItem6 = new(Helper.Translate("削除", CurrentLanguage),
+                ToolStripMenuItem toolStripMenuItem6 = new(Helper.Translate("実装/未実装", CurrentLanguage),
+                    SharedImages.GetImage(SharedImages.Images.EditIcon));
+
+                foreach (var avatar in Items.Where(i => i.Type == ItemType.Avatar))
+                {
+                    ToolStripMenuItem toolStripMenuItemTemp = new(Helper.GetAvatarNameFromPath(Items, avatar.ItemPath))
+                    {
+                        Tag = avatar.ItemPath,
+                        Checked = item.ImplementationAvatars.Contains(avatar.ItemPath)
+                    };
+
+                    EventHandler clickEvent8 = (_, _) =>
+                    {
+                        if (toolStripMenuItemTemp.Checked)
+                        {
+                            item.ImplementationAvatars = item.ImplementationAvatars.Where(avatarPath => avatarPath != (string)toolStripMenuItemTemp.Tag).ToArray();
+                            toolStripMenuItemTemp.Checked = false;
+                        }
+                        else
+                        {
+                            item.ImplementationAvatars = item.ImplementationAvatars.Append((string)toolStripMenuItemTemp.Tag).ToArray();
+                            toolStripMenuItemTemp.Checked = true;
+                        }
+
+                        Helper.SaveItemsData(Items);
+                    };
+
+                    toolStripMenuItemTemp.Click += clickEvent8;
+                    toolStripMenuItemTemp.Click += Helper.ShowParentToolStrip;
+                    toolStripMenuItemTemp.Disposed += (_, _) =>
+                    {
+                        toolStripMenuItemTemp.Click -= clickEvent8;
+                        toolStripMenuItemTemp.Click -= Helper.ShowParentToolStrip;
+                    };
+                    toolStripMenuItem6.DropDownItems.Add(toolStripMenuItemTemp);
+                }
+
+                ToolStripMenuItem toolStripMenuItem7 = new(Helper.Translate("削除", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.TrashIcon));
-                EventHandler clickEvent8 = (_, _) =>
+                EventHandler clickEvent9 = (_, _) =>
                 {
                     DialogResult result = MessageBox.Show(Helper.Translate("本当に削除しますか？", CurrentLanguage),
                         Helper.Translate("確認", CurrentLanguage), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -2007,14 +2116,15 @@ namespace Avatar_Explorer.Forms
                     Helper.SaveItemsData(Items);
                 };
 
-                toolStripMenuItem6.Click += clickEvent8;
-                toolStripMenuItem6.Disposed += (_, _) => toolStripMenuItem6.Click -= clickEvent8;
+                toolStripMenuItem7.Click += clickEvent9;
+                toolStripMenuItem7.Disposed += (_, _) => toolStripMenuItem7.Click -= clickEvent9;
 
                 contextMenuStrip.Items.Add(toolStripMenuItem2);
                 contextMenuStrip.Items.Add(toolStripMenuItem3);
                 contextMenuStrip.Items.Add(toolStripMenuItem4);
                 contextMenuStrip.Items.Add(toolStripMenuItem5);
                 contextMenuStrip.Items.Add(toolStripMenuItem6);
+                contextMenuStrip.Items.Add(toolStripMenuItem7);
                 button.ContextMenuStrip = contextMenuStrip;
                 AvatarItemExplorer.Controls.Add(button);
                 index++;
@@ -2792,7 +2902,7 @@ namespace Avatar_Explorer.Forms
                 ChangeControlFont(control);
             }
 
-            string[] sortingItems = ["タイトル", "作者", "登録日時", "更新日時"];
+            string[] sortingItems = ["タイトル", "作者", "登録日時", "更新日時", "実装済み", "未実装"];
             var selected = SortingBox.SelectedIndex;
             SortingBox.Items.Clear();
             SortingBox.Items.AddRange(sortingItems.Select(item => Helper.Translate(item, CurrentLanguage)).ToArray());

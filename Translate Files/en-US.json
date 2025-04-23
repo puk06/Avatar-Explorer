@@ -154,5 +154,8 @@
   "以下のアイテムは対応していない、もしくは存在しないため追加されません": "Following items are not supported or do not exist, so they will not be added",
   "追加可能なフォルダ、またはファイルがありません": "There are no folders or files that can be added.",
   "アイテムフォルダを選択してください": "Please select the item folder.",
-  "マテリアルフォルダを選択してください": "Please select the material folder."
+  "マテリアルフォルダを選択してください": "Please select the material folder.",
+  "実装/未実装": "Implemented or Not Implemented",
+  "実装済み": "Implemented",
+  "未実装": "Not Implemented"
 }

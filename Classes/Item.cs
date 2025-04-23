@@ -84,5 +84,10 @@
         /// アイテムの更新日時を取得または設定します。
         /// </summary>
         public string UpdatedDate { get; set; } = "";
+
+        /// <summary>
+        /// アイテムが実装済みかどうかを管理する配列を取得または設定します。
+        /// </summary>
+        public string[] ImplementationAvatars { get; set; } = Array.Empty<string>();
     }
 }
