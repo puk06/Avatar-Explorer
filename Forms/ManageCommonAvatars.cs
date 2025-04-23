@@ -104,11 +104,13 @@ namespace Avatar_Explorer.Forms
         /// <returns></returns>
         private static CustomItemButton CreateAvatarButton(Item item, string language)
         {
-            CustomItemButton button = new CustomItemButton(875);
-            button.ImagePath = item.ImagePath;
-            button.TitleText = item.Title;
-            button.AuthorName = Helper.Translate("作者: ", language) + item.AuthorName;
-            button.ToolTipText = item.Title;
+            CustomItemButton button = new(875)
+            {
+                ImagePath = item.ImagePath,
+                TitleText = item.Title,
+                AuthorName = Helper.Translate("作者: ", language) + item.AuthorName,
+                ToolTipText = item.Title
+            };
 
             button.Click += (_, _) =>
             {

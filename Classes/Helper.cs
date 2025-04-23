@@ -1312,5 +1312,21 @@ namespace Avatar_Explorer.Classes
         /// <param name="sender"></param>
         /// <param name="e"></param>
         public static void OnScroll(object sender, EventArgs e) => UpdateExplorerThumbnails(sender);
+
+        /// <summary>
+        /// 親のToolStripを表示します。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public static void ShowParentToolStrip(object? sender, EventArgs e)
+        {
+            if (sender == null) return;
+            if (((ToolStripMenuItem)sender).GetCurrentParent() is ToolStripDropDownMenu dropDown)
+            {
+                var ownerItem = dropDown.OwnerItem;
+                if (ownerItem == null) return;
+                dropDown.Show(ownerItem.Bounds.Location);
+            }
+        }
     }
 }
