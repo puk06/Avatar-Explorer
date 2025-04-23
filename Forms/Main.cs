@@ -11,7 +11,6 @@ namespace Avatar_Explorer.Forms
 {
     public sealed partial class Main : Form
     {
-
         #region フォームのテキスト関連の変数
         /// <summary>
         /// ソフトの現在のバージョン
