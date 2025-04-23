@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Formats.Tar;
 using System.IO.Compression;
+using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text;
 using System.Text.Json;
@@ -1327,6 +1328,263 @@ namespace Avatar_Explorer.Classes
                 if (ownerItem == null) return;
                 dropDown.Show(ownerItem.Bounds.Location);
             }
+        }
+
+        /// <summary>
+        /// アイテムの説明を取得します。
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="CurrentLanguage"></param>
+        /// <returns></returns>
+        public static string GetItemDescription(Item item, string CurrentLanguage)
+        {
+            var description = item.Title;
+
+            if (!string.IsNullOrEmpty(item.CreatedDate))
+            {
+                description += "\n" + Translate("登録日時", CurrentLanguage) + ": " + GetDateStringFromUnixTime(item.CreatedDate);
+            }
+
+            if (!string.IsNullOrEmpty(item.UpdatedDate))
+            {
+                description += "\n" + Translate("更新日時", CurrentLanguage) + ": " + GetDateStringFromUnixTime(item.UpdatedDate);
+            }
+
+            if (!string.IsNullOrEmpty(item.ItemMemo))
+            {
+                description += "\n\n" + Translate("メモ: ", CurrentLanguage) + item.ItemMemo;
+            }
+
+            return description;
+        }
+
+        /// <summary>
+        /// アイテムのフォルダを開きます。
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="CurrentLanguage"></param>
+        public static void OpenItemFolder(Item item, string CurrentLanguage)
+        {
+            if (!Directory.Exists(item.ItemPath))
+            {
+                MessageBox.Show(Translate("フォルダが見つかりませんでした。", CurrentLanguage),
+                    Translate("エラー", CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            try
+            {
+                var itemFullFolderPath = Path.GetFullPath(item.ItemPath);
+                Process.Start("explorer.exe", itemFullFolderPath);
+            }
+            catch
+            {
+                MessageBox.Show(Translate("フォルダを開けませんでした。", CurrentLanguage),
+                    Translate("エラー", CurrentLanguage), MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// アイテムのファイルを開きます。
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="openFile"></param>
+        /// <param name="CurrentLanguage"></param>
+        public static void OpenItemFile(FileData file, bool openFile, string CurrentLanguage)
+        {
+            if (openFile)
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = file.FilePath,
+                        UseShellExecute = true
+                    });
+                }
+                catch
+                {
+                    OpenItemFilePath(file, CurrentLanguage);
+                }
+            }
+            else
+            {
+                OpenItemFilePath(file, CurrentLanguage);
+            }
+        }
+
+        /// <summary>
+        /// アイテムのファイルパスを開きます。
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="CurrentLanguage"></param>
+        private static void OpenItemFilePath(FileData file, string CurrentLanguage)
+        {
+            try
+            {
+                var itemFullFolderPath = Path.GetFullPath(file.FilePath);
+                Process.Start("explorer.exe", "/select," + itemFullFolderPath);
+            }
+            catch
+            {
+                MessageBox.Show(Translate("ファイルを開けませんでした。", CurrentLanguage),
+                    Translate("エラー", CurrentLanguage), MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// 選択されたアバターがアイテムの実装済みリストに含まれているかどうかを確認します。
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="selectedAvatar"></param>
+        /// <returns></returns>
+        public static bool ContainsSelectedAvatar(Item item, string? selectedAvatar)
+        {
+            if (string.IsNullOrEmpty(selectedAvatar)) return false;
+            return item.ImplementationAvatars.Contains(selectedAvatar);
+        }
+
+        /// <summary>
+        /// アイテムの検索結果を取得します。
+        /// </summary>
+        /// <param name="items"></param>
+        /// <param name="item"></param>
+        /// <param name="searchFilter"></param>
+        /// <param name="CurrentLanguage"></param>
+        /// <returns></returns>
+        public static bool GetSearchResult(Item[] items, Item item, SearchFilter searchFilter, string CurrentLanguage)
+        {
+            if (searchFilter.Author.Length != 0 && !searchFilter.Author.Contains(item.AuthorName))
+                return false;
+
+            if (searchFilter.Title.Length != 0 && !searchFilter.Title.Contains(item.Title))
+                return false;
+
+            if (searchFilter.BoothId.Length != 0 && !searchFilter.BoothId.Contains(item.BoothId.ToString()))
+                return false;
+
+            if (searchFilter.Avatar.Length != 0 && !searchFilter.Avatar.Any(avatar =>
+            {
+                return item.SupportedAvatar.Any(supportedAvatar =>
+                {
+                    var supportedAvatarName = GetAvatarNameFromPath(items, supportedAvatar);
+                    if (supportedAvatarName == "") return false;
+                    return supportedAvatarName.ToLower().Contains(avatar.ToLower());
+                });
+            }))
+            {
+                return false;
+            }
+
+            if (searchFilter.Category.Length != 0 && !searchFilter.Category.Any(category =>
+            {
+                var translatedCategory = GetCategoryName(item.Type, CurrentLanguage);
+                return translatedCategory.Contains(category) || item.CustomCategory.Contains(category);
+
+            }))
+            {
+                return false;
+            }
+
+            if (searchFilter.ItemMemo.Length != 0 && !searchFilter.ItemMemo.Any(memo =>
+            {
+                return item.ItemMemo.ToLower().Contains(memo.ToLower());
+            }))
+            {
+                return false;
+            }
+
+            if (searchFilter.FolderName.Length != 0 && !searchFilter.FolderName.Any(folderName =>
+            {
+                return Path.GetFileName(item.ItemPath).ToLower().Contains(folderName.ToLower()) ||
+                        Path.GetFileName(item.MaterialPath).ToLower().Contains(folderName.ToLower());
+            }))
+            {
+                return false;
+            }
+
+            if (searchFilter.FileName.Length != 0 && !searchFilter.FileName.Any(fileName =>
+            {
+                return GetItemFolderInfo(item.ItemPath, item.MaterialPath).GetAllItem()
+                    .Any(file =>
+                        file.FileName.ToLower().Contains(fileName.ToLower()) ||
+                        file.FileExtension.ToLower().Contains(fileName.ToLower()));
+            }))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// アイテムのBOOTHリンクを開きます。
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="CurrentLanguage"></param>
+        public static void OpenItenBoothLink(Item item, string CurrentLanguage)
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = $"https://booth.pm/{GetCurrentLanguageCode(CurrentLanguage)}/items/" +
+                               item.BoothId,
+                    UseShellExecute = true
+                });
+            }
+            catch
+            {
+                MessageBox.Show(Translate("リンクを開けませんでした。", CurrentLanguage),
+                    Translate("エラー", CurrentLanguage), MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// アイテムのBOOTHリンクをクリップボードにコピーします。
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="CurrentLanguage"></param>
+        public static void CopyItemBoothLink(Item item, string CurrentLanguage)
+        {
+            try
+            {
+                Clipboard.SetText(
+                    $"https://booth.pm/{GetCurrentLanguageCode(CurrentLanguage)}/items/" +
+                    item.BoothId);
+            }
+            catch (Exception ex)
+            {
+                if (ex is ExternalException) return;
+                MessageBox.Show(Translate("クリップボードにコピーできませんでした", CurrentLanguage),
+                    Translate("エラー", CurrentLanguage), MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// すべての作者情報を取得します。
+        /// </summary>
+        /// <param name="items"></param>
+        /// <returns></returns>
+        public static Author[] GetAuthors(Item[] items)
+        {
+            var authors = Array.Empty<Author>();
+
+            foreach (Item item in items)
+            {
+                if (authors.Any(author => author.AuthorName == item.AuthorName)) continue;
+                authors = authors.Append(new Author
+                {
+                    AuthorName = item.AuthorName,
+                    AuthorImagePath = item.AuthorImageFilePath
+                }).ToArray();
+            }
+
+            return authors;
         }
     }
 }
