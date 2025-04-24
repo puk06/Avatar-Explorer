@@ -320,12 +320,19 @@ namespace Avatar_Explorer.Classes
         /// <returns></returns>
         private static Dictionary<string, string> GetTranslateData(string lang)
         {
-            if (TranslateData.TryGetValue(lang, out var data)) return data;
-            var json = File.ReadAllText(($"./Translate/{lang}.json"));
-            var translateData = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
-            if (translateData == null) return new Dictionary<string, string>();
-            TranslateData.Add(lang, translateData);
-            return translateData;
+            try
+            {
+                if (TranslateData.TryGetValue(lang, out var data)) return data;
+                var json = File.ReadAllText(($"./Translate/{lang}.json"));
+                var translateData = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+                if (translateData == null) return new Dictionary<string, string>();
+                TranslateData.Add(lang, translateData);
+                return translateData;
+            }
+            catch
+            {
+                return new Dictionary<string, string>();
+            }
         }
 
         /// <summary>
