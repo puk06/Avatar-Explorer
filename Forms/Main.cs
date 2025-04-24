@@ -2401,15 +2401,23 @@ namespace Avatar_Explorer.Forms
                 }
 
                 using var sw = new StreamWriter("./Output/" + fileName, false, Encoding.UTF8);
-                sw.WriteLine("Title,AuthorName,AuthorImageFilePath,ImagePath,Type,Memo,SupportedAvatar,BoothId,ItemPath");
+                sw.WriteLine("Title,AuthorName,AuthorImageFilePath,ImagePath,Type,Memo,SupportedAvatars,ImplementedAvatars,BoothId,ItemPath");
                 foreach (var item in Items)
                 {
-                    string[] avatarNames = Array.Empty<string>();
+                    string[] SupportedAvatarNames = Array.Empty<string>();
                     foreach (var avatar in item.SupportedAvatar)
                     {
                         var avatarName = Helper.GetAvatarName(Items, avatar);
                         if (avatarName == null) continue;
-                        avatarNames = avatarNames.Append(avatarName).ToArray();
+                        SupportedAvatarNames = SupportedAvatarNames.Append(avatarName).ToArray();
+                    }
+
+                    string[] ImplementedAvatarNames = Array.Empty<string>();
+                    foreach (var avatar in item.ImplementationAvatars)
+                    {
+                        var avatarName = Helper.GetAvatarName(Items, avatar);
+                        if (avatarName == null) continue;
+                        ImplementedAvatarNames = ImplementedAvatarNames.Append(avatarName).ToArray();
                     }
 
                     var itemTitle = Helper.EscapeCsv(item.Title);
@@ -2418,11 +2426,12 @@ namespace Avatar_Explorer.Forms
                     var imagePath = Helper.EscapeCsv(item.ImagePath);
                     var type = Helper.EscapeCsv(Helper.GetCategoryName(item.Type, CurrentLanguage, item.CustomCategory));
                     var memo = Helper.EscapeCsv(item.ItemMemo);
-                    var supportedAvatar = Helper.EscapeCsv(string.Join(";", avatarNames));
+                    var SupportedAvatarList = Helper.EscapeCsv(string.Join(Environment.NewLine, SupportedAvatarNames));
+                    var ImplementedAvatarList = Helper.EscapeCsv(string.Join(Environment.NewLine, ImplementedAvatarNames));
                     var boothId = Helper.EscapeCsv(item.BoothId.ToString());
                     var itemPath = Helper.EscapeCsv(item.ItemPath);
 
-                    sw.WriteLine($"{itemTitle},{authorName},{authorImageFilePath},{imagePath},{type},{memo},{supportedAvatar},{boothId},{itemPath}");
+                    sw.WriteLine($"{itemTitle},{authorName},{authorImageFilePath},{imagePath},{type},{memo},{SupportedAvatarList},{ImplementedAvatarList},{boothId},{itemPath}");
                 }
 
                 MessageBox.Show(Helper.Translate("Outputフォルダにエクスポートが完了しました！\nファイル名: ", CurrentLanguage) + fileName,
