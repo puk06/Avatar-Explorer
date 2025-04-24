@@ -1287,20 +1287,27 @@ namespace Avatar_Explorer.Classes
         /// <param name="senderObject"></param>
         public static void UpdateExplorerThumbnails(object senderObject)
         {
-            if (senderObject is TabPage tabPage)
+            try
             {
-                var visibleArea = new Rectangle(0, tabPage.VerticalScroll.Value,
-                    tabPage.ClientSize.Width, tabPage.ClientSize.Height);
-
-                foreach (Control control in tabPage.Controls)
+                if (senderObject is TabPage tabPage)
                 {
-                    if (control is CustomItemButton button)
+                    var visibleArea = new Rectangle(0, tabPage.VerticalScroll.Value,
+                        tabPage.ClientSize.Width, tabPage.ClientSize.Height);
+
+                    foreach (Control control in tabPage.Controls)
                     {
-                        var buttonAbsoluteLocation = button.Location;
-                        buttonAbsoluteLocation.Y += tabPage.VerticalScroll.Value;
-                        button.CheckThmbnail(buttonAbsoluteLocation, button.Size, visibleArea);
+                        if (control is CustomItemButton button)
+                        {
+                            var buttonAbsoluteLocation = button.Location;
+                            buttonAbsoluteLocation.Y += tabPage.VerticalScroll.Value;
+                            button.CheckThmbnail(buttonAbsoluteLocation, button.Size, visibleArea);
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                ErrorLogger("サムネイルの更新に失敗しました。", ex);
             }
         }
 
