@@ -1,4 +1,10 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.Win32;
+using Newtonsoft.Json.Linq;
+using SharpCompress.Archives;
+using SharpCompress.Archives.Tar;
+using SharpCompress.Common;
+using SharpCompress.Writers;
+using System.Diagnostics;
 using System.Formats.Tar;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
@@ -7,12 +13,6 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Web;
-using Microsoft.Win32;
-using Newtonsoft.Json.Linq;
-using SharpCompress.Archives;
-using SharpCompress.Archives.Tar;
-using SharpCompress.Common;
-using SharpCompress.Writers;
 using Timer = System.Windows.Forms.Timer;
 
 namespace Avatar_Explorer.Classes
