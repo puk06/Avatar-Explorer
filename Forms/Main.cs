@@ -175,16 +175,16 @@ namespace Avatar_Explorer.Forms
                 CommonAvatars = Helper.LoadCommonAvatarData();
 
                 // Fix Supported Avatar Path (Title => Path)
-                Items = Helper.FixSupportedAvatarPath(Items);
+                Helper.FixSupportedAvatarPath(ref Items);
 
                 // Update Empty Dates
-                Items = Helper.UpdateEmptyDates(Items);
+                Helper.UpdateEmptyDates(ref Items);
 
                 // Fix Item Dates
-                Items = Helper.FixItemDates(Items);
+                Helper.FixItemDates(ref Items);
 
                 // Fix Relative Path Escape
-                Items = Helper.FixRelativePathEscape(Items);
+                Helper.FixRelativePathEscape(ref Items);
 
                 AddFontFile();
                 CustomCategories = Helper.LoadCustomCategoriesData();
@@ -401,14 +401,7 @@ namespace Avatar_Explorer.Forms
                     addItem.ShowDialog();
 
                     //対応アバターのパスを変えてあげる
-                    foreach (var item2 in Items)
-                    {
-                        if (item2.SupportedAvatar.Contains(prePath))
-                        {
-                            item2.SupportedAvatar = item2.SupportedAvatar.Select(avatar =>
-                                avatar == prePath ? item.ItemPath : avatar).ToArray();
-                        }
-                    }
+                    Helper.ChangeAllItemPath(ref Items, prePath);
 
                     // もしアイテムで編集されたアイテムを開いていたら、パスなどに使用される文字列も更新しないといけないため
                     if (CurrentPath.CurrentSelectedAvatarPath == prePath)
@@ -477,8 +470,6 @@ namespace Avatar_Explorer.Forms
                         undo2 = true;
                     }
 
-                    Items = Items.Where(i => i.ItemPath != item.ItemPath).ToArray();
-
                     // アバターのときは対応アバター削除、共通素体グループから削除用の処理を実行する
                     if (item.Type == ItemType.Avatar)
                     {
@@ -486,14 +477,7 @@ namespace Avatar_Explorer.Forms
                             Helper.Translate("このアバターを対応アバターとしているアイテムの対応アバターからこのアバターを削除しますか？", CurrentLanguage),
                             Helper.Translate("確認", CurrentLanguage), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
-                        if (result2 == DialogResult.Yes)
-                        {
-                            foreach (var item2 in Items)
-                            {
-                                item2.SupportedAvatar = item2.SupportedAvatar.Where(avatar => avatar != item.ItemPath)
-                                    .ToArray();
-                            }
-                        }
+                        Helper.DeleteAvatarFromItem(ref Items, item.ItemPath, result2 == DialogResult.Yes);
 
                         if (CommonAvatars.Any(commonAvatar => commonAvatar.Avatars.Contains(item.ItemPath)))
                         {
@@ -503,16 +487,14 @@ namespace Avatar_Explorer.Forms
 
                             if (result3 == DialogResult.Yes)
                             {
-                                foreach (var commonAvatar in CommonAvatars)
-                                {
-                                    commonAvatar.Avatars = commonAvatar.Avatars.Where(avatar => avatar != item.ItemPath)
-                                        .ToArray();
-                                }
+                                Helper.DeleteAvatarFromCommonAvatars(ref CommonAvatars, item.ItemPath);
 
                                 Helper.SaveCommonAvatarData(CommonAvatars);
                             }
                         }
                     }
+
+                    Items = Items.Where(i => i.ItemPath != item.ItemPath).ToArray();
 
                     MessageBox.Show(Helper.Translate("削除が完了しました。", CurrentLanguage),
                         Helper.Translate("完了", CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -1010,14 +992,7 @@ namespace Avatar_Explorer.Forms
                         }
 
                         //対応アバターのパスを変えてあげる
-                        foreach (var item2 in Items)
-                        {
-                            if (item2.SupportedAvatar.Contains(prePath))
-                            {
-                                item2.SupportedAvatar = item2.SupportedAvatar.Select(avatar =>
-                                    avatar == prePath ? item.ItemPath : avatar).ToArray();
-                            }
-                        }
+                        Helper.ChangeAllItemPath(ref Items, prePath);
 
                         if (CurrentPath.CurrentSelectedAvatarPath == prePath)
                         {
@@ -1129,14 +1104,7 @@ namespace Avatar_Explorer.Forms
                     addItem.ShowDialog();
 
                     //対応アバターのパスを変えてあげる
-                    foreach (var item2 in Items)
-                    {
-                        if (item2.SupportedAvatar.Contains(prePath))
-                        {
-                            item2.SupportedAvatar = item2.SupportedAvatar.Select(avatar =>
-                                avatar == prePath ? item.ItemPath : avatar).ToArray();
-                        }
-                    }
+                    Helper.ChangeAllItemPath(ref Items, prePath);
 
                     if (CurrentPath.CurrentSelectedAvatarPath == prePath)
                     {
@@ -1245,14 +1213,7 @@ namespace Avatar_Explorer.Forms
                             Helper.Translate("このアバターを対応アバターとしているアイテムの対応アバターからこのアバターを削除しますか？", CurrentLanguage),
                             Helper.Translate("確認", CurrentLanguage), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
-                        if (result2 == DialogResult.Yes)
-                        {
-                            foreach (var item2 in Items)
-                            {
-                                item2.SupportedAvatar = item2.SupportedAvatar.Where(avatar => avatar != item.ItemPath)
-                                    .ToArray();
-                            }
-                        }
+                        Helper.DeleteAvatarFromItem(ref Items, item.ItemPath, result2 == DialogResult.Yes);
 
                         if (CommonAvatars.Any(commonAvatar => commonAvatar.Avatars.Contains(item.ItemPath)))
                         {
@@ -1262,11 +1223,7 @@ namespace Avatar_Explorer.Forms
 
                             if (result3 == DialogResult.Yes)
                             {
-                                foreach (var commonAvatar in CommonAvatars)
-                                {
-                                    commonAvatar.Avatars = commonAvatar.Avatars.Where(avatar => avatar != item.ItemPath)
-                                        .ToArray();
-                                }
+                                Helper.DeleteAvatarFromCommonAvatars(ref CommonAvatars, item.ItemPath);
 
                                 Helper.SaveCommonAvatarData(CommonAvatars);
                             }
@@ -1274,6 +1231,7 @@ namespace Avatar_Explorer.Forms
                     }
 
                     Items = Items.Where(i => i.ItemPath != item.ItemPath).ToArray();
+
                     MessageBox.Show(Helper.Translate("削除が完了しました。", CurrentLanguage),
                         Helper.Translate("完了", CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Information);
 
@@ -1463,16 +1421,16 @@ namespace Avatar_Explorer.Forms
             filteredItems = filteredItems
                 .Where(item =>
                     searchFilter.SearchWords.All(word =>
-                        item.Title.ToLower().Contains(word.ToLower()) ||
-                        item.AuthorName.ToLower().Contains(word.ToLower()) ||
+                        item.Title.Contains(word, StringComparison.CurrentCultureIgnoreCase) ||
+                        item.AuthorName.Contains(word, StringComparison.CurrentCultureIgnoreCase) ||
                         item.SupportedAvatar.Any(avatar =>
                         {
                             var supportedAvatarName = Helper.GetAvatarNameFromPath(Items, avatar);
                             if (supportedAvatarName == "") return false;
-                            return supportedAvatarName.ToLower().Contains(word.ToLower());
+                            return supportedAvatarName.Contains(word, StringComparison.CurrentCultureIgnoreCase);
                         }) ||
-                        item.BoothId.ToString().Contains(word.ToLower()) ||
-                        item.ItemMemo.ToLower().Contains(word.ToLower())
+                        item.BoothId.ToString().Contains(word, StringComparison.CurrentCultureIgnoreCase) ||
+                        item.ItemMemo.Contains(word, StringComparison.CurrentCultureIgnoreCase)
                     )
                 )
                 .OrderByDescending(item =>
@@ -1480,16 +1438,16 @@ namespace Avatar_Explorer.Forms
                     var matchCount = 0;
                     foreach (var word in searchFilter.SearchWords)
                     {
-                        if (item.Title.ToLower().Contains(word.ToLower())) matchCount++;
-                        if (item.AuthorName.ToLower().Contains(word.ToLower())) matchCount++;
+                        if (item.Title.Contains(word, StringComparison.CurrentCultureIgnoreCase)) matchCount++;
+                        if (item.AuthorName.Contains(word, StringComparison.CurrentCultureIgnoreCase)) matchCount++;
                         if (item.SupportedAvatar.Any(avatar =>
                         {
                             var supportedAvatarName = Helper.GetAvatarNameFromPath(Items, avatar);
                             if (supportedAvatarName == "") return false;
-                            return supportedAvatarName.ToLower().Contains(word.ToLower());
+                            return supportedAvatarName.Contains(word, StringComparison.CurrentCultureIgnoreCase);
                         })) matchCount++;
-                        if (item.BoothId.ToString().Contains(word.ToLower())) matchCount++;
-                        if (item.ItemMemo.ToLower().Contains(word.ToLower())) matchCount++;
+                        if (item.BoothId.ToString().Contains(word, StringComparison.CurrentCultureIgnoreCase)) matchCount++;
+                        if (item.ItemMemo.Contains(word, StringComparison.CurrentCultureIgnoreCase)) matchCount++;
                     }
 
                     return matchCount;
@@ -1535,14 +1493,7 @@ namespace Avatar_Explorer.Forms
                         }
 
                         //対応アバターのパスを変えてあげる
-                        foreach (var item2 in Items)
-                        {
-                            if (item2.SupportedAvatar.Contains(prePath))
-                            {
-                                item2.SupportedAvatar = item2.SupportedAvatar.Select(avatar =>
-                                    avatar == prePath ? item.ItemPath : avatar).ToArray();
-                            }
-                        }
+                        Helper.ChangeAllItemPath(ref Items, prePath);
 
                         GenerateFilteredItem(searchFilter);
                         GenerateAvatarList();
@@ -1650,14 +1601,7 @@ namespace Avatar_Explorer.Forms
                     addItem.ShowDialog();
 
                     //対応アバターのパスを変えてあげる
-                    foreach (var item2 in Items)
-                    {
-                        if (item2.SupportedAvatar.Contains(prePath))
-                        {
-                            item2.SupportedAvatar = item2.SupportedAvatar.Select(avatar =>
-                                avatar == prePath ? item.ItemPath : avatar).ToArray();
-                        }
-                    }
+                    Helper.ChangeAllItemPath(ref Items, prePath);
 
                     if (CurrentPath.CurrentSelectedAvatarPath == prePath)
                     {
@@ -1746,14 +1690,7 @@ namespace Avatar_Explorer.Forms
                             Helper.Translate("このアバターを対応アバターとしているアイテムの対応アバターからこのアバターを削除しますか？", CurrentLanguage),
                             Helper.Translate("確認", CurrentLanguage), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
-                        if (result2 == DialogResult.Yes)
-                        {
-                            foreach (var item2 in Items)
-                            {
-                                item2.SupportedAvatar = item2.SupportedAvatar.Where(avatar => avatar != item.ItemPath)
-                                    .ToArray();
-                            }
-                        }
+                        Helper.DeleteAvatarFromItem(ref Items, item.ItemPath, result2 == DialogResult.Yes);
 
                         if (CommonAvatars.Any(commonAvatar => commonAvatar.Avatars.Contains(item.ItemPath)))
                         {
@@ -1763,11 +1700,7 @@ namespace Avatar_Explorer.Forms
 
                             if (result3 == DialogResult.Yes)
                             {
-                                foreach (var commonAvatar in CommonAvatars)
-                                {
-                                    commonAvatar.Avatars = commonAvatar.Avatars.Where(avatar => avatar != item.ItemPath)
-                                        .ToArray();
-                                }
+                                Helper.DeleteAvatarFromCommonAvatars(ref CommonAvatars, item.ItemPath);
 
                                 Helper.SaveCommonAvatarData(CommonAvatars);
                             }
@@ -1775,6 +1708,7 @@ namespace Avatar_Explorer.Forms
                     }
 
                     Items = Items.Where(i => i.ItemPath != item.ItemPath).ToArray();
+
                     MessageBox.Show(Helper.Translate("削除が完了しました。", CurrentLanguage),
                         Helper.Translate("完了", CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Information);
 
@@ -1824,12 +1758,12 @@ namespace Avatar_Explorer.Forms
             var filteredFileData = fileDatas
                 .Where(file =>
                     searchWords.SearchWords.All(word =>
-                        file.FileName.ToLower().Contains(word.ToLower())
+                        file.FileName.Contains(word, StringComparison.CurrentCultureIgnoreCase)
                     )
                 )
                 .OrderByDescending(file =>
                 {
-                    return searchWords.SearchWords.Count(word => file.FileName.ToLower().Contains(word.ToLower()));
+                    return searchWords.SearchWords.Count(word => file.FileName.Contains(word, StringComparison.CurrentCultureIgnoreCase));
                 })
                 .ToList();
 
@@ -2400,16 +2334,36 @@ namespace Avatar_Explorer.Forms
                     index++;
                 }
 
+                var commonAvatarResult = MessageBox.Show(Helper.Translate("対応アバターの欄に共通素体グループのアバターも追加しますか？", CurrentLanguage), Helper.Translate("確認", CurrentLanguage), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
                 using var sw = new StreamWriter("./Output/" + fileName, false, Encoding.UTF8);
                 sw.WriteLine("Title,AuthorName,AuthorImageFilePath,ImagePath,Type,Memo,SupportedAvatars,ImplementedAvatars,BoothId,ItemPath");
+
                 foreach (var item in Items)
                 {
                     string[] SupportedAvatarNames = Array.Empty<string>();
+                    string[] SupportedAvatarPaths = Array.Empty<string>();
+
                     foreach (var avatar in item.SupportedAvatar)
                     {
                         var avatarName = Helper.GetAvatarName(Items, avatar);
                         if (avatarName == null) continue;
                         SupportedAvatarNames = SupportedAvatarNames.Append(avatarName).ToArray();
+                        SupportedAvatarPaths = SupportedAvatarPaths.Append(avatar).ToArray();
+
+                        if (commonAvatarResult != DialogResult.Yes) continue;
+                        var commonAvatarGroup = CommonAvatars.Where(commonAvatar => commonAvatar.Avatars.Contains(avatar));
+                        foreach (var commonAvatar in commonAvatarGroup)
+                        {
+                            foreach (var commonAvatarPath in commonAvatar.Avatars)
+                            {
+                                if (SupportedAvatarPaths.Contains(commonAvatarPath)) continue;
+                                var name = Helper.GetAvatarName(Items, commonAvatarPath);
+                                if (name == null) continue;
+                                SupportedAvatarNames = SupportedAvatarNames.Append(name).ToArray();
+                                SupportedAvatarPaths = SupportedAvatarPaths.Append(commonAvatarPath).ToArray();
+                            }
+                        }
                     }
 
                     string[] ImplementedAvatarNames = Array.Empty<string>();
@@ -2617,10 +2571,10 @@ namespace Avatar_Explorer.Forms
                     else
                     {
                         Items = Helper.LoadItemsData(filePath);
-                        Items = Helper.FixSupportedAvatarPath(Items);
-                        Items = Helper.UpdateEmptyDates(Items);
-                        Items = Helper.FixItemDates(Items);
-                        Items = Helper.FixRelativePathEscape(Items);
+                        Helper.FixSupportedAvatarPath(ref Items);
+                        Helper.UpdateEmptyDates(ref Items);
+                        Helper.FixItemDates(ref Items);
+                        Helper.FixRelativePathEscape(ref Items);
                         Helper.SaveItemsData(Items);
                     }
 
@@ -2686,10 +2640,10 @@ namespace Avatar_Explorer.Forms
                     else
                     {
                         Items = Helper.LoadItemsData(filePath);
-                        Items = Helper.FixSupportedAvatarPath(Items);
-                        Items = Helper.UpdateEmptyDates(Items);
-                        Items = Helper.FixItemDates(Items);
-                        Items = Helper.FixRelativePathEscape(Items);
+                        Helper.FixSupportedAvatarPath(ref Items);
+                        Helper.UpdateEmptyDates(ref Items);
+                        Helper.FixItemDates(ref Items);
+                        Helper.FixRelativePathEscape(ref Items);
                         Helper.SaveItemsData(Items);
                     }
 

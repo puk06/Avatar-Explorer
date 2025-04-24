@@ -300,24 +300,6 @@ namespace Avatar_Explorer.Classes
         public static void DragEnter(object _, DragEventArgs e) => e.Effect = DragDropEffects.All;
 
         /// <summary>
-        /// 画像を指定されたサイズにリサイズします。
-        /// </summary>
-        /// <param name="imagePath"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <returns></returns>
-        private static Bitmap ResizeImage(string imagePath, int width, int height)
-        {
-            if (!File.Exists(imagePath)) return new Bitmap(width, height);
-            using var originalImage = Image.FromFile(imagePath);
-            var resizedImage = new Bitmap(width, height);
-            using var graphics = Graphics.FromImage(resizedImage);
-            graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-            graphics.DrawImage(originalImage, 0, 0, width, height);
-            return resizedImage;
-        }
-
-        /// <summary>
         /// 文字列を指定された言語に翻訳します。なければそのまま返します。
         /// </summary>
         /// <param name="str"></param>
@@ -351,7 +333,7 @@ namespace Avatar_Explorer.Classes
         /// </summary>
         /// <param name="items"></param>
         /// <returns></returns>
-        public static Item[] FixSupportedAvatarPath(Item[] items)
+        public static void FixSupportedAvatarPath(ref Item[] items)
         {
             var avatars = items.Where(x => x.Type == ItemType.Avatar).ToArray();
             foreach (var item in items)
@@ -365,8 +347,6 @@ namespace Avatar_Explorer.Classes
                         .ToArray();
                 }
             }
-
-            return items;
         }
 
         /// <summary>
@@ -397,7 +377,7 @@ namespace Avatar_Explorer.Classes
         }
 
         /// <summary>
-        /// 指定されたアイテムがタウ王アバターかどうか、共通素体グループに入っているかどうかを取得します。
+        /// 指定されたアイテムが対応アバターかどうか、共通素体グループに入っているかどうかを取得します。
         /// </summary>
         /// <param name="item"></param>
         /// <param name="commonAvatars"></param>
@@ -912,7 +892,7 @@ namespace Avatar_Explorer.Classes
         /// </summary>
         /// <param name="items"></param>
         /// <returns></returns>
-        public static Item[] UpdateEmptyDates(Item[] items)
+        public static void UpdateEmptyDates(ref Item[] items)
         {
             string now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
 
@@ -928,11 +908,9 @@ namespace Avatar_Explorer.Classes
                     item.UpdatedDate = now;
                 }
             }
-
-            return items;
         }
 
-        public static Item[] FixItemDates(Item[] items)
+        public static void FixItemDates(ref Item[] items)
         {
             foreach (var item in items)
             {
@@ -948,8 +926,6 @@ namespace Avatar_Explorer.Classes
                     item.UpdatedDate = unixTime.ToString();
                 }
             }
-
-            return items;
         }
 
         private static DateTime GetDate(string date)
@@ -986,7 +962,7 @@ namespace Avatar_Explorer.Classes
             }
         }
 
-        public static Item[] FixRelativePathEscape(Item[] items)
+        public static void FixRelativePathEscape(ref Item[] items)
         {
             foreach (var item in items)
             {
@@ -995,8 +971,6 @@ namespace Avatar_Explorer.Classes
                 item.ImagePath = FixPath(item.ImagePath);
                 item.AuthorImageFilePath = FixPath(item.AuthorImageFilePath);
             }
-
-            return items;
         }
 
         private static string FixPath(string path)
@@ -1471,7 +1445,7 @@ namespace Avatar_Explorer.Classes
                 {
                     var supportedAvatarName = GetAvatarNameFromPath(items, supportedAvatar);
                     if (supportedAvatarName == "") return false;
-                    return supportedAvatarName.ToLower().Contains(avatar.ToLower());
+                    return supportedAvatarName.Contains(avatar, StringComparison.CurrentCultureIgnoreCase);
                 });
             }))
             {
@@ -1490,7 +1464,7 @@ namespace Avatar_Explorer.Classes
 
             if (searchFilter.ItemMemo.Length != 0 && !searchFilter.ItemMemo.Any(memo =>
             {
-                return item.ItemMemo.ToLower().Contains(memo.ToLower());
+                return item.ItemMemo.Contains(memo, StringComparison.CurrentCultureIgnoreCase);
             }))
             {
                 return false;
@@ -1498,8 +1472,8 @@ namespace Avatar_Explorer.Classes
 
             if (searchFilter.FolderName.Length != 0 && !searchFilter.FolderName.Any(folderName =>
             {
-                return Path.GetFileName(item.ItemPath).ToLower().Contains(folderName.ToLower()) ||
-                        Path.GetFileName(item.MaterialPath).ToLower().Contains(folderName.ToLower());
+                return Path.GetFileName(item.ItemPath).Contains(folderName, StringComparison.CurrentCultureIgnoreCase) ||
+                        Path.GetFileName(item.MaterialPath).Contains(folderName, StringComparison.CurrentCultureIgnoreCase);
             }))
             {
                 return false;
@@ -1509,8 +1483,8 @@ namespace Avatar_Explorer.Classes
             {
                 return GetItemFolderInfo(item.ItemPath, item.MaterialPath).GetAllItem()
                     .Any(file =>
-                        file.FileName.ToLower().Contains(fileName.ToLower()) ||
-                        file.FileExtension.ToLower().Contains(fileName.ToLower()));
+                        file.FileName.Contains(fileName, StringComparison.CurrentCultureIgnoreCase) ||
+                        file.FileExtension.Contains(fileName, StringComparison.CurrentCultureIgnoreCase));
             }))
             {
                 return false;
@@ -1585,6 +1559,65 @@ namespace Avatar_Explorer.Classes
             }
 
             return authors;
+        }
+
+        /// <summary>
+        /// アイテムのパスを変更します。
+        /// </summary>
+        /// <param name="items"></param>
+        /// <param name="oldPath"></param>
+        public static void ChangeAllItemPath(ref Item[] items, string oldPath)
+        {
+            foreach (var item in items)
+            {
+                if (item.SupportedAvatar.Contains(oldPath))
+                {
+                    item.SupportedAvatar = item.SupportedAvatar.Select(avatar =>
+                        avatar == oldPath ? item.ItemPath : avatar).ToArray();
+                }
+
+                if (item.ImplementationAvatars.Contains(oldPath))
+                {
+                    item.ImplementationAvatars = item.ImplementationAvatars.Select(avatar =>
+                        avatar == oldPath ? item.ItemPath : avatar).ToArray();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 指定されたアバターをアイテムから削除します。
+        /// </summary>
+        /// <param name="items"></param>
+        /// <param name="avatarPath"></param>
+        /// <param name="deleteFromSupported"></param>
+        public static void DeleteAvatarFromItem(ref Item[] items, string avatarPath, bool deleteFromSupported)
+        {
+            foreach (var item in items)
+            {
+                if (deleteFromSupported && item.SupportedAvatar.Contains(avatarPath))
+                {
+                    item.SupportedAvatar = item.SupportedAvatar.Where(avatar => avatar != avatarPath).ToArray();
+                }
+
+                if (item.ImplementationAvatars.Contains(avatarPath))
+                {
+                    item.ImplementationAvatars = item.ImplementationAvatars.Where(avatar => avatar != avatarPath).ToArray();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 指定されたアバターをCommonAvatarから削除します。
+        /// </summary>
+        /// <param name="commonAvatars"></param>
+        /// <param name="avatarPath"></param>
+        public static void DeleteAvatarFromCommonAvatars(ref CommonAvatar[] commonAvatars, string avatarPath)
+        {
+            foreach (var commonAvatar in commonAvatars)
+            {
+                commonAvatar.Avatars = commonAvatar.Avatars.Where(avatar => avatar != avatarPath)
+                    .ToArray();
+            }
         }
     }
 }

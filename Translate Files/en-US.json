@@ -157,5 +157,6 @@
   "マテリアルフォルダを選択してください": "Please select the material folder.",
   "実装/未実装": "Implemented or Not Implemented",
   "実装済み": "Implemented",
-  "未実装": "Not Implemented"
+  "未実装": "Not Implemented",
+  "対応アバターの欄に共通素体グループのアバターも追加しますか？": "Do you want to add the common avatar group's avatar to the supported avatar section?"
 }

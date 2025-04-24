@@ -5,7 +5,6 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Style", "IDE0305:コレクションの初期化を簡略化します", Justification = "<保留中>", Scope = "member", Target = "~M:Avatar_Explorer.Classes.Helper.FixSupportedAvatarPath(Avatar_Explorer.Classes.Item[])~Avatar_Explorer.Classes.Item[]")]
 [assembly: SuppressMessage("Performance", "SYSLIB1045:'GeneratedRegexAttribute' に変換します。", Justification = "<保留中>", Scope = "member", Target = "~M:Avatar_Explorer.Classes.Helper.GetAuthorId(System.String)~System.String")]
 [assembly: SuppressMessage("Style", "IDE0028:コレクションの初期化を簡略化します", Justification = "<保留中>", Scope = "member", Target = "~F:Avatar_Explorer.Classes.Helper.TranslateData")]
 [assembly: SuppressMessage("Style", "IDE0305:コレクションの初期化を簡略化します", Justification = "<保留中>", Scope = "member", Target = "~M:Avatar_Explorer.Classes.Helper.GetItemFolderInfo(System.String,System.String)~Avatar_Explorer.Classes.ItemFolderInfo")]
@@ -24,13 +23,11 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Style", "IDE0028:コレクションの初期化を簡略化します", Justification = "<保留中>", Scope = "member", Target = "~M:Avatar_Explorer.Classes.Helper.GetTranslateData(System.String)~System.Collections.Generic.Dictionary{System.String,System.String}")]
 [assembly: SuppressMessage("Style", "IDE0301:コレクションの初期化を簡略化します", Justification = "<保留中>", Scope = "member", Target = "~P:Avatar_Explorer.Classes.Item.SupportedAvatar")]
 [assembly: SuppressMessage("Style", "IDE0305:コレクションの初期化を簡略化します", Justification = "<保留中>", Scope = "member", Target = "~M:Avatar_Explorer.Forms.AddItem.AddButton_Click(System.Object,System.EventArgs)")]
-[assembly: SuppressMessage("Performance", "CA1862:大文字と小文字を区別しない文字列比較を実行するには、'StringComparison' メソッド オーバーロードを使用します", Justification = "<保留中>", Scope = "member", Target = "~M:Avatar_Explorer.Forms.Main.GenerateFilteredItem(Avatar_Explorer.Classes.SearchFilter)")]
 [assembly: SuppressMessage("Style", "IDE0039:ローカル関数を使用します", Justification = "<保留中>", Scope = "member", Target = "~M:Avatar_Explorer.Forms.Main.AvatarItemExplorer_DragDrop(System.Object,System.Windows.Forms.DragEventArgs)")]
 [assembly: SuppressMessage("Style", "IDE0305:コレクションの初期化を簡略化します", Justification = "<保留中>", Scope = "member", Target = "~M:Avatar_Explorer.Forms.Main.SearchItems")]
 [assembly: SuppressMessage("Style", "IDE0305:コレクションの初期化を簡略化します", Justification = "<保留中>", Scope = "member", Target = "~M:Avatar_Explorer.Classes.Helper.GetAvatarName(Avatar_Explorer.Classes.Item[],System.String)~System.String")]
 [assembly: SuppressMessage("Style", "IDE0301:コレクションの初期化を簡略化します", Justification = "<保留中>", Scope = "member", Target = "~M:Avatar_Explorer.Classes.Helper.LoadCustomCategoriesData(System.String)~System.String[]")]
 [assembly: SuppressMessage("Style", "IDE0039:ローカル関数を使用します", Justification = "<保留中>", Scope = "member", Target = "~M:Avatar_Explorer.Forms.Main.GenerateAvatarList")]
-[assembly: SuppressMessage("Performance", "CA1862:大文字と小文字を区別しない文字列比較を実行するには、'StringComparison' メソッド オーバーロードを使用します", Justification = "<保留中>", Scope = "member", Target = "~M:Avatar_Explorer.Forms.Main.GenerateFilteredFolderItems(Avatar_Explorer.Classes.SearchFilter)")]
 [assembly: SuppressMessage("Style", "IDE0305:コレクションの初期化を簡略化します", Justification = "<保留中>", Scope = "member", Target = "~M:Avatar_Explorer.Forms.Main.GenerateItemFiles")]
 [assembly: SuppressMessage("Style", "IDE0305:コレクションの初期化を簡略化します", Justification = "<保留中>", Scope = "member", Target = "~M:Avatar_Explorer.Forms.Main.GenerateFilteredItem(Avatar_Explorer.Classes.SearchFilter)")]
 [assembly: SuppressMessage("Style", "IDE0305:コレクションの初期化を簡略化します", Justification = "<保留中>", Scope = "member", Target = "~M:Avatar_Explorer.Classes.Helper.LoadCustomCategoriesData(System.String)~System.String[]")]
@@ -40,8 +37,6 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Style", "IDE0039:ローカル関数を使用します", Justification = "<保留中>", Scope = "member", Target = "~M:Avatar_Explorer.Forms.Main.GenerateCategoryList")]
 [assembly: SuppressMessage("Style", "IDE0039:ローカル関数を使用します", Justification = "<保留中>", Scope = "member", Target = "~M:Avatar_Explorer.Forms.Main.GenerateCategoryListLeft")]
 [assembly: SuppressMessage("Style", "IDE0028:コレクションの初期化を簡略化します", Justification = "<保留中>", Scope = "member", Target = "~F:Avatar_Explorer.Forms.Main._controlNames")]
-[assembly: SuppressMessage("Style", "IDE0028:コレクションの初期化を簡略化します", Justification = "<保留中>", Scope = "member", Target = "~F:Avatar_Explorer.Forms.Main._defaultControlLocation")]
-[assembly: SuppressMessage("Style", "IDE0028:コレクションの初期化を簡略化します", Justification = "<保留中>", Scope = "member", Target = "~F:Avatar_Explorer.Forms.Main._defaultFontSize")]
 [assembly: SuppressMessage("Style", "IDE0305:コレクションの初期化を簡略化します", Justification = "<保留中>", Scope = "member", Target = "~M:Avatar_Explorer.Forms.Main.GenerateAuthorList")]
 [assembly: SuppressMessage("Style", "IDE0039:ローカル関数を使用します", Justification = "<保留中>", Scope = "member", Target = "~M:Avatar_Explorer.Forms.Main.GenerateItemCategoryList")]
 [assembly: SuppressMessage("Style", "IDE0039:ローカル関数を使用します", Justification = "<保留中>", Scope = "member", Target = "~M:Avatar_Explorer.Forms.Main.GenerateItemFiles")]
