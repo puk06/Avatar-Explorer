@@ -13,6 +13,7 @@ using SharpCompress.Archives;
 using SharpCompress.Archives.Tar;
 using SharpCompress.Common;
 using SharpCompress.Writers;
+using Timer = System.Windows.Forms.Timer;
 
 namespace Avatar_Explorer.Classes
 {
@@ -38,6 +39,21 @@ namespace Avatar_Explorer.Classes
         {
             WriteIndented = true
         };
+        private static readonly Timer _thumbnailUpdateTimer = new()
+        {
+            Interval = 200
+        };
+        private static object? _lastScrollSender;
+
+        static Helper()
+        {
+            _thumbnailUpdateTimer.Tick += (s, e) =>
+            {
+                _thumbnailUpdateTimer.Stop();
+                if (_lastScrollSender == null) return;
+                UpdateExplorerThumbnails(_lastScrollSender);
+            };
+        }
 
         /// <summary>
         ///　Boothのアイテム情報を取得します。
@@ -1293,7 +1309,12 @@ namespace Avatar_Explorer.Classes
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public static void OnScroll(object sender, EventArgs e) => UpdateExplorerThumbnails(sender);
+        public static void OnScroll(object sender, EventArgs e)
+        {
+            _lastScrollSender = sender;
+            _thumbnailUpdateTimer.Stop();
+            _thumbnailUpdateTimer.Start();
+        }
 
         /// <summary>
         /// 親のToolStripを表示します。
