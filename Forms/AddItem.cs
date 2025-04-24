@@ -516,16 +516,12 @@ namespace Avatar_Explorer.Forms
             {
                 Description = Helper.Translate("アイテムフォルダを選択してください", _mainForm.CurrentLanguage),
                 UseDescriptionForTitle = true,
-                ShowNewFolderButton = true
+                ShowNewFolderButton = true,
+                Multiselect = true
             };
 
-            var result = fbd.ShowDialog();
-            if (result == DialogResult.OK)
-            {
-                ItemFolderPaths = [fbd.SelectedPath];
-                FolderTextBox.Text = fbd.SelectedPath;
-                otherFolderCount.Text = "+" + " " + (ItemFolderPaths.Length - 1) + " " + Helper.Translate("個", _mainForm.CurrentLanguage);
-            }
+            if (fbd.ShowDialog() != DialogResult.OK) return;
+            ItemFolderPaths = fbd.SelectedPaths;
         }
 
         /// <summary>
@@ -542,11 +538,8 @@ namespace Avatar_Explorer.Forms
                 ShowNewFolderButton = true
             };
 
-            var result = fbd.ShowDialog();
-            if (result == DialogResult.OK)
-            {
-                MaterialTextBox.Text = fbd.SelectedPath;
-            }
+            if (fbd.ShowDialog() != DialogResult.OK) return;
+            MaterialTextBox.Text = fbd.SelectedPath;
         }
 
         /// <summary>

@@ -120,7 +120,7 @@ namespace Avatar_Explorer.Classes
                     FilePath = file
                 };
 
-                switch (extension)
+                switch (extension.ToLower())
                 {
                     case ".psd":
                     case ".clip":
