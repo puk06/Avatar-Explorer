@@ -516,11 +516,12 @@ namespace Avatar_Explorer.Forms
             {
                 Description = Helper.Translate("アイテムフォルダを選択してください", _mainForm.CurrentLanguage),
                 UseDescriptionForTitle = true,
-                ShowNewFolderButton = true
+                ShowNewFolderButton = true,
+                Multiselect = true
             };
 
             if (fbd.ShowDialog() != DialogResult.OK) return;
-            ItemFolderPaths = [fbd.SelectedPath];
+            ItemFolderPaths = fbd.SelectedPaths;
         }
 
         /// <summary>
