@@ -124,7 +124,6 @@
   "最終自動バックアップ: ": "Last auto backup: ",
   "自動バックアップフォルダから復元しますか？": "Restore from auto backup folder?",
   "バックアップフォルダが見つかりませんでした。": "Backup folder not found.",
-  "復元する時間のバックアップフォルダを選択してください": "Please select the backup folder to restore from.",
   "バックアップエラー": "Backup Error",
   "復元が完了しました。": "Restore completed.",
   "このアバターを対応アバターとしているアイテムの対応アバターからこのアバターを削除しますか？": "Remove this avatar from the supported avatars of item(s) that support this avatar?",
@@ -159,5 +158,13 @@
   "実装済み": "Implemented",
   "未実装": "Not Implemented",
   "対応アバターの欄に共通素体グループのアバターも追加しますか？": "Do you want to add the common avatar group's avatar to the supported avatar section?",
-  "実装アバター": "Implemented Avatar"
+  "実装アバター": "Implemented Avatar",
+  "自動バックアップから復元": "Restore from Auto Backup",
+  "復元日時": "Restore Date",
+  "バックアップ情報": "Backup Info",
+  "カスタムカテゴリ": "Custom Category",
+  "アイテムデータ": "Item Data",
+  "共通素体データ": "Common Avatar Data",
+  "このバックアップを復元": "Restore this backup",
+  "バックアップデータの取得に失敗しました": "Failed to retrieve backup data"
 }

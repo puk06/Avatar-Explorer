@@ -2541,9 +2541,12 @@ namespace Avatar_Explorer.Forms
 
             if (result == DialogResult.Yes)
             {
-                //バックアップ先のフォルダ
-                var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                var backupPath = Path.Combine(appDataPath, "Avatar Explorer", "Backup");
+                var selectedBackupForm = new SelectAutoBackup(this);
+                selectedBackupForm.ShowDialog();
+
+                var backupPath = selectedBackupForm.SelectedBackupPath;
+
+                if (string.IsNullOrEmpty(backupPath)) return;
 
                 //バックアップフォルダが存在しない場合
                 if (!Directory.Exists(backupPath))
@@ -2553,23 +2556,9 @@ namespace Avatar_Explorer.Forms
                     return;
                 }
 
-                //最初のフォルダ
-                var firstFolder = Directory.GetDirectories(backupPath).MaxBy(d => new DirectoryInfo(d).CreationTime) ??
-                                  backupPath;
-
-                FolderBrowserDialog fbd = new()
-                {
-                    UseDescriptionForTitle = true,
-                    Description = Helper.Translate("復元する時間のバックアップフォルダを選択してください", CurrentLanguage),
-                    ShowNewFolderButton = false,
-                    SelectedPath = firstFolder
-                };
-
-                if (fbd.ShowDialog() != DialogResult.OK) return;
-
                 try
                 {
-                    var filePath = fbd.SelectedPath + "/ItemsData.json";
+                    var filePath = backupPath + "/ItemsData.json";
                     if (!File.Exists(filePath))
                     {
                         MessageBox.Show(Helper.Translate("アイテムファイルが見つかりませんでした。", CurrentLanguage),
@@ -2585,7 +2574,7 @@ namespace Avatar_Explorer.Forms
                         Helper.SaveItemsData(Items);
                     }
 
-                    var filePath2 = fbd.SelectedPath + "/CommonAvatar.json";
+                    var filePath2 = backupPath + "/CommonAvatar.json";
                     if (!File.Exists(filePath2))
                     {
                         MessageBox.Show(Helper.Translate("共通素体ファイルが見つかりませんでした。", CurrentLanguage),
@@ -2597,7 +2586,7 @@ namespace Avatar_Explorer.Forms
                         Helper.SaveCommonAvatarData(CommonAvatars);
                     }
 
-                    var customCategoryPath = fbd.SelectedPath + "/CustomCategory.txt";
+                    var customCategoryPath = backupPath + "/CustomCategory.txt";
                     if (!File.Exists(customCategoryPath))
                     {
                         MessageBox.Show(Helper.Translate("カスタムカテゴリーファイルが見つかりませんでした。", CurrentLanguage),

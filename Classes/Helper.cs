@@ -798,11 +798,11 @@ namespace Avatar_Explorer.Classes
         /// 指定されたパスからカスタムカテゴリーデータを取得します。
         /// </summary>
         /// <returns></returns>
-        public static string[] LoadCustomCategoriesData(string path = "./Datas/CustomCategory.txt")
+        public static string[] LoadCustomCategoriesData(string path = "./Datas/CustomCategory.txt", bool createNewFile = true)
         {
             if (!File.Exists(path))
             {
-                File.Create(path).Close();
+                if (createNewFile) File.Create(path).Close();
                 return Array.Empty<string>();
             }
 
@@ -1670,6 +1670,58 @@ namespace Avatar_Explorer.Classes
                 commonAvatar.Avatars = commonAvatar.Avatars.Where(avatar => avatar != avatarPath)
                     .ToArray();
             }
+        }
+
+        /// <summary>
+        /// バックアップの時間を取得します。
+        /// </summary>
+        /// <param name="FileName"></param>
+        /// <param name="CurrnentLanguage"></param>
+        /// <returns></returns>
+        public static string GetBackupTime(string FileName)
+        {
+            try
+            {
+                var dateTime = DateTime.ParseExact(FileName, "yyyy-MM-dd-HH-mm-ss", null);
+                return dateTime.ToString("yyyy/MM/dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+            }
+            catch
+            {
+                return FileName;
+            }
+        }
+
+        /// <summary>
+        /// カスタムカテゴリーデータの数を取得します。
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static int GetCustomCategoryCount(string path)
+        {
+            var customCategoryDatas = LoadCustomCategoriesData(path + "/CustomCategory.txt", false);
+            return customCategoryDatas.Length;
+        }
+
+        /// <summary>
+        /// アイテムデータベースの数を取得します。
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static int GetItemDatabaseCount(string path)
+        {
+            var itemDatas = LoadItemsData(path + "/ItemsData.json");
+            return itemDatas.Length;
+        }
+
+        /// <summary>
+        /// 共通素体データベースの数を取得します。
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static int GetCommonAvatarDatabaseCount(string path)
+        {
+            var commonAvatars = LoadCommonAvatarData(path + "/CommonAvatar.json");
+            return commonAvatars.Length;
         }
     }
 }
