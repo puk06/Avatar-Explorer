@@ -47,6 +47,11 @@
         public string[] FileName { get; set; } = Array.Empty<string>();
 
         /// <summary>
+        /// 検索する実装済みのアバターを取得または設定します。
+        /// </summary>
+        public string[] ImplementedAvatars { get; set; } = Array.Empty<string>();
+
+        /// <summary>
         /// 検索するアイテムの文字列を取得または設定します。
         /// </summary>
         public string[] SearchWords { get; set; } = Array.Empty<string>();

@@ -469,7 +469,7 @@ namespace Avatar_Explorer.Classes
         public static SearchFilter GetSearchFilter(string searchWord)
         {
             var searchFilter = new SearchFilter();
-            var regex = new Regex(@"(?<key>Author|Title|Booth|Avatar|Category|Memo|Folder|File)=(?:""(?<value>.*?)""|(?<value>[^\s]+))|(?<word>[^\s]+)");
+            var regex = new Regex(@"(?<key>Author|Title|Booth|Avatar|Category|Memo|Folder|File|Implemented)=(?:""(?<value>.*?)""|(?<value>[^\s]+))|(?<word>[^\s]+)");
             var matches = regex.Matches(searchWord);
 
             foreach (Match match in matches)
@@ -505,6 +505,10 @@ namespace Avatar_Explorer.Classes
                         case "File":
                             searchFilter.FileName = searchFilter.FileName.Append(value).ToArray();
                             break;
+                        case "Implemented":
+                            searchFilter.ImplementedAvatars = searchFilter.ImplementedAvatars.Append(value).ToArray();
+                            break;
+
                     }
                 }
                 else if (match.Groups["word"].Success)
@@ -1452,7 +1456,7 @@ namespace Avatar_Explorer.Classes
         public static bool ContainsSelectedAvatar(Item item, string? selectedAvatar)
         {
             if (string.IsNullOrEmpty(selectedAvatar)) return false;
-            return item.ImplementationAvatars.Contains(selectedAvatar);
+            return item.ImplementedAvatars.Contains(selectedAvatar);
         }
 
         /// <summary>
@@ -1521,6 +1525,19 @@ namespace Avatar_Explorer.Classes
                         file.FileName.Contains(fileName, StringComparison.CurrentCultureIgnoreCase) ||
                         file.FileExtension.Contains(fileName, StringComparison.CurrentCultureIgnoreCase));
             }))
+            {
+                return false;
+            }
+
+            if (searchFilter.ImplementedAvatars.Length != 0 && !searchFilter.ImplementedAvatars.Any(avatar =>
+                {
+                    return item.ImplementedAvatars.Any(implementedAvatar =>
+                    {
+                        var implementedAvatarName = GetAvatarNameFromPath(items, implementedAvatar);
+                        if (implementedAvatarName == "") return false;
+                        return implementedAvatarName.Contains(avatar, StringComparison.CurrentCultureIgnoreCase);
+                    });
+                }))
             {
                 return false;
             }
@@ -1611,9 +1628,9 @@ namespace Avatar_Explorer.Classes
                         avatar == oldPath ? item.ItemPath : avatar).ToArray();
                 }
 
-                if (item.ImplementationAvatars.Contains(oldPath))
+                if (item.ImplementedAvatars.Contains(oldPath))
                 {
-                    item.ImplementationAvatars = item.ImplementationAvatars.Select(avatar =>
+                    item.ImplementedAvatars = item.ImplementedAvatars.Select(avatar =>
                         avatar == oldPath ? item.ItemPath : avatar).ToArray();
                 }
             }
@@ -1634,9 +1651,9 @@ namespace Avatar_Explorer.Classes
                     item.SupportedAvatar = item.SupportedAvatar.Where(avatar => avatar != avatarPath).ToArray();
                 }
 
-                if (item.ImplementationAvatars.Contains(avatarPath))
+                if (item.ImplementedAvatars.Contains(avatarPath))
                 {
-                    item.ImplementationAvatars = item.ImplementationAvatars.Where(avatar => avatar != avatarPath).ToArray();
+                    item.ImplementedAvatars = item.ImplementedAvatars.Where(avatar => avatar != avatarPath).ToArray();
                 }
             }
         }

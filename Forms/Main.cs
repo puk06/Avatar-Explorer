@@ -964,7 +964,7 @@ namespace Avatar_Explorer.Forms
                     var currentAvatar = CurrentPath.CurrentSelectedAvatarPath;
                     if (!string.IsNullOrEmpty(currentAvatar))
                     {
-                        button.BackColor = item.ImplementationAvatars.Contains(currentAvatar)
+                        button.BackColor = item.ImplementedAvatars.Contains(currentAvatar)
                             ? Color.LightGreen
                             : Color.LightPink;
                     }
@@ -1149,19 +1149,19 @@ namespace Avatar_Explorer.Forms
                     ToolStripMenuItem toolStripMenuItemTemp = new(Helper.GetAvatarNameFromPath(Items, avatar.ItemPath))
                     {
                         Tag = avatar.ItemPath,
-                        Checked = item.ImplementationAvatars.Contains(avatar.ItemPath)
+                        Checked = item.ImplementedAvatars.Contains(avatar.ItemPath)
                     };
 
                     EventHandler clickEvent8 = (_, _) =>
                     {
                         if (toolStripMenuItemTemp.Checked)
                         {
-                            item.ImplementationAvatars = item.ImplementationAvatars.Where(avatarPath => avatarPath != (string)toolStripMenuItemTemp.Tag).ToArray();
+                            item.ImplementedAvatars = item.ImplementedAvatars.Where(avatarPath => avatarPath != (string)toolStripMenuItemTemp.Tag).ToArray();
                             toolStripMenuItemTemp.Checked = false;
                         }
                         else
                         {
-                            item.ImplementationAvatars = item.ImplementationAvatars.Append((string)toolStripMenuItemTemp.Tag).ToArray();
+                            item.ImplementedAvatars = item.ImplementedAvatars.Append((string)toolStripMenuItemTemp.Tag).ToArray();
                             toolStripMenuItemTemp.Checked = true;
                         }
 
@@ -1170,7 +1170,7 @@ namespace Avatar_Explorer.Forms
                             var currentAvatar = CurrentPath.CurrentSelectedAvatarPath;
                             if (!string.IsNullOrEmpty(currentAvatar))
                             {
-                                button.BackColor = item.ImplementationAvatars.Contains(currentAvatar)
+                                button.BackColor = item.ImplementedAvatars.Contains(currentAvatar)
                                     ? Color.LightGreen
                                     : Color.LightPink;
                             }
@@ -1645,19 +1645,19 @@ namespace Avatar_Explorer.Forms
                     ToolStripMenuItem toolStripMenuItemTemp = new(Helper.GetAvatarNameFromPath(Items, avatar.ItemPath))
                     {
                         Tag = avatar.ItemPath,
-                        Checked = item.ImplementationAvatars.Contains(avatar.ItemPath)
+                        Checked = item.ImplementedAvatars.Contains(avatar.ItemPath)
                     };
 
                     EventHandler clickEvent8 = (_, _) =>
                     {
                         if (toolStripMenuItemTemp.Checked)
                         {
-                            item.ImplementationAvatars = item.ImplementationAvatars.Where(avatarPath => avatarPath != (string)toolStripMenuItemTemp.Tag).ToArray();
+                            item.ImplementedAvatars = item.ImplementedAvatars.Where(avatarPath => avatarPath != (string)toolStripMenuItemTemp.Tag).ToArray();
                             toolStripMenuItemTemp.Checked = false;
                         }
                         else
                         {
-                            item.ImplementationAvatars = item.ImplementationAvatars.Append((string)toolStripMenuItemTemp.Tag).ToArray();
+                            item.ImplementedAvatars = item.ImplementedAvatars.Append((string)toolStripMenuItemTemp.Tag).ToArray();
                             toolStripMenuItemTemp.Checked = true;
                         }
 
@@ -2146,6 +2146,13 @@ namespace Avatar_Explorer.Forms
                     .ToArray();
             }
 
+            if (searchFilter.ImplementedAvatars.Length != 0)
+            {
+                pathTextArr = pathTextArr.Append(Helper.Translate("実装アバター", CurrentLanguage) + ": " +
+                                                 string.Join(", ", searchFilter.ImplementedAvatars))
+                    .ToArray();
+            }
+
             pathTextArr = pathTextArr.Append(string.Join(", ", searchFilter.SearchWords)).ToArray();
 
             PathTextBox.Text = Helper.Translate("検索中... - ", CurrentLanguage) + string.Join(" / ", pathTextArr);
@@ -2367,7 +2374,7 @@ namespace Avatar_Explorer.Forms
                     }
 
                     string[] ImplementedAvatarNames = Array.Empty<string>();
-                    foreach (var avatar in item.ImplementationAvatars)
+                    foreach (var avatar in item.ImplementedAvatars)
                     {
                         var avatarName = Helper.GetAvatarName(Items, avatar);
                         if (avatarName == null) continue;

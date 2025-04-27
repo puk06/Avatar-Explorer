@@ -88,6 +88,6 @@
         /// <summary>
         /// アイテムが実装済みかどうかを管理する配列を取得または設定します。
         /// </summary>
-        public string[] ImplementationAvatars { get; set; } = Array.Empty<string>();
+        public string[] ImplementedAvatars { get; set; } = Array.Empty<string>();
     }
 }
