@@ -10,6 +10,7 @@ namespace Avatar_Explorer.Forms
     public sealed partial class Main : Form
     {
         #region フォームのテキスト関連の変数
+
         /// <summary>
         /// ソフトの現在のバージョン
         /// </summary>
@@ -19,9 +20,11 @@ namespace Avatar_Explorer.Forms
         /// デフォルトのフォームテキスト
         /// </summary>
         private const string CurrentVersionFormText = $"VRChat Avatar Explorer {CurrentVersion} by ぷこるふ";
+
         #endregion
 
         #region ソフトのデータベース関連の変数
+
         /// <summary>
         /// アイテムデータベース
         /// </summary>
@@ -36,6 +39,7 @@ namespace Avatar_Explorer.Forms
         /// カスタムカテゴリーデータベース
         /// </summary>
         public string[] CustomCategories;
+
         #endregion
 
         #region フォント関連の変数
@@ -54,6 +58,7 @@ namespace Avatar_Explorer.Forms
         /// フォームのGUIフォント
         /// </summary>
         public FontFamily? GuiFont;
+
         #endregion
 
         #region 現在のウィンドウの種類に関する変数
@@ -72,6 +77,7 @@ namespace Avatar_Explorer.Forms
         /// 現在開いているメイン画面ウィンドウタイプ
         /// </summary>
         private Window _openingWindow = Window.Nothing;
+
         #endregion
 
         #region フォームリサイズ関連の変数
@@ -120,6 +126,7 @@ namespace Avatar_Explorer.Forms
         /// </summary>
         /// <returns>ItemExplorerList Width</returns>
         private int GetItemExplorerListWidth() => AvatarItemExplorer.Width - _baseAvatarItemExplorerListWidth;
+
         #endregion
 
         #region バックアップ関連の変数
@@ -138,9 +145,11 @@ namespace Avatar_Explorer.Forms
         /// 最後のバックアップ時にエラーが発生したかどうかを取得または設定します。
         /// </summary>
         private bool _lastBackupError;
+
         #endregion
 
         #region ソフトのステータスに関する変数
+
         /// <summary>
         /// 現在のソフトの言語
         /// </summary>
@@ -160,6 +169,7 @@ namespace Avatar_Explorer.Forms
         /// フォームが初期化されたかどうかを取得します。
         /// </summary>
         private readonly bool _initialized;
+
         #endregion
 
         #region フォームの初期化
@@ -265,6 +275,7 @@ namespace Avatar_Explorer.Forms
             var newFont = _fontFamilies.TryGetValue(CurrentLanguage, out var family) ? family : _fontFamilies["ja-JP"];
             GuiFont = newFont;
         }
+
         #endregion
 
         #region 左のリスト関連の処理
@@ -768,9 +779,11 @@ namespace Avatar_Explorer.Forms
 
             Helper.UpdateExplorerThumbnails(CategoryPage);
         }
+
         #endregion
 
         #region 右のリスト関連の処理
+
         /// <summary>
         /// メイン画面右のカテゴリ欄を作成します。
         /// </summary>
@@ -1405,9 +1418,11 @@ namespace Avatar_Explorer.Forms
 
             Helper.UpdateExplorerThumbnails(AvatarItemExplorer);
         }
+
         #endregion
 
         #region 検索関連の処理
+
         /// <summary>
         /// 検索ボックスに入力された文字列を元にアイテムを検索します。
         /// </summary>
@@ -1818,6 +1833,7 @@ namespace Avatar_Explorer.Forms
 
             Helper.UpdateExplorerThumbnails(AvatarItemExplorer);
         }
+
         #endregion
 
         #region アイテム追加関連の処理
@@ -1834,6 +1850,7 @@ namespace Avatar_Explorer.Forms
             RefleshWindow();
             Helper.SaveItemsData(Items);
         }
+
         #endregion
 
         #region パス関連の処理
@@ -1913,6 +1930,7 @@ namespace Avatar_Explorer.Forms
                 CurrentPath.CurrentSelectedCustomCategory = item.CustomCategory;
             CurrentPath.CurrentSelectedItem = item;
         }
+
         #endregion
 
         #region 戻るボタンの処理
@@ -2025,6 +2043,7 @@ namespace Avatar_Explorer.Forms
             ResetAvatarExplorer(true);
             PathTextBox.Text = GeneratePath();
         }
+
         #endregion
 
         #region 検索ボックスの処理
@@ -2157,6 +2176,7 @@ namespace Avatar_Explorer.Forms
 
             PathTextBox.Text = Helper.Translate("検索中... - ", CurrentLanguage) + string.Join(" / ", pathTextArr);
         }
+
         #endregion
 
         #region リセット関連の処理
@@ -2259,6 +2279,7 @@ namespace Avatar_Explorer.Forms
             GenerateAuthorList();
             GenerateCategoryListLeft();
         }
+
         #endregion
 
         #region ドラッグアンドドロップ関連の処理
@@ -2311,6 +2332,7 @@ namespace Avatar_Explorer.Forms
             addItem.Show();
             Enabled = false;
         }
+
         #endregion
 
         #region 画面下部のボタン関連の処理
@@ -2776,6 +2798,7 @@ namespace Avatar_Explorer.Forms
             PathTextBox.Text = GeneratePath();
             Helper.SaveCommonAvatarData(CommonAvatars);
         }
+
         #endregion
 
         #region リサイズ関連の処理
@@ -2934,6 +2957,7 @@ namespace Avatar_Explorer.Forms
                 }
             }
         }
+
         #endregion
 
         #region バックアップ関連の処理
@@ -3006,6 +3030,7 @@ namespace Avatar_Explorer.Forms
                 Helper.ErrorLogger("自動バックアップに失敗しました。", ex);
             }
         }
+
         #endregion
 
         #region フォルダーが閉じられる際の処理
@@ -3027,6 +3052,7 @@ namespace Avatar_Explorer.Forms
                 Helper.ErrorLogger("一時フォルダの削除に失敗しました。", ex);
             }
         }
+
         #endregion
     }
 }
