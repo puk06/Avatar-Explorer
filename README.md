@@ -29,3 +29,8 @@ git push origin feature/your-feature
 ## ライセンス
 
 このプロジェクトはMITライセンスの元で公開されています。詳細はLICENSEファイルをご覧ください。
+
+本ソフトウェアで使用されている「Noto Sans」フォントは、Google によって提供され、SIL Open Font License 1.1 のもとでライセンスされています。
+
+ライセンス名: SIL Open Font License 1.1
+ライセンスの全文: https://scripts.sil.org/OFL
