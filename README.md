@@ -34,3 +34,13 @@ git push origin feature/your-feature
 
 ライセンス名: SIL Open Font License 1.1
 ライセンスの全文: https://scripts.sil.org/OFL
+
+- SharpCompress
+  https://github.com/adamhathcock/sharpcompress  
+  Licensed under the MIT License  
+  https://github.com/adamhathcock/sharpcompress/blob/master/LICENSE
+
+- Newtonsoft.Json
+  https://github.com/JamesNK/Newtonsoft.Json  
+  Licensed under the MIT License  
+  https://github.com/JamesNK/Newtonsoft.Json/blob/master/LICENSE.md
