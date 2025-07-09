@@ -1942,7 +1942,7 @@ namespace Avatar_Explorer.Forms
         /// <param name="e"></param>
         private void UndoButton_Click(object sender, EventArgs e)
         {
-            //検索中だった場合は前の画面までとりあえず戻してあげる
+            // 検索中だった場合は前の画面までとりあえず戻してあげる
             if (_isSearching)
             {
                 SearchBox.Text = "";
@@ -1987,7 +1987,7 @@ namespace Avatar_Explorer.Forms
 
             if (CurrentPath.IsEmpty())
             {
-                //エラー音を再生
+                // エラー音を再生
                 SystemSounds.Hand.Play();
                 return;
             }
@@ -3052,7 +3052,6 @@ namespace Avatar_Explorer.Forms
                 Helper.ErrorLogger("一時フォルダの削除に失敗しました。", ex);
             }
         }
-
         #endregion
     }
 }

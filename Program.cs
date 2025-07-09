@@ -17,7 +17,7 @@ namespace Avatar_Explorer
                 // To customize application configuration such as set high DPI settings or default font,
                 // see https://aka.ms/applicationconfiguration.
 
-                //相対パスを取得し、カレントディレクトリを設定
+                // 相対パスを取得し、カレントディレクトリを設定
                 var currentDirectory = Path.GetDirectoryName(Process.GetCurrentProcess()?.MainModule?.FileName);
                 if (currentDirectory != null) Directory.SetCurrentDirectory(currentDirectory);
 
