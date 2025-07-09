@@ -1,18 +1,21 @@
 const fs = require('fs');
-const fontName = "Noto Sans JP";
 
-const data = fs.readFileSync("Forms/Main.Designer.cs", "utf-8");
-const replacedData = data.replace(/GuiFont/g, `"${fontName}"`);
-fs.writeFileSync("Forms/Main.Designer.cs", replacedData);
+const files = [
+    { path: "Forms/MainForm.Designer.cs", replacement: "GuiFont" },
+    { path: "Forms/AddItemForm.Designer.cs", replacement: "_mainForm.GuiFont" },
+    { path: "Forms/SelectSupportedAvatarForm.Designer.cs", replacement: "_mainForm.GuiFont" },
+    { path: "Forms/ManageCommonAvatarsFrom.Designer.cs", replacement: "_mainForm.GuiFont" },
+    { path: "Forms/SelectAutoBackupForm.Designer.cs", replacement: "_mainForm.GuiFont" },
+    { path: "Forms/AddNoteForm.Designer.cs", replacement: "_mainForm.GuiFont" }
+];
 
-const data2 = fs.readFileSync("Forms/AddItem.Designer.cs", "utf-8");
-const replacedData2 = data2.replace(/_mainForm.GuiFont/g, `"${fontName}"`);
-fs.writeFileSync("Forms/AddItem.Designer.cs", replacedData2);
-
-const data3 = fs.readFileSync("Forms/SelectSupportedAvatar.Designer.cs", "utf-8");
-const replacedData3 = data3.replace(/_mainForm.GuiFont/g, `"${fontName}"`);
-fs.writeFileSync("Forms/SelectSupportedAvatar.Designer.cs", replacedData3);
-
-const data4 = fs.readFileSync("Forms/ManageCommonAvatars.Designer.cs", "utf-8");
-const replacedData4 = data4.replace(/_mainForm.GuiFont/g, `"${fontName}"`);
-fs.writeFileSync("Forms/ManageCommonAvatars.Designer.cs", replacedData4);
+files.forEach(({ path, replacement }) => {
+    try {
+        const data = fs.readFileSync(path, "utf-8");
+        const replacedData = data.replace(new RegExp(`"${target}"`, "g"), `"Noto Sans JP"`);
+        fs.writeFileSync(path, replacedData);
+        console.log(`Replaced in ${path}`);
+    } catch (err) {
+        console.error(`Error processing ${path}:`, err.message);
+    }
+});

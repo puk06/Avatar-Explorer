@@ -51,9 +51,9 @@ for (let i = 0; i < fontFilesLength; i++) {
     console.log("Copying: " + file);
 }
 
-const CUSTOM_CATEGORY_FILES = "../../../CustomCategory.txt";
-console.log("Copying Custom Category");
-fs.copyFileSync(CUSTOM_CATEGORY_FILES, "Datas/CustomCategory.txt");
+console.log("Generating Empty CustomCategory");
+const customCategoryPath = path.join("Datas", "CustomCategory.txt");
+fs.writeFileSync(customCategoryPath, "", "utf8");
 
 fs.rmSync("build.js");
 console.log("Build Completed!");

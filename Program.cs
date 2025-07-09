@@ -1,6 +1,7 @@
 using Avatar_Explorer.Forms;
-using Avatar_Explorer.Classes;
+using Avatar_Explorer.Models;
 using System.Diagnostics;
+using Avatar_Explorer.Utils;
 
 namespace Avatar_Explorer
 {
@@ -31,12 +32,12 @@ namespace Avatar_Explorer
                 }
 
                 // Check if the schema is registered in the registry
-                Helper.CheckScheme();
+                SchemeUtils.CheckScheme();
 
-                var launchInfo = args.Length > 0 ? Helper.GetLaunchInfo(args[0]) : new LaunchInfo();
+                var launchInfo = args.Length > 0 ? AEUtils.GetLaunchInfo(args[0]) : new LaunchInfo();
 
                 ApplicationConfiguration.Initialize();
-                Application.Run(new Main(launchInfo));
+                Application.Run(new MainForm(launchInfo));
             }
             catch (Exception ex)
             {
