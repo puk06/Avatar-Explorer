@@ -3,7 +3,7 @@ using Avatar_Explorer.Utils;
 
 namespace Avatar_Explorer.Forms;
 
-public sealed partial class ManageCommonAvatarsForm : Form
+internal sealed partial class ManageCommonAvatarsForm : Form
 {
     /// <summary>
     /// メインフォームを取得または設定します。
@@ -19,7 +19,7 @@ public sealed partial class ManageCommonAvatarsForm : Form
     /// 共通素体の管理フォームを初期化します。
     /// </summary>
     /// <param name="mainform"></param>
-    public ManageCommonAvatarsForm(MainForm mainform)
+    internal ManageCommonAvatarsForm(MainForm mainform)
     {
         _mainForm = mainform;
         _commonAvatars = _mainForm.CommonAvatars;

@@ -2,7 +2,7 @@
 
 namespace Avatar_Explorer.Forms;
 
-public partial class SelectAutoBackupForm : Form
+internal partial class SelectAutoBackupForm : Form
 {
     /// <summary>
     /// メインフォームを取得または設定します。
@@ -17,14 +17,14 @@ public partial class SelectAutoBackupForm : Form
     /// <summary>
     /// バックアップフォルダと日付を紐づけてあるDictionaryを取得または設定します。
     /// </summary>
-    private readonly Dictionary<string, string> _backupPaths = new();
+    private readonly Dictionary<string, string> _backupPaths;
 
     /// <summary>
     /// 選択されたフォルダパスを取得または設定します。
     /// </summary>
-    public string SelectedBackupPath { get; private set; } = string.Empty;
+    internal string SelectedBackupPath { get; private set; } = string.Empty;
 
-    public SelectAutoBackupForm(MainForm mainForm)
+    internal SelectAutoBackupForm(MainForm mainForm)
     {
         _mainForm = mainForm;
         InitializeComponent();

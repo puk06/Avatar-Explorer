@@ -3,7 +3,7 @@ using Avatar_Explorer.Utils;
 
 namespace Avatar_Explorer.Forms;
 
-public sealed partial class AddItemForm : Form
+internal sealed partial class AddItemForm : Form
 {
     /// <summary>
     /// メインフォームを取得または設定します。
@@ -23,7 +23,7 @@ public sealed partial class AddItemForm : Form
     /// <summary>
     /// HTTPクライアントを取得または設定します。
     /// </summary>
-    private static readonly HttpClient HttpClient = new();
+    private static readonly HttpClient _httpClient = new();
 
     /// <summary>
     /// 追加ボタンが有効になれるかどうかを取得または設定します。
@@ -33,17 +33,17 @@ public sealed partial class AddItemForm : Form
     /// <summary>
     /// アイテムが追加されたときに発生するイベントです。
     /// </summary>
-    public event EventHandler? ItemAdded;
+    internal event EventHandler? ItemAdded;
 
     /// <summary>
     /// メインフォームに反映される予定のアイテムファイルです。
     /// </summary>
-    public Item Item = new();
+    internal Item Item = new();
 
     /// <summary>
     /// 対応しているアバターのリストを取得または設定します。
     /// </summary>
-    public List<string> SupportedAvatar = new List<string>();
+    internal List<string> SupportedAvatar = new List<string>();
 
     /// <summary>
     /// アイテムのその他のフォルダのパスを取得または設定します。
@@ -115,7 +115,7 @@ public sealed partial class AddItemForm : Form
     /// <param name="item"></param>
     /// <param name="itemFolderPaths"></param>
     /// <param name="boothId"></param>
-    public AddItemForm(MainForm mainForm, ItemType type, string? customCategory, bool edit, Item? item, string[]? itemFolderPaths, string boothId = "")
+    internal AddItemForm(MainForm mainForm, ItemType type, string? customCategory, bool edit, Item? item, string[]? itemFolderPaths, string boothId = "")
     {
         _edit = edit;
         _mainForm = mainForm;
@@ -229,7 +229,7 @@ public sealed partial class AddItemForm : Form
     /// <param name="e"></param>
     private async void GetButton_Click(object sender, EventArgs e)
     {
-        var boothId = BoothURLTextBox.Text.Split('/').Last();
+        var boothId = BoothURLTextBox.Text.Split('/')[^1];
         if (!int.TryParse(boothId, out _))
         {
             FormUtils.ShowMessageBox(
@@ -388,7 +388,7 @@ public sealed partial class AddItemForm : Form
                 {
                     try
                     {
-                        var thumbnailData = await HttpClient.GetByteArrayAsync(Item.ThumbnailUrl);
+                        var thumbnailData = await _httpClient.GetByteArrayAsync(Item.ThumbnailUrl);
                         await File.WriteAllBytesAsync(thumbnailPath, thumbnailData);
                         Item.ImagePath = thumbnailPath;
                     }
@@ -424,7 +424,7 @@ public sealed partial class AddItemForm : Form
                 {
                     try
                     {
-                        var authorImageData = await HttpClient.GetByteArrayAsync(Item.AuthorImageUrl);
+                        var authorImageData = await _httpClient.GetByteArrayAsync(Item.AuthorImageUrl);
                         await File.WriteAllBytesAsync(authorImagePath, authorImageData);
                         Item.AuthorImageFilePath = authorImagePath;
                     }

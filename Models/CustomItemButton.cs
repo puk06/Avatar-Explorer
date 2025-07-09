@@ -1,6 +1,6 @@
 namespace Avatar_Explorer.Models;
 
-public class CustomItemButton : Button
+internal class CustomItemButton : Button
 {
     private readonly PictureBox _pictureBox;
     private readonly Label _title;
@@ -39,7 +39,7 @@ public class CustomItemButton : Button
         }
     }
 
-    public CustomItemButton(int buttonWidth)
+    internal CustomItemButton(int buttonWidth)
     {
         UseVisualStyleBackColor = true;
         Size = new Size(buttonWidth, 64);

@@ -8,7 +8,7 @@ using Timer = System.Windows.Forms.Timer;
 
 namespace Avatar_Explorer.Forms;
 
-public sealed partial class MainForm : Form
+internal sealed partial class MainForm : Form
 {
     #region フォームのテキスト関連の変数
 
@@ -94,7 +94,7 @@ public sealed partial class MainForm : Form
     private readonly Size _initialFormSize;
 
     /// <summary>
-    ///　メイン画面左のアバター欄の初期幅
+    /// メイン画面左のアバター欄の初期幅
     /// </summary>
     private readonly int _baseAvatarSearchFilterListWidth;
 
@@ -215,16 +215,13 @@ public sealed partial class MainForm : Form
             Text = $"VRChat Avatar Explorer {CurrentVersion} by ぷこるふ";
 
             // Check if the software is launched with a URL
-            if (launchInfo.launchedWithUrl)
+            if (launchInfo.launchedWithUrl && launchInfo.assetDirs.Length != 0 && !string.IsNullOrEmpty(launchInfo.assetId))
             {
-                if (launchInfo.assetDirs.Length != 0 && !string.IsNullOrEmpty(launchInfo.assetId))
-                {
-                    AddItemForm addItem = new(this, ItemType.Avatar, null, false, null, launchInfo.assetDirs, launchInfo.assetId);
-                    addItem.ShowDialog();
+                AddItemForm addItem = new(this, ItemType.Avatar, null, false, null, launchInfo.assetDirs, launchInfo.assetId);
+                addItem.ShowDialog();
 
-                    RefleshWindow();
-                    DatabaseUtils.SaveItemsData(Items);
-                }
+                RefleshWindow();
+                DatabaseUtils.SaveItemsData(Items);
             }
 
             AdjustLabelPosition();
@@ -867,7 +864,7 @@ public sealed partial class MainForm : Form
         _openingWindow = Window.ItemList;
         ResetAvatarExplorer();
 
-        var filteredItems = Items.AsEnumerable();
+        IEnumerable<Item> filteredItems;
 
         if (_authorMode)
         {
@@ -1410,7 +1407,7 @@ public sealed partial class MainForm : Form
                 return matchCount;
             });
 
-        SearchResultLabel.Text = 
+        SearchResultLabel.Text =
             LanguageUtils.Translate("検索結果: ", CurrentLanguage) + filteredItems.Count() + LanguageUtils.Translate("件", CurrentLanguage) +
             LanguageUtils.Translate(" (全", CurrentLanguage) + Items.Count + LanguageUtils.Translate("件)", CurrentLanguage);
 
@@ -1590,6 +1587,9 @@ public sealed partial class MainForm : Form
                 DatabaseUtils.SaveItemsData(Items);
             };
 
+            toolStripMenuItem5.Click += clickEvent7;
+            toolStripMenuItem5.Disposed += (_, _) => toolStripMenuItem5.Click -= clickEvent7;
+
             ToolStripMenuItem toolStripMenuItem6 = new(LanguageUtils.Translate("実装/未実装", CurrentLanguage), SharedImages.GetImage(SharedImages.Images.EditIcon));
 
             foreach (var avatar in Items.Where(i => i.Type == ItemType.Avatar))
@@ -1712,8 +1712,8 @@ public sealed partial class MainForm : Form
             .Where(file => searchWords.SearchWords.All(word => file.FileName.Contains(word, StringComparison.CurrentCultureIgnoreCase)))
             .OrderByDescending(file => searchWords.SearchWords.Count(word => file.FileName.Contains(word, StringComparison.CurrentCultureIgnoreCase)));
 
-        SearchResultLabel.Text = 
-            LanguageUtils.Translate("フォルダー内検索結果: ", CurrentLanguage) + filteredFileData.Count() + LanguageUtils.Translate("件", CurrentLanguage) + 
+        SearchResultLabel.Text =
+            LanguageUtils.Translate("フォルダー内検索結果: ", CurrentLanguage) + filteredFileData.Count() + LanguageUtils.Translate("件", CurrentLanguage) +
             LanguageUtils.Translate(" (全", CurrentLanguage) + fileDatas.Count() + LanguageUtils.Translate("件)", CurrentLanguage);
 
         if (!filteredFileData.Any()) return;
@@ -2238,9 +2238,19 @@ public sealed partial class MainForm : Form
             var index = 1;
             while (File.Exists("./Output/" + fileName))
             {
-                if (index > 60) throw new Exception("Too many exports.");
+                if (index > 60) break;
                 fileName = currentTimeStr + $"_{index}.csv";
                 index++;
+            }
+
+            if (index > 60)
+            {
+                FormUtils.ShowMessageBox(
+                    LanguageUtils.Translate("エクスポートに失敗しました", CurrentLanguage),
+                    LanguageUtils.Translate("エラー", CurrentLanguage),
+                    true
+                );
+                return;
             }
 
             var commonAvatarResult = FormUtils.ShowConfirmDialog(
@@ -2344,9 +2354,19 @@ public sealed partial class MainForm : Form
             var index = 1;
             while (File.Exists("./Backup/" + fileName))
             {
-                if (index > 60) throw new Exception("Too many backups");
+                if (index > 60) break;
                 fileName = currentTimeStr + $"_{index}.zip";
                 index++;
+            }
+
+            if (index > 60)
+            {
+                FormUtils.ShowMessageBox(
+                    LanguageUtils.Translate("バックアップに失敗しました", CurrentLanguage),
+                    LanguageUtils.Translate("エラー", CurrentLanguage),
+                    true
+                );
+                return;
             }
 
             ZipFile.CreateFromDirectory("./Datas", "./Backup/" + fileName);
@@ -2583,7 +2603,7 @@ public sealed partial class MainForm : Form
                 {
                     FormUtils.ShowMessageBox(
                         LanguageUtils.Translate("共通素体ファイルが見つかりませんでした。", CurrentLanguage),
-                        LanguageUtils.Translate("エラー", CurrentLanguage), 
+                        LanguageUtils.Translate("エラー", CurrentLanguage),
                         true
                     );
                 }
@@ -2690,7 +2710,7 @@ public sealed partial class MainForm : Form
                 var itemsResultText = itemsResult ? "" : "\n" + LanguageUtils.Translate("Itemsのコピーに一部失敗しています。", CurrentLanguage);
 
                 FormUtils.ShowMessageBox(
-                    LanguageUtils.Translate("コピーが完了しました。", CurrentLanguage) + "\n\n" + LanguageUtils.Translate("コピー失敗一覧: ", CurrentLanguage) + 
+                    LanguageUtils.Translate("コピーが完了しました。", CurrentLanguage) + "\n\n" + LanguageUtils.Translate("コピー失敗一覧: ", CurrentLanguage) +
                     thumbilResultText + authorImageResultText + itemsResultText,
                     LanguageUtils.Translate("完了", CurrentLanguage)
                 );

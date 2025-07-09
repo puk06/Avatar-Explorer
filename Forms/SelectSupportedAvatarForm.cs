@@ -3,7 +3,7 @@ using Avatar_Explorer.Utils;
 
 namespace Avatar_Explorer.Forms;
 
-public sealed partial class SelectSupportedAvatarForm : Form
+internal sealed partial class SelectSupportedAvatarForm : Form
 {
     /// <summary>
     /// メインフォームを取得または設定します。
@@ -20,7 +20,7 @@ public sealed partial class SelectSupportedAvatarForm : Form
     /// </summary>
     /// <param name="mainForm"></param>
     /// <param name="addItem"></param>
-    public SelectSupportedAvatarForm(MainForm mainForm, AddItemForm addItem)
+    internal SelectSupportedAvatarForm(MainForm mainForm, AddItemForm addItem)
     {
         _mainForm = mainForm;
         _addItem = addItem;
