@@ -52,28 +52,22 @@ internal static class SchemeUtils
 
     private static bool PromptUserToRegisterScheme()
     {
-        var result = MessageBox.Show(
+        return FormUtils.ShowConfirmDialog(
             $"カスタムURLスキームを登録しますか？\n\n" +
             $"登録すると、ブラウザから「{REG_PROTCOL}://」でこのソフトを起動できます。\n" +
             $"登録しない場合は、URLスキームでの起動はできませんが、通常の起動は可能です。",
-            "カスタムURLスキーム登録",
-            MessageBoxButtons.YesNo, MessageBoxIcon.Information
+            "カスタムURLスキーム登録"
         );
-
-        return result == DialogResult.Yes;
     }
 
     private static bool PromptUserToReRegister(string reason)
-    {
-        var result = MessageBox.Show(
+    { 
+        return FormUtils.ShowConfirmDialog(
             $"カスタムURLスキームは{reason}\n\n" +
             $"登録すると、ブラウザから「{REG_PROTCOL}://」でこのソフトを起動できます。\n" +
             $"登録しない場合は、URLスキームでの起動はできませんが、通常の起動は可能です。",
-            "カスタムURLスキーム登録",
-            MessageBoxButtons.YesNo, MessageBoxIcon.Information
+            "カスタムURLスキーム登録"
         );
-
-        return result == DialogResult.Yes;
     }
 
     private static void RegisterSchemeFlow(string exePath)
@@ -82,13 +76,13 @@ internal static class SchemeUtils
         {
             if (!IsRunAsAdmin())
             {
-                var result = MessageBox.Show(
+                var result = FormUtils.ShowConfirmDialog(
                     "カスタムURLスキームの登録には管理者権限が必要です。\n" +
                     "再起動して管理者権限で起動しますか？",
-                    "確認",
-                    MessageBoxButtons.YesNo, MessageBoxIcon.Information
+                    "確認"
                 );
-                if (result == DialogResult.Yes)
+
+                if (result)
                     RestartAsAdmin();
                 return;
             }
@@ -96,24 +90,23 @@ internal static class SchemeUtils
             RegisterCustomScheme(REG_PROTCOL, exePath);
             File.WriteAllText(SCHEME_FILE_PATH, exePath);
 
-            var exitResult = MessageBox.Show(
+            var exitResult = FormUtils.ShowConfirmDialog(
                 "カスタムURLスキームの登録に成功しました。\n" +
                 "ソフトを終了して、通常のユーザーとして起動することをおすすめします！\n\n" +
                 "終了しないと、ソフト内のD&Dなどが正常に動作しない場合があります。\n" +
                 "終了しますか？",
-                "確認",
-                MessageBoxButtons.YesNo, MessageBoxIcon.Information
+                "確認"
             );
 
-            if (exitResult == DialogResult.Yes)
+            if (exitResult)
                 Environment.Exit(0);
         }
         catch (Exception ex)
         {
-            MessageBox.Show(
+            FormUtils.ShowMessageBox(
                 "カスタムURLスキームの登録に失敗しました。\n\n" + ex,
                 "エラー",
-                MessageBoxButtons.OK, MessageBoxIcon.Error
+                true
             );
         }
     }
@@ -121,11 +114,10 @@ internal static class SchemeUtils
     private static void MarkSchemeSkipped()
     {
         File.WriteAllText(SCHEME_FILE_PATH, "false");
-        MessageBox.Show(
+        FormUtils.ShowMessageBox(
             "カスタムURLスキームの登録をスキップしました。\n" +
             "もし登録したければ、Datasフォルダ内のVRCAESCHEME.txtを削除してもう一度起動してください！",
-            "情報",
-            MessageBoxButtons.OK, MessageBoxIcon.Information
+            "情報"
         );
     }
 
@@ -180,7 +172,11 @@ internal static class SchemeUtils
         var exePath = Process.GetCurrentProcess()?.MainModule?.FileName;
         if (string.IsNullOrEmpty(exePath))
         {
-            MessageBox.Show("再起動に失敗しました。手動で管理者としてソフトを実行してください！", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            FormUtils.ShowMessageBox(
+                "再起動に失敗しました。手動で管理者としてソフトを実行してください！",
+                "エラー",
+                true
+            );
             return;
         }
 
@@ -198,8 +194,11 @@ internal static class SchemeUtils
         }
         catch (Exception ex)
         {
-            MessageBox.Show("再起動に失敗しました。手動で管理者としてソフトを実行してください。\n" + ex.Message, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            return;
+            FormUtils.ShowMessageBox(
+                "再起動に失敗しました。手動で管理者としてソフトを実行してください。\n" + ex.Message,
+                "エラー",
+                true
+            );
         }
     }
 }

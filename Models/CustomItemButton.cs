@@ -1,6 +1,6 @@
 ﻿namespace Avatar_Explorer.Models;
 
-internal class CustomItemButton : Button
+public class CustomItemButton : Button
 {
     private readonly PictureBox _pictureBox;
     private readonly Label _title;
@@ -11,58 +11,21 @@ internal class CustomItemButton : Button
     private PictureBox? _previewPictureBox;
     private Image? _loadedPicture;
 
-    public void CheckThmbnail(Point location, Size size, Rectangle scrollArea)
-    {
-        if (location.Y >= scrollArea.Y && location.Y <= scrollArea.Y + scrollArea.Height ||
-            location.Y + size.Height >= scrollArea.Y && location.Y + size.Height <= scrollArea.Y + scrollArea.Height)
-        {
-            if (_pictureBox.Image != null) return;
+    internal string? ImagePath { get; set; }
 
-            if (ImagePath == null)
-            {
-                _pictureBox.Image = SharedImages.GetImage(SharedImages.Images.FolderIcon);
-            }
-            else
-            {
-                if (_loadedPicture == null && File.Exists(ImagePath))
-                {
-                    try
-                    {
-                        var image = Image.FromFile(ImagePath);
-                        _loadedPicture = new Bitmap(image, new Size(56, 56));
-                        image.Dispose();
-                        image = null;
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Failed to load image: {ex.Message}");
-                    }
-                }
-
-                _pictureBox.Image = _loadedPicture ?? SharedImages.GetImage(SharedImages.Images.FileIcon);
-            }
-        }
-        else if (_pictureBox.Image != null)
-        {
-            _pictureBox.Image = null;
-        }
-    }
-
-    public string? ImagePath { get; set; }
-
-    public string TitleText
+    internal string TitleText
     {
         get => _title.Text;
         set => _title.Text = value;
     }
 
-    public string AuthorName
+    internal string AuthorName
     {
         get => _authorName.Text;
         set => _authorName.Text = value;
     }
 
-    public string ToolTipText
+    internal string ToolTipText
     {
         get => _toolTipText;
         set
@@ -129,6 +92,42 @@ internal class CustomItemButton : Button
 
         _pictureBox.MouseEnter += PictureBox_MouseEnter;
         _pictureBox.MouseLeave += PictureBox_MouseLeave;
+    }
+
+    internal void CheckThmbnail(Point location, Size size, Rectangle scrollArea)
+    {
+        if (location.Y >= scrollArea.Y && location.Y <= scrollArea.Y + scrollArea.Height || location.Y + size.Height >= scrollArea.Y && location.Y + size.Height <= scrollArea.Y + scrollArea.Height)
+        {
+            if (_pictureBox.Image != null) return;
+
+            if (ImagePath == null)
+            {
+                _pictureBox.Image = SharedImages.GetImage(SharedImages.Images.FolderIcon);
+            }
+            else
+            {
+                if (_loadedPicture == null && File.Exists(ImagePath))
+                {
+                    try
+                    {
+                        var image = Image.FromFile(ImagePath);
+                        _loadedPicture = new Bitmap(image, new Size(56, 56));
+                        image.Dispose();
+                        image = null;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Failed to load image: {ex.Message}");
+                    }
+                }
+
+                _pictureBox.Image = _loadedPicture ?? SharedImages.GetImage(SharedImages.Images.FileIcon);
+            }
+        }
+        else if (_pictureBox.Image != null)
+        {
+            _pictureBox.Image = null;
+        }
     }
 
     private void PictureBox_MouseEnter(object? sender, EventArgs e)

@@ -111,9 +111,11 @@ internal static class BoothUtils
         }
         catch
         {
-            MessageBox.Show(LanguageUtils.Translate("リンクを開けませんでした。", CurrentLanguage),
-                LanguageUtils.Translate("エラー", CurrentLanguage), MessageBoxButtons.OK,
-                MessageBoxIcon.Error);
+            FormUtils.ShowMessageBox(
+                LanguageUtils.Translate("リンクを開けませんでした。", CurrentLanguage),
+                LanguageUtils.Translate("エラー", CurrentLanguage),
+                true
+            );
         }
     }
 
@@ -133,9 +135,11 @@ internal static class BoothUtils
         catch (Exception ex)
         {
             if (ex is ExternalException) return;
-            MessageBox.Show(LanguageUtils.Translate("クリップボードにコピーできませんでした", CurrentLanguage),
-                LanguageUtils.Translate("エラー", CurrentLanguage), MessageBoxButtons.OK,
-                MessageBoxIcon.Error);
+            FormUtils.ShowMessageBox(
+                LanguageUtils.Translate("クリップボードにコピーできませんでした", CurrentLanguage),
+                LanguageUtils.Translate("エラー", CurrentLanguage),
+                true
+            );
         }
     }
 }

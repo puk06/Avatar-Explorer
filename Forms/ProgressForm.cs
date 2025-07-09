@@ -11,6 +11,7 @@ internal sealed class ProgressForm : Form
     internal ProgressForm(string currentLanguage)
     {
         _formTitle = LanguageUtils.Translate("Unitypackageのインポート先の変更中", currentLanguage);
+
         Text = _formTitle;
         Size = new Size(400, 90);
         FormBorderStyle = FormBorderStyle.FixedDialog;

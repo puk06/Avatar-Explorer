@@ -162,10 +162,10 @@ internal static class FileSystemUtils
         }
         catch
         {
-            MessageBox.Show(
+            FormUtils.ShowMessageBox(
                 LanguageUtils.Translate("ファイルを開けませんでした。", CurrentLanguage),
                 LanguageUtils.Translate("エラー", CurrentLanguage),
-                MessageBoxButtons.OK, MessageBoxIcon.Error
+                true
             );
         }
     }
@@ -179,8 +179,11 @@ internal static class FileSystemUtils
     {
         if (!Directory.Exists(item.ItemPath))
         {
-            MessageBox.Show(LanguageUtils.Translate("フォルダが見つかりませんでした。", CurrentLanguage),
-                LanguageUtils.Translate("エラー", CurrentLanguage), MessageBoxButtons.OK, MessageBoxIcon.Error);
+            FormUtils.ShowMessageBox(
+                LanguageUtils.Translate("フォルダが見つかりませんでした。", CurrentLanguage),
+                LanguageUtils.Translate("エラー", CurrentLanguage),
+                true
+            );
             return;
         }
 
@@ -191,10 +194,10 @@ internal static class FileSystemUtils
         }
         catch
         {
-            MessageBox.Show(
+            FormUtils.ShowMessageBox(
                 LanguageUtils.Translate("フォルダを開けませんでした。", CurrentLanguage),
                 LanguageUtils.Translate("エラー", CurrentLanguage),
-                MessageBoxButtons.OK, MessageBoxIcon.Error
+                true
             );
         }
     }

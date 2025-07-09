@@ -75,7 +75,6 @@ internal static class AEUtils
             progressForm.UpdateProgress(10, extractingStatus);
 
             // ファイル数を取得するための一時リスト
-
             var entries = new List<TarEntry>();
             await using (var fileStream = File.OpenRead(file.FilePath))
             await using (var gzipStream = new GZipStream(fileStream, CompressionMode.Decompress))
@@ -144,11 +143,10 @@ internal static class AEUtils
         catch (Exception ex)
         {
             LogUtils.ErrorLogger("UnityPackageの展開に失敗しました。", ex);
-            MessageBox.Show(
+            FormUtils.ShowMessageBox(
                 LanguageUtils.Translate("UnityPackageの展開に失敗しました。詳細はErrorLog.txtをご覧ください。", currentLanguage),
                 LanguageUtils.Translate("エラー", currentLanguage),
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Error
+                true
             );
 
             Process.Start(new ProcessStartInfo()
@@ -311,8 +309,6 @@ internal static class AEUtils
     /// <summary>
     /// 引数を無限に受け取って、スラッシュで区切られたパスを生成します。
     /// </summary>
-    internal static string GernerateSeparatedPath(params string[] paths)
-    {
-        return string.Join(" / ", paths);
-    }
+    internal static string GenerateSeparatedPath(params string[] paths)
+        => string.Join(" / ", paths);
 }
