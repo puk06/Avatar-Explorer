@@ -35,7 +35,7 @@ internal static class FormUtils
     internal static void ShowMessageBox(string message, string title, bool error = false)
     {
         var messageType = error ? MessageBoxIcon.Error : MessageBoxIcon.Information;
-        MessageBox.Show(message, title, MessageBoxButtons.OK, messageType;
+        MessageBox.Show(message, title, MessageBoxButtons.OK, messageType);
     }
 
     /// <summary>
