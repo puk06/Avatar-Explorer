@@ -306,7 +306,7 @@ internal static class AEUtils
     }
 
     /// <summary>
-    /// 引数を無限に受け取って、スラッシュで区切られたパスを生成します。
+    /// 引数からスラッシュで区切られたパスを生成します。
     /// </summary>
     internal static string GenerateSeparatedPath(params string[] paths)
         => string.Join(" / ", paths);
