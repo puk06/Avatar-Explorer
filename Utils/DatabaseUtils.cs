@@ -1,4 +1,4 @@
-﻿using Avatar_Explorer.Models;
+using Avatar_Explorer.Models;
 using System.Text;
 using System.Text.Json;
 
@@ -202,7 +202,6 @@ internal static class DatabaseUtils
             if (deleteFromSupported && item.SupportedAvatar.Contains(avatarPath))
             {
                 item.SupportedAvatar.RemoveAll(avatar => string.IsNullOrEmpty(avatar) || avatar == avatarPath);
-
             }
 
             if (item.ImplementedAvatars.Contains(avatarPath))
@@ -326,7 +325,6 @@ internal static class DatabaseUtils
         {
             var translatedCategory = ItemUtils.GetCategoryName(item.Type, CurrentLanguage);
             return translatedCategory.Contains(category) || item.CustomCategory.Contains(category);
-
         }))
         {
             return false;

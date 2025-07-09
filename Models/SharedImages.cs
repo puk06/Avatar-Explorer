@@ -1,4 +1,4 @@
-﻿namespace Avatar_Explorer.Models;
+namespace Avatar_Explorer.Models;
 
 /// <summary>
 /// 共有画像を表します。
@@ -71,7 +71,7 @@ internal static class SharedImages
         /// 開くの画像
         /// </summary>
         OpenIcon
-    };
+    }
 
     /// <summary>
     /// 共有画像を取得します。

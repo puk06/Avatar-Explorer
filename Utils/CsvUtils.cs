@@ -1,8 +1,7 @@
-﻿namespace Avatar_Explorer.Utils;
+namespace Avatar_Explorer.Utils;
 
 internal static class CsvUtils
 {
-
     /// <summary>
     /// 文字列をCSV形式にエスケープします。
     /// </summary>
