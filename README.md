@@ -27,20 +27,4 @@ git push origin feature/your-feature
 5. プルリクエストを作成します。
 
 ## ライセンス
-
 このプロジェクトはMITライセンスの元で公開されています。詳細はLICENSEファイルをご覧ください。
-
-本ソフトウェアで使用されている「Noto Sans」フォントは、Google によって提供され、SIL Open Font License 1.1 のもとでライセンスされています。
-
-ライセンス名: SIL Open Font License 1.1
-ライセンスの全文: https://scripts.sil.org/OFL
-
-- SharpCompress
-  https://github.com/adamhathcock/sharpcompress  
-  Licensed under the MIT License  
-  https://github.com/adamhathcock/sharpcompress/blob/master/LICENSE
-
-- Newtonsoft.Json
-  https://github.com/JamesNK/Newtonsoft.Json  
-  Licensed under the MIT License  
-  https://github.com/JamesNK/Newtonsoft.Json/blob/master/LICENSE.md
