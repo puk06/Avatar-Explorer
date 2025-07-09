@@ -293,7 +293,6 @@ internal static class AEUtils
                     case "Implemented":
                         searchFilter.ImplementedAvatars = searchFilter.ImplementedAvatars.Append(value).ToArray();
                         break;
-
                 }
             }
             else if (match.Groups["word"].Success)
