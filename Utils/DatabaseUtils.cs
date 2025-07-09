@@ -135,7 +135,6 @@ internal static class DatabaseUtils
         return commonAvatars.Count;
     }
 
-
     /// <summary>
     ///　指定されたパスからアバター名を取得します。なければnullを返します。
     /// </summary>
@@ -164,7 +163,6 @@ internal static class DatabaseUtils
         var item = items.FirstOrDefault(x => x.ItemPath == path);
         return item?.Title ?? "";
     }
-
 
     /// <summary>
     /// アイテムのパスを変更します。

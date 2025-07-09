@@ -2825,20 +2825,20 @@ public sealed partial class MainForm : Form
     {
         label2.Location = label2.Location with
         {
-            X = LanguageBox.Location.X + LanguageBox.Width / 2 - label2.Width / 2,
+            X = LanguageBox.Location.X + (LanguageBox.Width / 2) - (label2.Width / 2),
             Y = label2.Location.Y
         };
 
         SortingLabel.Location = SortingLabel.Location with
         {
-            X = SortingBox.Location.X + SortingBox.Width / 2 - SortingLabel.Width / 2,
+            X = SortingBox.Location.X + (SortingBox.Width / 2) - (SortingLabel.Width / 2),
             Y = SortingLabel.Location.Y
         };
 
         label1.Location = label1.Location with
         {
             X = SearchBox.Location.X - label1.Width - 8,
-            Y = SearchBox.Location.Y + SearchBox.Height / 2 - label1.Height / 2
+            Y = SearchBox.Location.Y + (SearchBox.Height / 2) - (label1.Height / 2)
         };
 
         SearchResultLabel.Location = SearchResultLabel.Location with
