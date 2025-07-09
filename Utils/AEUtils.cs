@@ -1,9 +1,8 @@
-﻿using Avatar_Explorer.Models;
-using Avatar_Explorer.Forms;
-using SharpCompress.Compressors;
-using SharpCompress.Compressors.Deflate;
+﻿using Avatar_Explorer.Forms;
+using Avatar_Explorer.Models;
 using System.Diagnostics;
 using System.Formats.Tar;
+using System.IO.Compression;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
