@@ -1,11 +1,10 @@
-﻿namespace Avatar_Explorer.Models;
+namespace Avatar_Explorer.Models;
 
 /// <summary>
 /// 検索フィルタを表します。
 /// </summary>
 internal class SearchFilter
 {
-
     /// <summary>
     /// 検索する作者の名前を取得または設定します。
     /// </summary>

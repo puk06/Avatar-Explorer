@@ -1,4 +1,4 @@
-﻿using Avatar_Explorer.Models;
+using Avatar_Explorer.Models;
 using Avatar_Explorer.Utils;
 
 namespace Avatar_Explorer.Forms;
@@ -139,7 +139,6 @@ public sealed partial class ManageCommonAvatarsForm : Form
     /// </summary>
     private void RefleshCommonAvatarButtonColor()
     {
-
         foreach (Button button in AvatarList.Controls)
         {
             var commonAvatar = GetCommonAvatar(CommonAvatarsCombobox.Text);

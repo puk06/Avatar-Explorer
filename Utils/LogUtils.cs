@@ -1,8 +1,7 @@
-﻿namespace Avatar_Explorer.Utils;
+namespace Avatar_Explorer.Utils;
 
 internal static class LogUtils
 {
-
     /// <summary>
     /// 渡されたエラーを記録します。
     /// </summary>

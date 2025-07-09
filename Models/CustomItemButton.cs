@@ -1,4 +1,4 @@
-﻿namespace Avatar_Explorer.Models;
+namespace Avatar_Explorer.Models;
 
 public class CustomItemButton : Button
 {
@@ -96,7 +96,7 @@ public class CustomItemButton : Button
 
     internal void CheckThmbnail(Point location, Size size, Rectangle scrollArea)
     {
-        if (location.Y >= scrollArea.Y && location.Y <= scrollArea.Y + scrollArea.Height || location.Y + size.Height >= scrollArea.Y && location.Y + size.Height <= scrollArea.Y + scrollArea.Height)
+        if ((location.Y >= scrollArea.Y && location.Y <= scrollArea.Y + scrollArea.Height) || (location.Y + size.Height >= scrollArea.Y && location.Y + size.Height <= scrollArea.Y + scrollArea.Height))
         {
             if (_pictureBox.Image != null) return;
 

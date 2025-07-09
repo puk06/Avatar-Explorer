@@ -1,8 +1,7 @@
-﻿namespace Avatar_Explorer.Utils;
+namespace Avatar_Explorer.Utils;
 
 internal static class BackupUtils
 {
-
     /// <summary>
     ///　指定されたファイルをバックアップします。
     /// </summary>

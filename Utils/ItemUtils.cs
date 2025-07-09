@@ -1,10 +1,9 @@
-﻿using Avatar_Explorer.Models;
+using Avatar_Explorer.Models;
 
 namespace Avatar_Explorer.Utils;
 
 internal static class ItemUtils
 {
-
     /// <summary>
     /// 指定されたアイテムが対応アバターかどうか、共通素体グループに入っているかどうかを取得します。
     /// </summary>
