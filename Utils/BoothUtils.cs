@@ -104,8 +104,7 @@ internal static class BoothUtils
         {
             Process.Start(new ProcessStartInfo
             {
-                FileName = $"https://booth.pm/{LanguageUtils.GetCurrentLanguageCode(CurrentLanguage)}/items/" +
-                           item.BoothId,
+                FileName = $"https://booth.pm/{LanguageUtils.GetCurrentLanguageCode(CurrentLanguage)}/items/" + item.BoothId,
                 UseShellExecute = true
             });
         }
@@ -128,9 +127,7 @@ internal static class BoothUtils
     {
         try
         {
-            Clipboard.SetText(
-                $"https://booth.pm/{LanguageUtils.GetCurrentLanguageCode(CurrentLanguage)}/items/" +
-                item.BoothId);
+            Clipboard.SetText($"https://booth.pm/{LanguageUtils.GetCurrentLanguageCode(CurrentLanguage)}/items/" + item.BoothId);
         }
         catch (Exception ex)
         {
