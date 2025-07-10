@@ -2790,6 +2790,9 @@ internal sealed partial class MainForm : Form
     {
         if (!_initialized) return;
 
+        SuspendLayout();
+        AvatarItemExplorer.SuspendLayout();
+
         var labelControl = AvatarItemExplorer.Controls.OfType<Label>().First();
         var allControls = Controls.OfType<Control>().ToList();
         allControls.Add(labelControl);
@@ -2837,6 +2840,9 @@ internal sealed partial class MainForm : Form
 
         AdjustLabelPosition();
         ScaleItemButtons();
+
+        AvatarItemExplorer.ResumeLayout();
+        ResumeLayout();
 
         AEUtils.UpdateExplorerThumbnails(AvatarItemExplorer);
         AEUtils.UpdateExplorerThumbnails(AvatarPage);
