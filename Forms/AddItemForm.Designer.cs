@@ -70,7 +70,7 @@ namespace Avatar_Explorer.Forms
             // 
             label2.AutoSize = true;
             label2.Font = new Font(_mainForm.GuiFont, 12F, FontStyle.Bold);
-            label2.Location = new Point(18, 167);
+            label2.Location = new Point(18, 162);
             label2.Name = "label2";
             label2.Size = new Size(94, 23);
             label2.TabIndex = 1;
@@ -288,7 +288,7 @@ namespace Avatar_Explorer.Forms
             // 
             label10.AutoSize = true;
             label10.Font = new Font(_mainForm.GuiFont, 12F, FontStyle.Bold);
-            label10.Location = new Point(17, 121);
+            label10.Location = new Point(17, 122);
             label10.Name = "label10";
             label10.Size = new Size(90, 23);
             label10.TabIndex = 21;

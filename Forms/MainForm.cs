@@ -62,14 +62,10 @@ internal sealed partial class MainForm : Form
 
     #region 現在のウィンドウの種類に関する変数
     /// <summary>
-    /// 現在開かれているウィンドウが作者モードかどうかを取得または設定します。
+    /// 現在開かれている左ウィンドウのタイプを取得または設定します。
     /// </summary>
-    private bool _authorMode;
 
-    /// <summary>
-    /// 現在開かれているウィンドウがカテゴリーモードかどうかを取得または設定します。
-    /// </summary>
-    private bool _categoryMode;
+    private LeftWindow _leftWindow = LeftWindow.Default;
 
     /// <summary>
     /// 現在開いているメイン画面ウィンドウタイプ
@@ -304,11 +300,13 @@ internal sealed partial class MainForm : Form
                     CurrentSelectedAvatar = item.Title,
                     CurrentSelectedAvatarPath = item.ItemPath
                 };
-                _authorMode = false;
-                _categoryMode = false;
+
+                _leftWindow = LeftWindow.Default;
+
                 SearchBox.Text = "";
                 SearchResultLabel.Text = "";
                 _isSearching = false;
+
                 GenerateCategoryList();
                 PathTextBox.Text = GeneratePath();
             };
@@ -373,7 +371,7 @@ internal sealed partial class MainForm : Form
                 // もしアバターの欄を右で開いていたら、そのサムネイルも更新しないといけないため。
                 if (_openingWindow == Window.ItemList && !_isSearching) GenerateItems();
 
-                //検索中だと、検索画面を再読込してあげる
+                // 検索中だと、検索画面を再読込してあげる
                 if (_isSearching) SearchItems();
 
                 GenerateAvatarList();
@@ -391,7 +389,7 @@ internal sealed partial class MainForm : Form
                 AddItemForm addItem = new(this, item.Type, item.CustomCategory, true, item, null);
                 addItem.ShowDialog();
 
-                //対応アバターのパスを変えてあげる
+                // 対応アバターのパスを変えてあげる
                 DatabaseUtils.ChangeAllItemPath(ref Items, prePath);
 
                 // もしアイテムで編集されたアイテムを開いていたら、パスなどに使用される文字列も更新しないといけないため
@@ -404,7 +402,7 @@ internal sealed partial class MainForm : Form
                 // もしアバターの欄を右で開いていたら、そのアイテムの情報も更新しないといけないため
                 if (_openingWindow == Window.ItemList && !_isSearching) GenerateItems();
 
-                //検索中だと、検索画面を再読込してあげる
+                // 検索中だと、検索画面を再読込してあげる
                 if (_isSearching) SearchItems();
 
                 // 検索時の文字列を消さないようにするために_isSearchingでチェックしている
@@ -420,12 +418,12 @@ internal sealed partial class MainForm : Form
             ToolStripMenuItem toolStripMenuItem5 = new(LanguageUtils.Translate("メモの追加", CurrentLanguage), SharedImages.GetImage(SharedImages.Images.EditIcon));
             EventHandler clickEvent7 = (_, _) =>
             {
-                var previouseMemo = item.ItemMemo;
+                var previousMemo = item.ItemMemo;
                 AddNoteForm addMemo = new(this, item);
                 addMemo.ShowDialog();
 
                 var memo = addMemo.Memo;
-                if (string.IsNullOrEmpty(memo) || memo == previouseMemo) return;
+                if (string.IsNullOrEmpty(memo) || memo == previousMemo) return;
 
                 item.ItemMemo = memo;
                 item.UpdatedDate = DateUtils.GetUnixTime();
@@ -440,10 +438,13 @@ internal sealed partial class MainForm : Form
             ToolStripMenuItem toolStripMenuItem6 = new(LanguageUtils.Translate("削除", CurrentLanguage), SharedImages.GetImage(SharedImages.Images.TrashIcon));
             EventHandler clickEvent8 = (_, _) =>
             {
-                var result = FormUtils.ShowConfirmDialog(LanguageUtils.Translate("本当に削除しますか？", CurrentLanguage), LanguageUtils.Translate("確認", CurrentLanguage));
+                var result = FormUtils.ShowConfirmDialog(
+                    LanguageUtils.Translate("本当に削除しますか？", CurrentLanguage),
+                    LanguageUtils.Translate("確認", CurrentLanguage)
+                );
                 if (!result) return;
 
-                var undo = false; //もし削除されるアイテムが開かれていたら
+                var undo = false; // もし削除されるアイテムが開かれていたら
                 if (CurrentPath.CurrentSelectedItem?.ItemPath == item.ItemPath)
                 {
                     CurrentPath.CurrentSelectedItemCategory = null;
@@ -451,8 +452,8 @@ internal sealed partial class MainForm : Form
                     undo = true;
                 }
 
-                var undo2 = false; //アバターモードでもし削除されるアバターから今までのアイテムが開かれていたら
-                if (CurrentPath.CurrentSelectedAvatarPath == item.ItemPath && !_authorMode && !_categoryMode)
+                var undo2 = false; // アバターモードでもし削除されるアバターから今までのアイテムが開かれていたら
+                if (CurrentPath.CurrentSelectedAvatarPath == item.ItemPath && _leftWindow == LeftWindow.Default)
                 {
                     CurrentPath = new CurrentPath();
                     undo2 = true;
@@ -505,6 +506,7 @@ internal sealed partial class MainForm : Form
                             SearchBox.Text = "";
                             SearchResultLabel.Text = "";
                             _isSearching = false;
+
                             ResetAvatarExplorer(true);
                             PathTextBox.Text = GeneratePath();
                             DatabaseUtils.SaveItemsData(Items);
@@ -517,6 +519,7 @@ internal sealed partial class MainForm : Form
                             SearchBox.Text = "";
                             SearchResultLabel.Text = "";
                             _isSearching = false;
+
                             GenerateItems();
                             PathTextBox.Text = GeneratePath();
                             DatabaseUtils.SaveItemsData(Items);
@@ -615,11 +618,12 @@ internal sealed partial class MainForm : Form
                     CurrentSelectedAuthor = author
                 };
 
-                _authorMode = true;
-                _categoryMode = false;
+                _leftWindow = LeftWindow.Author;
+
                 SearchBox.Text = "";
                 SearchResultLabel.Text = "";
                 _isSearching = false;
+
                 GenerateCategoryList();
                 PathTextBox.Text = GeneratePath();
             };
@@ -703,11 +707,12 @@ internal sealed partial class MainForm : Form
                     CurrentSelectedCategory = itemType
                 };
 
-                _authorMode = false;
-                _categoryMode = true;
+                _leftWindow = LeftWindow.Category;
+
                 SearchBox.Text = "";
                 SearchResultLabel.Text = "";
                 _isSearching = false;
+
                 GenerateItems();
                 PathTextBox.Text = GeneratePath();
             };
@@ -736,11 +741,13 @@ internal sealed partial class MainForm : Form
                         CurrentSelectedCategory = ItemType.Custom,
                         CurrentSelectedCustomCategory = customCategory
                     };
-                    _authorMode = false;
-                    _categoryMode = true;
+
+                    _leftWindow = LeftWindow.Category;
+
                     SearchBox.Text = "";
                     SearchResultLabel.Text = "";
                     _isSearching = false;
+
                     GenerateItems();
                     PathTextBox.Text = GeneratePath();
                 };
@@ -778,7 +785,7 @@ internal sealed partial class MainForm : Form
             if (itemType is ItemType.Unknown or ItemType.Custom) continue;
 
             int itemCount = 0;
-            if (_authorMode)
+            if (_leftWindow == LeftWindow.Author)
             {
                 itemCount = Items.Count(item => item.Type == itemType && item.AuthorName == CurrentPath.CurrentSelectedAuthor?.AuthorName);
             }
@@ -814,7 +821,7 @@ internal sealed partial class MainForm : Form
             foreach (var customCategory in CustomCategories)
             {
                 var itemCount = 0;
-                if (_authorMode)
+                if (_leftWindow == LeftWindow.Author)
                 {
                     itemCount = Items.Count(item =>
                         item.CustomCategory == customCategory &&
@@ -866,7 +873,7 @@ internal sealed partial class MainForm : Form
 
         IEnumerable<Item> filteredItems;
 
-        if (_authorMode)
+        if (_leftWindow == LeftWindow.Author)
         {
             filteredItems = Items.Where(item =>
                 item.Type == CurrentPath.CurrentSelectedCategory &&
@@ -874,7 +881,7 @@ internal sealed partial class MainForm : Form
                 (item.Type != ItemType.Custom || item.CustomCategory == CurrentPath.CurrentSelectedCustomCategory)
             );
         }
-        else if (_categoryMode)
+        else if (_leftWindow == LeftWindow.Category)
         {
             filteredItems = Items.Where(item => item.Type == CurrentPath.CurrentSelectedCategory && (item.Type != ItemType.Custom || item.CustomCategory == CurrentPath.CurrentSelectedCustomCategory));
         }
@@ -937,13 +944,13 @@ internal sealed partial class MainForm : Form
             {
                 if (!Directory.Exists(item.ItemPath))
                 {
-                    var prePath = item.ItemPath;
-
                     var result = FormUtils.ShowConfirmDialog(
                         LanguageUtils.Translate("フォルダが見つかりませんでした。編集しますか？", CurrentLanguage),
                         LanguageUtils.Translate("エラー", CurrentLanguage)
                     );
                     if (!result) return;
+
+                    var prePath = item.ItemPath;
 
                     AddItemForm addItem = new(this, CurrentPath.CurrentSelectedCategory, CurrentPath.CurrentSelectedCustomCategory, true, item, null);
                     addItem.ShowDialog();
@@ -958,7 +965,7 @@ internal sealed partial class MainForm : Form
                         return;
                     }
 
-                    //対応アバターのパスを変えてあげる
+                    // 対応アバターのパスを変えてあげる
                     DatabaseUtils.ChangeAllItemPath(ref Items, prePath);
 
                     if (CurrentPath.CurrentSelectedAvatarPath == prePath)
@@ -1029,7 +1036,6 @@ internal sealed partial class MainForm : Form
                     Title = LanguageUtils.Translate("サムネイル変更", CurrentLanguage),
                     Multiselect = false
                 };
-
                 if (ofd.ShowDialog() != DialogResult.OK) return;
 
                 item.ImagePath = ofd.FileName;
@@ -1085,12 +1091,12 @@ internal sealed partial class MainForm : Form
             ToolStripMenuItem toolStripMenuItem5 = new(LanguageUtils.Translate("メモの追加", CurrentLanguage), SharedImages.GetImage(SharedImages.Images.EditIcon));
             EventHandler clickEvent7 = (_, _) =>
             {
-                var previouseMemo = item.ItemMemo;
+                var previousMemo = item.ItemMemo;
                 AddNoteForm addMemo = new(this, item);
                 addMemo.ShowDialog();
 
                 var memo = addMemo.Memo;
-                if (string.IsNullOrEmpty(memo) || memo == previouseMemo) return;
+                if (string.IsNullOrEmpty(memo) || memo == previousMemo) return;
 
                 item.ItemMemo = memo;
 
@@ -1154,11 +1160,10 @@ internal sealed partial class MainForm : Form
                     LanguageUtils.Translate("本当に削除しますか？", CurrentLanguage),
                     LanguageUtils.Translate("確認", CurrentLanguage)
                 );
-
                 if (!result) return;
 
                 var undo = false;
-                if (CurrentPath.CurrentSelectedAvatarPath == item.ItemPath && !_authorMode && !_categoryMode)
+                if (CurrentPath.CurrentSelectedAvatarPath == item.ItemPath && _leftWindow == LeftWindow.Default)
                 {
                     CurrentPath = new CurrentPath();
                     undo = true;
@@ -1201,6 +1206,7 @@ internal sealed partial class MainForm : Form
                     SearchBox.Text = "";
                     SearchResultLabel.Text = "";
                     _isSearching = false;
+
                     GenerateAvatarList();
                     GenerateAuthorList();
                     GenerateCategoryListLeft();
@@ -1428,12 +1434,13 @@ internal sealed partial class MainForm : Form
             {
                 if (!Directory.Exists(item.ItemPath))
                 {
-                    var prePath = item.ItemPath;
                     bool result = FormUtils.ShowConfirmDialog(
                         LanguageUtils.Translate("フォルダが見つかりませんでした。編集しますか？", CurrentLanguage),
                         LanguageUtils.Translate("エラー", CurrentLanguage)
                     );
                     if (!result) return;
+
+                    var prePath = item.ItemPath;
 
                     AddItemForm addItem = new(this, CurrentPath.CurrentSelectedCategory, CurrentPath.CurrentSelectedCustomCategory, true, item, null);
                     addItem.ShowDialog();
@@ -1448,7 +1455,7 @@ internal sealed partial class MainForm : Form
                         return;
                     }
 
-                    //対応アバターのパスを変えてあげる
+                    // 対応アバターのパスを変えてあげる
                     DatabaseUtils.ChangeAllItemPath(ref Items, prePath);
 
                     GenerateFilteredItem(searchFilter);
@@ -1458,12 +1465,14 @@ internal sealed partial class MainForm : Form
                     DatabaseUtils.SaveItemsData(Items);
                 }
 
-                _authorMode = false;
-                _categoryMode = false;
+                _leftWindow = LeftWindow.Default;
+
                 GeneratePathFromItem(item);
+
                 SearchBox.Text = "";
                 SearchResultLabel.Text = "";
                 _isSearching = false;
+
                 GenerateItemCategoryList();
                 PathTextBox.Text = GeneratePath();
             };
@@ -1551,7 +1560,7 @@ internal sealed partial class MainForm : Form
                 AddItemForm addItem = new(this, item.Type, item.CustomCategory, true, item, null);
                 addItem.ShowDialog();
 
-                //対応アバターのパスを変えてあげる
+                // 対応アバターのパスを変えてあげる
                 DatabaseUtils.ChangeAllItemPath(ref Items, prePath);
 
                 if (CurrentPath.CurrentSelectedAvatarPath == prePath)
@@ -1573,12 +1582,12 @@ internal sealed partial class MainForm : Form
             ToolStripMenuItem toolStripMenuItem5 = new(LanguageUtils.Translate("メモの追加", CurrentLanguage), SharedImages.GetImage(SharedImages.Images.EditIcon));
             EventHandler clickEvent7 = (_, _) =>
             {
-                var previouseMemo = item.ItemMemo;
+                var previousMemo = item.ItemMemo;
                 AddNoteForm addMemo = new(this, item);
                 addMemo.ShowDialog();
 
                 var memo = addMemo.Memo;
-                if (string.IsNullOrEmpty(memo) || memo == previouseMemo) return;
+                if (string.IsNullOrEmpty(memo) || memo == previousMemo) return;
 
                 item.ItemMemo = memo;
 
@@ -1784,32 +1793,42 @@ internal sealed partial class MainForm : Form
     /// <returns></returns>
     private string GeneratePath()
     {
-        string prefix;
+        string prefix = string.Empty;
         List<string> pathParts = new();
 
-        if (_authorMode)
+        switch (_leftWindow)
         {
-            prefix = LanguageUtils.Translate("作者", CurrentLanguage) + " | ";
+            case LeftWindow.Author:
+                {
+                    prefix = LanguageUtils.Translate("作者", CurrentLanguage) + " | ";
 
-            var author = CurrentPath.CurrentSelectedAuthor;
-            if (author == null)
-                return LanguageUtils.Translate("ここには現在のパスが表示されます", CurrentLanguage);
+                    var author = CurrentPath.CurrentSelectedAuthor;
+                    if (author == null)
+                        return LanguageUtils.Translate("ここには現在のパスが表示されます", CurrentLanguage);
 
-            pathParts.Add(AEUtils.RemoveFormat(author.AuthorName));
-        }
-        else if (_categoryMode)
-        {
-            prefix = LanguageUtils.Translate("カテゴリ別", CurrentLanguage) + " | ";
-        }
-        else
-        {
-            prefix = LanguageUtils.Translate("アバター", CurrentLanguage) + " | ";
+                    pathParts.Add(AEUtils.RemoveFormat(author.AuthorName));
+                    break;
+                }
+            case LeftWindow.Category:
+                {
+                    prefix = LanguageUtils.Translate("カテゴリ別", CurrentLanguage) + " | ";
+                    break;
+                }
+            case LeftWindow.Default:
+                {
+                    prefix = LanguageUtils.Translate("アバター", CurrentLanguage) + " | ";
 
-            var avatar = CurrentPath.CurrentSelectedAvatar;
-            if (avatar == null)
-                return LanguageUtils.Translate("ここには現在のパスが表示されます", CurrentLanguage);
+                    var avatar = CurrentPath.CurrentSelectedAvatar;
+                    if (avatar == null)
+                        return LanguageUtils.Translate("ここには現在のパスが表示されます", CurrentLanguage);
 
-            pathParts.Add(AEUtils.RemoveFormat(avatar));
+                    pathParts.Add(AEUtils.RemoveFormat(avatar));
+                    break;
+                }
+            default:
+                {
+                    break;
+                }
         }
 
         if (CurrentPath.CurrentSelectedCategory == ItemType.Unknown)
@@ -1930,7 +1949,7 @@ internal sealed partial class MainForm : Form
             return;
         }
 
-        if (_authorMode)
+        if (_leftWindow == LeftWindow.Author)
         {
             if (CurrentPath.CurrentSelectedCategory != ItemType.Unknown)
             {
@@ -1941,7 +1960,7 @@ internal sealed partial class MainForm : Form
                 return;
             }
         }
-        else if (!_categoryMode)
+        else if (_leftWindow == LeftWindow.Default)
         {
             if (CurrentPath.CurrentSelectedCategory != ItemType.Unknown)
             {
@@ -2072,8 +2091,7 @@ internal sealed partial class MainForm : Form
     {
         if (startLabelVisible)
         {
-            _authorMode = false;
-            _categoryMode = false;
+            _leftWindow = LeftWindow.Default;
             CurrentPath = new CurrentPath();
             _openingWindow = Window.Nothing;
         }
@@ -2106,8 +2124,7 @@ internal sealed partial class MainForm : Form
     /// <param name="page"></param>
     private static void ResetAvatarPage(TabPage page)
     {
-        var controls = page.Controls.Cast<Control>().ToList();
-        controls.Reverse();
+        var controls = page.Controls.Cast<Control>().Reverse().ToList();
 
         page.SuspendLayout();
         page.AutoScroll = false;
