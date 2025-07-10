@@ -64,7 +64,6 @@ internal sealed partial class MainForm : Form
     /// <summary>
     /// 現在開かれている左ウィンドウのタイプを取得または設定します。
     /// </summary>
-
     private LeftWindow _leftWindow = LeftWindow.Default;
 
     /// <summary>
