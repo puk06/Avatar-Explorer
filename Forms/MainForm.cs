@@ -2509,7 +2509,7 @@ internal sealed partial class MainForm : Form
     /// </summary>
     private void LoadDataFromFolder()
     {
-        //自動バックアップフォルダから復元するか聞く
+        // 自動バックアップフォルダから復元するか聞く
         var result = FormUtils.ShowConfirmDialog(
             LanguageUtils.Translate("自動バックアップフォルダから復元しますか？", CurrentLanguage),
             LanguageUtils.Translate("確認", CurrentLanguage)
@@ -2524,7 +2524,7 @@ internal sealed partial class MainForm : Form
 
             if (string.IsNullOrEmpty(backupPath)) return;
 
-            //バックアップフォルダが存在しない場合
+            // バックアップフォルダが存在しない場合
             if (!Directory.Exists(backupPath))
             {
                 FormUtils.ShowMessageBox(
