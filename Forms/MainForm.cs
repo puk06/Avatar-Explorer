@@ -11,7 +11,6 @@ namespace Avatar_Explorer.Forms;
 internal sealed partial class MainForm : Form
 {
     #region フォームのテキスト関連の変数
-
     /// <summary>
     /// ソフトの現在のバージョン
     /// </summary>
@@ -21,11 +20,9 @@ internal sealed partial class MainForm : Form
     /// デフォルトのフォームテキスト
     /// </summary>
     private const string CurrentVersionFormText = $"VRChat Avatar Explorer {CurrentVersion} by ぷこるふ";
-
     #endregion
 
     #region ソフトのデータベース関連の変数
-
     /// <summary>
     /// アイテムデータベース
     /// </summary>
@@ -40,7 +37,6 @@ internal sealed partial class MainForm : Form
     /// カスタムカテゴリーデータベース
     /// </summary>
     internal List<string> CustomCategories;
-
     #endregion
 
     #region フォント関連の変数
