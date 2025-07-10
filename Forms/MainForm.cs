@@ -350,6 +350,7 @@ internal sealed partial class MainForm : Form
                 SharedImages.GetImage(SharedImages.Images.EditIcon),
                 (_, _) =>
                 {
+                    var previousPath = item.ImagePath;
                     OpenFileDialog ofd = new()
                     {
                         Filter = LanguageUtils.Translate("画像ファイル|*.png;*.jpg", CurrentLanguage),
@@ -362,7 +363,7 @@ internal sealed partial class MainForm : Form
 
                     FormUtils.ShowMessageBox(
                         LanguageUtils.Translate("サムネイルを変更しました！", CurrentLanguage) + "\n\n" +
-                        LanguageUtils.Translate("変更前: ", CurrentLanguage) + item.ImagePath + "\n\n" +
+                        LanguageUtils.Translate("変更前: ", CurrentLanguage) + previousPath + "\n\n" +
                         LanguageUtils.Translate("変更後: ", CurrentLanguage) + ofd.FileName,
                         LanguageUtils.Translate("完了", CurrentLanguage)
                     );
@@ -634,6 +635,7 @@ internal sealed partial class MainForm : Form
                 SharedImages.GetImage(SharedImages.Images.EditIcon),
                 (_, _) =>
                 {
+                    var previousPath = author.AuthorImagePath;
                     OpenFileDialog ofd = new()
                     {
                         Filter = LanguageUtils.Translate("画像ファイル|*.png;*.jpg", CurrentLanguage),
@@ -649,7 +651,7 @@ internal sealed partial class MainForm : Form
 
                     FormUtils.ShowMessageBox(
                         LanguageUtils.Translate("サムネイルを変更しました！", CurrentLanguage) + "\n\n" +
-                        LanguageUtils.Translate("変更前: ", CurrentLanguage) + author.AuthorImagePath + "\n\n" +
+                        LanguageUtils.Translate("変更前: ", CurrentLanguage) + previousPath + "\n\n" +
                         LanguageUtils.Translate("変更後: ", CurrentLanguage) + ofd.FileName,
                         "完了"
                     );
@@ -1023,6 +1025,7 @@ internal sealed partial class MainForm : Form
                 SharedImages.GetImage(SharedImages.Images.EditIcon),
                 (_, _) =>
                 {
+                    var previousPath = item.ImagePath;
                     OpenFileDialog ofd = new()
                     {
                         Filter = LanguageUtils.Translate("画像ファイル|*.png;*.jpg", CurrentLanguage),
@@ -1035,7 +1038,7 @@ internal sealed partial class MainForm : Form
 
                     FormUtils.ShowMessageBox(
                         LanguageUtils.Translate("サムネイルを変更しました！", CurrentLanguage) + "\n\n" +
-                        LanguageUtils.Translate("変更前: ", CurrentLanguage) + item.ImagePath + "\n\n" +
+                        LanguageUtils.Translate("変更前: ", CurrentLanguage) + previousPath + "\n\n" +
                         LanguageUtils.Translate("変更後: ", CurrentLanguage) + ofd.FileName,
                         LanguageUtils.Translate("完了", CurrentLanguage)
                     );
@@ -1509,6 +1512,7 @@ internal sealed partial class MainForm : Form
                 SharedImages.GetImage(SharedImages.Images.EditIcon),
                 (_, _) =>
                 {
+                    var previousPath = item.ImagePath;
                     OpenFileDialog ofd = new()
                     {
                         Filter = LanguageUtils.Translate("画像ファイル|*.png;*.jpg", CurrentLanguage),
@@ -1521,7 +1525,7 @@ internal sealed partial class MainForm : Form
 
                     FormUtils.ShowMessageBox(
                         LanguageUtils.Translate("サムネイルを変更しました！", CurrentLanguage) + "\n\n" +
-                        LanguageUtils.Translate("変更前: ", CurrentLanguage) + item.ImagePath + "\n\n" +
+                        LanguageUtils.Translate("変更前: ", CurrentLanguage) + previousPath + "\n\n" +
                         LanguageUtils.Translate("変更後: ", CurrentLanguage) + ofd.FileName,
                         LanguageUtils.Translate("完了", CurrentLanguage)
                     );
