@@ -27,9 +27,7 @@ internal class DateUtils
     /// </summary>
     /// <returns></returns>
     internal static string GetUnixTime()
-    {
-        return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
-    }
+        => DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
 
     internal static DateTime GetDate(string date)
     {

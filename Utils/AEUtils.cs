@@ -55,77 +55,16 @@ internal static class AEUtils
         try
         {
             progressForm.UpdateProgress(0, LanguageUtils.Translate("準備中", currentLanguage));
-            var authorName = FileSystemUtils.CheckFilePath(currentPath.CurrentSelectedItem?.AuthorName ?? "Unknown");
-            var itemTitle = FileSystemUtils.CheckFilePath(currentPath.CurrentSelectedItem?.Title ?? "Unknown");
-            var category = ItemUtils.GetCategoryName(currentPath.CurrentSelectedCategory, currentLanguage, currentPath.CurrentSelectedCustomCategory);
 
-            string saveFolder = Path.Combine("./Datas", "Temp", authorName, itemTitle);
-            string saveFilePath = Path.Combine(saveFolder, $"{Path.GetFileNameWithoutExtension(file.FileName)}_export");
-            if (!Directory.Exists(saveFolder))
-            {
-                Directory.CreateDirectory(saveFolder);
-            }
-            else if (Directory.Exists(saveFilePath))
-            {
-                Directory.Delete(saveFilePath, true);
-            }
+            var (saveFolder, saveFilePath, unityPackagePath) = PrepareSavePaths(file, currentPath, currentLanguage);
+            PrepareSaveDirectory(saveFolder, saveFilePath);
 
             var extractingStatus = LanguageUtils.Translate("ファイルの展開中", currentLanguage);
             progressForm.UpdateProgress(10, extractingStatus);
 
-            // ファイル数を取得するための一時リスト
-            var entries = new List<TarEntry>();
-            await using (var fileStream = File.OpenRead(file.FilePath))
-            await using (var gzipStream = new GZipStream(fileStream, CompressionMode.Decompress))
-            await using (var tarReader = new TarReader(gzipStream))
-            {
-                while (await tarReader.GetNextEntryAsync() is { } entry)
-                {
-                    entries.Add(entry);
-                }
-            }
-
-            // 合計ファイル数
-            int totalEntries = entries.Count;
-            int processedEntries = 0;
-
-            // 再度読み込みして処理
-            await using var fileStream2 = File.OpenRead(file.FilePath);
-            await using var gzipStream2 = new GZipStream(fileStream2, CompressionMode.Decompress);
-            await using var tarReader2 = new TarReader(gzipStream2);
-
-            while (await tarReader2.GetNextEntryAsync() is { } entry)
-            {
-                if (Path.GetFileName(entry.Name) == "pathname" && entry.DataStream != null)
-                {
-                    using StreamReader reader = new(entry.DataStream);
-                    string assetPath = await reader.ReadToEndAsync();
-
-                    assetPath = assetPath.Insert(7, $"{category}/");
-
-                    entry.DataStream = new MemoryStream(Encoding.UTF8.GetBytes(assetPath));
-                }
-
-                var entryPath = Path.Combine(saveFilePath, entry.Name);
-                if (entryPath.EndsWith('/'))
-                {
-                    Directory.CreateDirectory(entryPath);
-                }
-                else
-                {
-                    entry.DataStream ??= new MemoryStream();
-                    await using var entryStream = File.Create(entryPath);
-                    await entry.DataStream.CopyToAsync(entryStream);
-                }
-
-                // 進捗更新
-                processedEntries++;
-                int progress = 10 + (int)(80.0 * processedEntries / totalEntries);
-                progressForm.UpdateProgress(progress, extractingStatus + ": " + processedEntries + "/" + totalEntries);
-            }
-
-            var unityPackagePath = saveFilePath + ".unitypackage";
-            if (File.Exists(unityPackagePath)) File.Delete(unityPackagePath);
+            int totalEntries = await CountTarEntriesAsync(file.FilePath);
+            var category = ItemUtils.GetCategoryName(currentPath.CurrentSelectedCategory, currentLanguage, currentPath.CurrentSelectedCustomCategory);
+            await ExtractTarToFolderAsync(file.FilePath, saveFilePath, category, totalEntries, extractingStatus, progressForm);
 
             progressForm.UpdateProgress(90, LanguageUtils.Translate("UnityPackageの作成中", currentLanguage));
             FileSystemUtils.CreateTarArchive(saveFilePath, unityPackagePath);
@@ -133,7 +72,7 @@ internal static class AEUtils
             Directory.Delete(saveFilePath, true);
             progressForm.UpdateProgress(100, LanguageUtils.Translate("完了", currentLanguage));
 
-            Process.Start(new ProcessStartInfo()
+            Process.Start(new ProcessStartInfo
             {
                 FileName = unityPackagePath,
                 UseShellExecute = true,
@@ -148,15 +87,92 @@ internal static class AEUtils
                 true
             );
 
-            Process.Start(new ProcessStartInfo()
-            {
-                FileName = file.FilePath,
-                UseShellExecute = true
-            });
+            FileSystemUtils.OpenItemFile(file, true, currentLanguage);
         }
         finally
         {
             progressForm.Close();
+        }
+    }
+
+    private static (string saveFolder, string saveFilePath, string unityPackagePath) PrepareSavePaths(FileData file, CurrentPath currentPath, string language)
+    {
+        string authorName = FileSystemUtils.CheckFilePath(currentPath.CurrentSelectedItem?.AuthorName ?? "Unknown");
+        string itemTitle = FileSystemUtils.CheckFilePath(currentPath.CurrentSelectedItem?.Title ?? "Unknown");
+
+        string saveFolder = Path.Combine("./Datas", "Temp", authorName, itemTitle);
+        string saveFilePath = Path.Combine(saveFolder, $"{Path.GetFileNameWithoutExtension(file.FileName)}_export");
+        string unityPackagePath = saveFilePath + ".unitypackage";
+        return (saveFolder, saveFilePath, unityPackagePath);
+    }
+
+    private static void PrepareSaveDirectory(string saveFolder, string saveFilePath)
+    {
+        if (!Directory.Exists(saveFolder))
+        {
+            Directory.CreateDirectory(saveFolder);
+        }
+        else if (Directory.Exists(saveFilePath))
+        {
+            Directory.Delete(saveFilePath, true);
+        }
+    }
+
+    private static async Task<int> CountTarEntriesAsync(string filePath)
+    {
+        int count = 0;
+        await using var fileStream = File.OpenRead(filePath);
+        await using var gzipStream = new GZipStream(fileStream, CompressionMode.Decompress);
+        await using var tarReader = new TarReader(gzipStream);
+        while (await tarReader.GetNextEntryAsync() is { })
+            count++;
+        return count;
+    }
+
+    private static async Task ExtractTarToFolderAsync(
+        string tarGzFilePath,
+        string saveFilePath,
+        string category,
+        int totalEntries,
+        string extractingStatus,
+        ProgressForm progressForm
+    )
+    {
+        int processedEntries = 0;
+
+        await using var fileStream = File.OpenRead(tarGzFilePath);
+        await using var gzipStream = new GZipStream(fileStream, CompressionMode.Decompress);
+        await using var tarReader = new TarReader(gzipStream);
+
+        while (await tarReader.GetNextEntryAsync() is { } entry)
+        {
+            if (Path.GetFileName(entry.Name) == "pathname" && entry.DataStream != null)
+            {
+                using var reader = new StreamReader(entry.DataStream);
+                string assetPath = await reader.ReadToEndAsync();
+
+                if (assetPath.StartsWith("Assets"))
+                    assetPath = assetPath.Insert(7, $"{category}/");
+
+                entry.DataStream = new MemoryStream(Encoding.UTF8.GetBytes(assetPath));
+            }
+
+            string entryPath = Path.Combine(saveFilePath, entry.Name);
+            if (entryPath.EndsWith('/'))
+            {
+                Directory.CreateDirectory(entryPath);
+            }
+            else
+            {
+                entry.DataStream ??= new MemoryStream();
+                Directory.CreateDirectory(Path.GetDirectoryName(entryPath)!);
+                await using var entryStream = File.Create(entryPath);
+                await entry.DataStream.CopyToAsync(entryStream);
+            }
+
+            processedEntries++;
+            int progress = 10 + (int)(80.0 * processedEntries / totalEntries);
+            progressForm.UpdateProgress(progress, $"{extractingStatus}: {processedEntries}/{totalEntries}");
         }
     }
 
@@ -168,20 +184,17 @@ internal static class AEUtils
     {
         try
         {
-            if (senderObject is TabPage tabPage)
-            {
-                var visibleArea = new Rectangle(0, tabPage.VerticalScroll.Value,
-                    tabPage.ClientSize.Width, tabPage.ClientSize.Height);
+            if (senderObject is not TabPage tabPage) return;
 
-                foreach (Control control in tabPage.Controls)
-                {
-                    if (control is CustomItemButton button)
-                    {
-                        var buttonAbsoluteLocation = button.Location;
-                        buttonAbsoluteLocation.Y += tabPage.VerticalScroll.Value;
-                        button.CheckThmbnail(buttonAbsoluteLocation, button.Size, visibleArea);
-                    }
-                }
+            var visibleArea = new Rectangle(0, tabPage.VerticalScroll.Value, tabPage.ClientSize.Width, tabPage.ClientSize.Height);
+
+            foreach (Control control in tabPage.Controls)
+            {
+                if (control is not CustomItemButton button) continue;
+
+                var buttonAbsoluteLocation = button.Location;
+                buttonAbsoluteLocation.Y += tabPage.VerticalScroll.Value;
+                button.CheckThmbnail(buttonAbsoluteLocation, button.Size, visibleArea);
             }
         }
         catch (Exception ex)
