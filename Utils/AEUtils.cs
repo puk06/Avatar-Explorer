@@ -214,7 +214,7 @@ internal static class AEUtils
     /// <param name="tooltip"></param>
     /// <param name="listWidthDiff"></param>
     /// <returns></returns>
-    internal static Button CreateButton(string? imagePath, string labelTitle, string? description, bool @short = false, string tooltip = "", int listWidthDiff = 0)
+    internal static CustomItemButton CreateButton(string? imagePath, string labelTitle, string? description, bool @short = false, string tooltip = "", int listWidthDiff = 0)
     {
         var buttonWidth = @short ? 303 : 874;
         if (listWidthDiff != 0) buttonWidth += listWidthDiff;

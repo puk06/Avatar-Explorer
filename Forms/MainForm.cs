@@ -190,7 +190,7 @@ internal sealed partial class MainForm : Form
             _resizeTimer.Tick += (s, ev) =>
             {
                 _resizeTimer.Stop();
-                ResizeControl();
+                BeginInvoke(() => ResizeControl());
             };
             _initialized = true;
 
@@ -596,70 +596,77 @@ internal sealed partial class MainForm : Form
         var index = 0;
         foreach (var author in authors)
         {
-            Button button = AEUtils.CreateButton(author.AuthorImagePath, author.AuthorName,Items.Count(item => item.AuthorName == author.AuthorName) + LanguageUtils.Translate("個の項目", CurrentLanguage), true, author.AuthorName, GetAvatarListWidth);
-            button.Location = new Point(0, (70 * index) + 2);
-            button.MouseClick += OnMouseClick;
-
-            EventHandler clickEvent = (_, _) =>
+            try
             {
-                CurrentPath = new CurrentPath
+                Button button = AEUtils.CreateButton(author.AuthorImagePath, author.AuthorName, Items.Count(item => item.AuthorName == author.AuthorName) + LanguageUtils.Translate("個の項目", CurrentLanguage), true, author.AuthorName, GetAvatarListWidth);
+                button.Location = new Point(0, (70 * index) + 2);
+                button.MouseClick += OnMouseClick;
+
+                void ButtonClick(object? sender, EventArgs? e)
                 {
-                    CurrentSelectedAuthor = author
+                    CurrentPath = new CurrentPath
+                    {
+                        CurrentSelectedAuthor = author
+                    };
+
+                    _leftWindow = LeftWindow.Author;
+
+                    SearchBox.Text = "";
+                    SearchResultLabel.Text = "";
+                    _isSearching = false;
+
+                    GenerateCategoryList();
+                    PathTextBox.Text = GeneratePath();
+                }
+
+                button.Click += ButtonClick;
+                button.Disposed += (_, _) =>
+                {
+                    button.Click -= ButtonClick;
+                    button.ContextMenuStrip?.Dispose();
                 };
 
-                _leftWindow = LeftWindow.Author;
+                var createContextMenu = new CreateContextMenu();
 
-                SearchBox.Text = "";
-                SearchResultLabel.Text = "";
-                _isSearching = false;
-
-                GenerateCategoryList();
-                PathTextBox.Text = GeneratePath();
-            };
-
-            button.Click += clickEvent;
-            button.Disposed += (_, _) =>
-            {
-                button.Click -= clickEvent;
-                button.ContextMenuStrip?.Dispose();
-            };
-
-            var createContextMenu = new CreateContextMenu();
-
-            createContextMenu.AddItem(
-                LanguageUtils.Translate("サムネイル変更", CurrentLanguage),
-                SharedImages.GetImage(SharedImages.Images.EditIcon),
-                (_, _) =>
-                {
-                    var previousPath = author.AuthorImagePath;
-                    OpenFileDialog ofd = new()
+                createContextMenu.AddItem(
+                    LanguageUtils.Translate("サムネイル変更", CurrentLanguage),
+                    SharedImages.GetImage(SharedImages.Images.EditIcon),
+                    (_, _) =>
                     {
-                        Filter = LanguageUtils.Translate("画像ファイル|*.png;*.jpg", CurrentLanguage),
-                        Title = LanguageUtils.Translate("サムネイル変更", CurrentLanguage),
-                        Multiselect = false
-                    };
-                    if (ofd.ShowDialog() != DialogResult.OK) return;
+                        var previousPath = author.AuthorImagePath;
+                        OpenFileDialog ofd = new()
+                        {
+                            Filter = LanguageUtils.Translate("画像ファイル|*.png;*.jpg", CurrentLanguage),
+                            Title = LanguageUtils.Translate("サムネイル変更", CurrentLanguage),
+                            Multiselect = false
+                        };
+                        if (ofd.ShowDialog() != DialogResult.OK) return;
 
-                    foreach (var item in Items.Where(item => item.AuthorName == author.AuthorName))
-                    {
-                        item.AuthorImageFilePath = ofd.FileName;
+                        foreach (var item in Items.Where(item => item.AuthorName == author.AuthorName))
+                        {
+                            item.AuthorImageFilePath = ofd.FileName;
+                        }
+
+                        FormUtils.ShowMessageBox(
+                            LanguageUtils.Translate("サムネイルを変更しました！", CurrentLanguage) + "\n\n" +
+                            LanguageUtils.Translate("変更前: ", CurrentLanguage) + previousPath + "\n\n" +
+                            LanguageUtils.Translate("変更後: ", CurrentLanguage) + ofd.FileName,
+                            "完了"
+                        );
+
+                        GenerateAuthorList();
+                        DatabaseUtils.SaveItemsData(Items);
                     }
+                );
 
-                    FormUtils.ShowMessageBox(
-                        LanguageUtils.Translate("サムネイルを変更しました！", CurrentLanguage) + "\n\n" +
-                        LanguageUtils.Translate("変更前: ", CurrentLanguage) + previousPath + "\n\n" +
-                        LanguageUtils.Translate("変更後: ", CurrentLanguage) + ofd.FileName,
-                        "完了"
-                    );
-
-                    GenerateAuthorList();
-                    DatabaseUtils.SaveItemsData(Items);
-                }
-            );
-
-            button.ContextMenuStrip = createContextMenu.ContextMenuStrip;
-            AvatarAuthorPage.Controls.Add(button);
-            index++;
+                button.ContextMenuStrip = createContextMenu.ContextMenuStrip;
+                AvatarAuthorPage.Controls.Add(button);
+                index++;
+            }
+            catch (Exception ex)
+            {
+                FormUtils.ShowMessageBox("Error Occured while rendering item button\n\nError: " + ex, "Button Error", true);
+            }
         }
 
         AvatarAuthorPage.ResumeLayout();
@@ -681,73 +688,94 @@ internal sealed partial class MainForm : Form
         var index = 0;
         foreach (ItemType itemType in Enum.GetValues<ItemType>())
         {
-            if (itemType is ItemType.Unknown or ItemType.Custom) continue;
-
-            var items = Items.Where(item => item.Type == itemType);
-            var itemCount = items.Count();
-
-            Button button = AEUtils.CreateButton(null, ItemUtils.GetCategoryName(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), true, "", GetAvatarListWidth);
-            button.Location = new Point(0, (70 * index) + 2);
-            button.MouseClick += OnMouseClick;
-
-            EventHandler clickEvent = (_, _) =>
+            try
             {
-                CurrentPath = new CurrentPath
-                {
-                    CurrentSelectedCategory = itemType
-                };
+                if (itemType is ItemType.Unknown or ItemType.Custom) continue;
 
-                _leftWindow = LeftWindow.Category;
-
-                SearchBox.Text = "";
-                SearchResultLabel.Text = "";
-                _isSearching = false;
-
-                GenerateItems();
-                PathTextBox.Text = GeneratePath();
-            };
-
-            button.Click += clickEvent;
-            button.Disposed += (_, _) => button.Click -= clickEvent;
-
-            CategoryPage.Controls.Add(button);
-            index++;
-        }
-
-        if (CustomCategories.Count != 0)
-        {
-            foreach (var customCategory in CustomCategories)
-            {
-                var items = Items.Where(item => item.CustomCategory == customCategory);
+                var items = Items.Where(item => item.Type == itemType);
                 var itemCount = items.Count();
 
-                Button button = AEUtils.CreateButton(null, customCategory, itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), true, "", GetAvatarListWidth);
+                CustomItemButton button = AEUtils.CreateButton(null, ItemUtils.GetCategoryName(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), true, "", GetAvatarListWidth);
                 button.Location = new Point(0, (70 * index) + 2);
                 button.MouseClick += OnMouseClick;
 
-                EventHandler clickEvent = (_, _) =>
+                void ButtonClick(object? sender, EventArgs? e)
                 {
                     CurrentPath = new CurrentPath
                     {
-                        CurrentSelectedCategory = ItemType.Custom,
-                        CurrentSelectedCustomCategory = customCategory
+                        CurrentSelectedCategory = itemType
                     };
 
                     _leftWindow = LeftWindow.Category;
-
                     SearchBox.Text = "";
                     SearchResultLabel.Text = "";
                     _isSearching = false;
 
                     GenerateItems();
                     PathTextBox.Text = GeneratePath();
-                };
+                }
 
-                button.Click += clickEvent;
-                button.Disposed += (_, _) => button.Click -= clickEvent;
+                button.Click += ButtonClick;
+                button.Disposed += (_, _) =>
+                {
+                    button.Click -= ButtonClick;
+                    button.ContextMenuStrip?.Dispose();
+                };
 
                 CategoryPage.Controls.Add(button);
                 index++;
+            }
+            catch (Exception ex)
+            {
+                FormUtils.ShowMessageBox("Error Occured while rendering item button\n\nError: " + ex, "Button Error", true);
+            }
+        }
+
+        if (CustomCategories.Count != 0)
+        {
+            foreach (var customCategory in CustomCategories)
+            {
+                try
+                {
+                    var items = Items.Where(item => item.CustomCategory == customCategory);
+                    var itemCount = items.Count();
+
+                    Button button = AEUtils.CreateButton(null, customCategory, itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), true, "", GetAvatarListWidth);
+                    button.Location = new Point(0, (70 * index) + 2);
+                    button.MouseClick += OnMouseClick;
+
+                    void ButtonClick(object? sender, EventArgs? e)
+                    {
+                        CurrentPath = new CurrentPath
+                        {
+                            CurrentSelectedCategory = ItemType.Custom,
+                            CurrentSelectedCustomCategory = customCategory
+                        };
+
+                        _leftWindow = LeftWindow.Category;
+
+                        SearchBox.Text = "";
+                        SearchResultLabel.Text = "";
+                        _isSearching = false;
+
+                        GenerateItems();
+                        PathTextBox.Text = GeneratePath();
+                    }
+
+                    button.Click += ButtonClick;
+                    button.Disposed += (_, _) =>
+                    {
+                        button.Click -= ButtonClick;
+                        button.ContextMenuStrip?.Dispose();
+                    };
+
+                    CategoryPage.Controls.Add(button);
+                    index++;
+                }
+                catch (Exception ex)
+                {
+                    FormUtils.ShowMessageBox("Error Occured while rendering item button\n\nError: " + ex, "Button Error", true);
+                }
             }
         }
 
@@ -773,80 +801,102 @@ internal sealed partial class MainForm : Form
         var index = 0;
         foreach (ItemType itemType in Enum.GetValues<ItemType>())
         {
-            if (itemType is ItemType.Unknown or ItemType.Custom) continue;
-
-            int itemCount = 0;
-            if (_leftWindow == LeftWindow.Author)
+            try
             {
-                itemCount = Items.Count(item => item.Type == itemType && item.AuthorName == CurrentPath.CurrentSelectedAuthor?.AuthorName);
-            }
-            else
-            {
-                itemCount = Items.Count(item =>
-                    item.Type == itemType &&
-                    (ItemUtils.IsSupportedAvatarOrCommon(item, CommonAvatars, CurrentPath.CurrentSelectedAvatarPath).IsSupportedOrCommon || item.SupportedAvatar.Count == 0 || CurrentPath.CurrentSelectedAvatar == "*")
-                );
-            }
+                if (itemType is ItemType.Unknown or ItemType.Custom) continue;
 
-            if (itemCount == 0) continue;
-
-            Button button = AEUtils.CreateButton(null, ItemUtils.GetCategoryName(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, "", GetItemExplorerListWidth);
-            button.Location = new Point(0, (70 * index) + 2);
-            button.MouseClick += OnMouseClick;
-
-            EventHandler clickEvent = (_, _) =>
-            {
-                CurrentPath.CurrentSelectedCategory = itemType;
-                GenerateItems();
-                PathTextBox.Text = GeneratePath();
-            };
-
-            button.Click += clickEvent;
-            button.Disposed += (_, _) => button.Click -= clickEvent;
-
-            AvatarItemExplorer.Controls.Add(button);
-            index++;
-        }
-
-        if (CustomCategories.Count != 0)
-        {
-            foreach (var customCategory in CustomCategories)
-            {
-                var itemCount = 0;
+                int itemCount = 0;
                 if (_leftWindow == LeftWindow.Author)
                 {
-                    itemCount = Items.Count(item =>
-                        item.CustomCategory == customCategory &&
-                        item.AuthorName == CurrentPath.CurrentSelectedAuthor?.AuthorName
-                    );
+                    itemCount = Items.Count(item => item.Type == itemType && item.AuthorName == CurrentPath.CurrentSelectedAuthor?.AuthorName);
                 }
                 else
                 {
                     itemCount = Items.Count(item =>
-                        item.CustomCategory == customCategory &&
+                        item.Type == itemType &&
                         (ItemUtils.IsSupportedAvatarOrCommon(item, CommonAvatars, CurrentPath.CurrentSelectedAvatarPath).IsSupportedOrCommon || item.SupportedAvatar.Count == 0 || CurrentPath.CurrentSelectedAvatar == "*")
                     );
                 }
 
                 if (itemCount == 0) continue;
 
-                Button button = AEUtils.CreateButton(null, customCategory, itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, "", GetItemExplorerListWidth);
+                Button button = AEUtils.CreateButton(null, ItemUtils.GetCategoryName(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, "", GetItemExplorerListWidth);
                 button.Location = new Point(0, (70 * index) + 2);
                 button.MouseClick += OnMouseClick;
 
-                EventHandler clickEvent = (_, _) =>
+                void ButtonClick(object? sender, EventArgs? e)
                 {
-                    CurrentPath.CurrentSelectedCategory = ItemType.Custom;
-                    CurrentPath.CurrentSelectedCustomCategory = customCategory;
+                    CurrentPath.CurrentSelectedCategory = itemType;
                     GenerateItems();
                     PathTextBox.Text = GeneratePath();
-                };
+                }
 
-                button.Click += clickEvent;
-                button.Disposed += (_, _) => button.Click -= clickEvent;
+                button.Click += ButtonClick;
+                button.Disposed += (_, _) =>
+                {
+                    button.Click -= ButtonClick;
+                    button.ContextMenuStrip?.Dispose();
+                };
 
                 AvatarItemExplorer.Controls.Add(button);
                 index++;
+            }
+            catch (Exception ex)
+            {
+                FormUtils.ShowMessageBox("Error Occured while rendering item button\n\nError: " + ex, "Button Error", true);
+            }
+        }
+
+        if (CustomCategories.Count != 0)
+        {
+            foreach (var customCategory in CustomCategories)
+            {
+                try
+                {
+                    var itemCount = 0;
+                    if (_leftWindow == LeftWindow.Author)
+                    {
+                        itemCount = Items.Count(item =>
+                            item.CustomCategory == customCategory &&
+                            item.AuthorName == CurrentPath.CurrentSelectedAuthor?.AuthorName
+                        );
+                    }
+                    else
+                    {
+                        itemCount = Items.Count(item =>
+                            item.CustomCategory == customCategory &&
+                            (ItemUtils.IsSupportedAvatarOrCommon(item, CommonAvatars, CurrentPath.CurrentSelectedAvatarPath).IsSupportedOrCommon || item.SupportedAvatar.Count == 0 || CurrentPath.CurrentSelectedAvatar == "*")
+                        );
+                    }
+
+                    if (itemCount == 0) continue;
+
+                    Button button = AEUtils.CreateButton(null, customCategory, itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, "", GetItemExplorerListWidth);
+                    button.Location = new Point(0, (70 * index) + 2);
+                    button.MouseClick += OnMouseClick;
+
+                    void ButtonClick(object? sender, EventArgs? e)
+                    {
+                        CurrentPath.CurrentSelectedCategory = ItemType.Custom;
+                        CurrentPath.CurrentSelectedCustomCategory = customCategory;
+                        GenerateItems();
+                        PathTextBox.Text = GeneratePath();
+                    };
+
+                    button.Click += ButtonClick;
+                    button.Disposed += (_, _) =>
+                    {
+                        button.Click -= ButtonClick;
+                        button.ContextMenuStrip?.Dispose();
+                    };
+
+                    AvatarItemExplorer.Controls.Add(button);
+                    index++;
+                }
+                catch (Exception ex)
+                {
+                    FormUtils.ShowMessageBox("Error Occured while rendering item button\n\nError: " + ex, "Button Error", true);
+                }
             }
         }
 
@@ -906,315 +956,325 @@ internal sealed partial class MainForm : Form
         var index = 0;
         foreach (Item item in filteredItems)
         {
-            var authorText = LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName;
-
-            var isSupportedOrCommon = ItemUtils.IsSupportedAvatarOrCommon(item, CommonAvatars, CurrentPath.CurrentSelectedAvatarPath);
-
-            if (isSupportedOrCommon.OnlyCommon && item.SupportedAvatar.Count != 0 && CurrentPath.CurrentSelectedAvatarPath != null && !item.SupportedAvatar.Contains(CurrentPath.CurrentSelectedAvatarPath))
+            try
             {
-                var commonAvatarName = isSupportedOrCommon.CommonAvatarName;
-                if (!string.IsNullOrEmpty(commonAvatarName))
+                var authorText = LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName;
+
+                var isSupportedOrCommon = ItemUtils.IsSupportedAvatarOrCommon(item, CommonAvatars, CurrentPath.CurrentSelectedAvatarPath);
+                if (isSupportedOrCommon.OnlyCommon && item.SupportedAvatar.Count != 0 && CurrentPath.CurrentSelectedAvatarPath != null && !item.SupportedAvatar.Contains(CurrentPath.CurrentSelectedAvatarPath))
                 {
-                    authorText += "\n" + LanguageUtils.Translate("共通素体: ", CurrentLanguage) + commonAvatarName;
+                    var commonAvatarName = isSupportedOrCommon.CommonAvatarName;
+                    if (!string.IsNullOrEmpty(commonAvatarName))
+                    {
+                        authorText += "\n" + LanguageUtils.Translate("共通素体: ", CurrentLanguage) + commonAvatarName;
+                    }
                 }
-            }
 
-            var description = ItemUtils.GetItemDescription(item, CurrentLanguage);
+                var description = ItemUtils.GetItemDescription(item, CurrentLanguage);
 
-            Button button = AEUtils.CreateButton(item.ImagePath, item.Title, authorText, false, description,GetItemExplorerListWidth);
-            button.Location = new Point(0, (70 * index) + 2);
-            button.MouseClick += OnMouseClick;
+                Button button = AEUtils.CreateButton(item.ImagePath, item.Title, authorText, false, description, GetItemExplorerListWidth);
+                button.Location = new Point(0, (70 * index) + 2);
+                button.MouseClick += OnMouseClick;
 
-            if (SortingBox.SelectedIndex == 4 || SortingBox.SelectedIndex == 5)
-            {
-                var currentAvatar = CurrentPath.CurrentSelectedAvatarPath;
-                if (!string.IsNullOrEmpty(currentAvatar))
+                if (SortingBox.SelectedIndex == 4 || SortingBox.SelectedIndex == 5)
                 {
-                    button.BackColor = item.ImplementedAvatars.Contains(currentAvatar) ? Color.LightGreen : Color.LightPink;
+                    var currentAvatar = CurrentPath.CurrentSelectedAvatarPath;
+                    if (!string.IsNullOrEmpty(currentAvatar))
+                    {
+                        button.BackColor = item.ImplementedAvatars.Contains(currentAvatar) ? Color.LightGreen : Color.LightPink;
+                    }
                 }
-            }
 
-            EventHandler clickEvent = (_, _) =>
-            {
-                if (!Directory.Exists(item.ItemPath))
+                void ButtonClick(object? sender, EventArgs? e)
                 {
-                    var result = FormUtils.ShowConfirmDialog(
-                        LanguageUtils.Translate("フォルダが見つかりませんでした。編集しますか？", CurrentLanguage),
-                        LanguageUtils.Translate("エラー", CurrentLanguage)
-                    );
-                    if (!result) return;
-
-                    var prePath = item.ItemPath;
-
-                    AddItemForm addItem = new(this, CurrentPath.CurrentSelectedCategory, CurrentPath.CurrentSelectedCustomCategory, true, item, null);
-                    addItem.ShowDialog();
-
                     if (!Directory.Exists(item.ItemPath))
                     {
-                        FormUtils.ShowMessageBox(
-                            LanguageUtils.Translate("フォルダが見つかりませんでした。", CurrentLanguage),
-                            LanguageUtils.Translate("エラー", CurrentLanguage),
-                            true
+                        var result = FormUtils.ShowConfirmDialog(
+                            LanguageUtils.Translate("フォルダが見つかりませんでした。編集しますか？", CurrentLanguage),
+                            LanguageUtils.Translate("エラー", CurrentLanguage)
                         );
-                        return;
+                        if (!result) return;
+
+                        var prePath = item.ItemPath;
+
+                        AddItemForm addItem = new(this, CurrentPath.CurrentSelectedCategory, CurrentPath.CurrentSelectedCustomCategory, true, item, null);
+                        addItem.ShowDialog();
+
+                        if (!Directory.Exists(item.ItemPath))
+                        {
+                            FormUtils.ShowMessageBox(
+                                LanguageUtils.Translate("フォルダが見つかりませんでした。", CurrentLanguage),
+                                LanguageUtils.Translate("エラー", CurrentLanguage),
+                                true
+                            );
+                            return;
+                        }
+
+                        // 対応アバターのパスを変えてあげる
+                        DatabaseUtils.ChangeAllItemPaths(ref Items, prePath);
+
+                        if (CurrentPath.CurrentSelectedAvatarPath == prePath)
+                        {
+                            CurrentPath.CurrentSelectedAvatar = item.Title;
+                            CurrentPath.CurrentSelectedAvatarPath = item.ItemPath;
+                        }
+
+                        RefleshWindow();
+                        DatabaseUtils.SaveItemsData(Items);
                     }
 
-                    // 対応アバターのパスを変えてあげる
-                    DatabaseUtils.ChangeAllItemPaths(ref Items, prePath);
-
-                    if (CurrentPath.CurrentSelectedAvatarPath == prePath)
-                    {
-                        CurrentPath.CurrentSelectedAvatar = item.Title;
-                        CurrentPath.CurrentSelectedAvatarPath = item.ItemPath;
-                    }
-
-                    RefleshWindow();
-                    DatabaseUtils.SaveItemsData(Items);
-                }
-
-                CurrentPath.CurrentSelectedItem = item;
-                GenerateItemCategoryList();
-                PathTextBox.Text = GeneratePath();
-            };
-
-            button.Click += clickEvent;
-            button.Disposed += (_, _) => button.Click -= clickEvent;
-
-            var createContextMenu = new CreateContextMenu();
-
-            if (Directory.Exists(item.ItemPath))
-            {
-                createContextMenu.AddItem(
-                    LanguageUtils.Translate("フォルダを開く", CurrentLanguage),
-                    SharedImages.GetImage(SharedImages.Images.OpenIcon),
-                    (_, _) => FileSystemUtils.OpenItemFolder(item, CurrentLanguage)
-                );
-            }
-
-            if (item.BoothId != -1)
-            {
-                createContextMenu.AddItem(
-                    LanguageUtils.Translate("Boothリンクのコピー", CurrentLanguage),
-                    SharedImages.GetImage(SharedImages.Images.CopyIcon),
-                    (_, _) => BoothUtils.CopyItemBoothLink(item, CurrentLanguage)
-                );
-
-                createContextMenu.AddItem(
-                    LanguageUtils.Translate("Boothリンクを開く", CurrentLanguage),
-                    SharedImages.GetImage(SharedImages.Images.CopyIcon),
-                    (_, _) => BoothUtils.OpenItenBoothLink(item, CurrentLanguage)
-                );
-            }
-
-            createContextMenu.AddItem(
-                LanguageUtils.Translate("この作者の他のアイテムを表示", CurrentLanguage),
-                SharedImages.GetImage(SharedImages.Images.OpenIcon),
-                (_, _) =>
-                {
-                    SearchBox.Text = $"Author=\"{item.AuthorName}\"";
-                    SearchItems();
-                }
-            );
-
-            createContextMenu.AddItem(
-                LanguageUtils.Translate("サムネイル変更", CurrentLanguage),
-                SharedImages.GetImage(SharedImages.Images.EditIcon),
-                (_, _) =>
-                {
-                    var previousPath = item.ImagePath;
-                    OpenFileDialog ofd = new()
-                    {
-                        Filter = LanguageUtils.Translate("画像ファイル|*.png;*.jpg", CurrentLanguage),
-                        Title = LanguageUtils.Translate("サムネイル変更", CurrentLanguage),
-                        Multiselect = false
-                    };
-                    if (ofd.ShowDialog() != DialogResult.OK) return;
-
-                    item.ImagePath = ofd.FileName;
-
-                    FormUtils.ShowMessageBox(
-                        LanguageUtils.Translate("サムネイルを変更しました！", CurrentLanguage) + "\n\n" +
-                        LanguageUtils.Translate("変更前: ", CurrentLanguage) + previousPath + "\n\n" +
-                        LanguageUtils.Translate("変更後: ", CurrentLanguage) + ofd.FileName,
-                        LanguageUtils.Translate("完了", CurrentLanguage)
-                    );
-
-                    if (_isSearching)
-                    {
-                        SearchItems();
-                    }
-                    else
-                    {
-                        GenerateItems();
-                    }
-
-                    GenerateAvatarList();
-                    DatabaseUtils.SaveItemsData(Items);
-                }
-            );
-
-            createContextMenu.AddItem(
-                LanguageUtils.Translate("編集", CurrentLanguage),
-                SharedImages.GetImage(SharedImages.Images.EditIcon),
-                (_, _) =>
-                {
-                    var prePath = item.ItemPath;
-
-                    AddItemForm addItem = new(this, CurrentPath.CurrentSelectedCategory, CurrentPath.CurrentSelectedCustomCategory, true, item, null);
-                    addItem.ShowDialog();
-
-                    // 対応アバターのパスを変えてあげる
-                    DatabaseUtils.ChangeAllItemPaths(ref Items, prePath);
-
-                    if (CurrentPath.CurrentSelectedAvatarPath == prePath)
-                    {
-                        CurrentPath.CurrentSelectedAvatar = item.Title;
-                        CurrentPath.CurrentSelectedAvatarPath = item.ItemPath;
-                    }
-
-                    if (!_isSearching) PathTextBox.Text = GeneratePath();
-                    RefleshWindow();
-                    DatabaseUtils.SaveItemsData(Items);
-                }
-            );
-
-            createContextMenu.AddItem(
-                LanguageUtils.Translate("メモの追加", CurrentLanguage),
-                SharedImages.GetImage(SharedImages.Images.EditIcon),
-                (_, _) =>
-                {
-                    var previousMemo = item.ItemMemo;
-                    AddNoteForm addMemo = new(this, item);
-                    addMemo.ShowDialog();
-
-                    var memo = addMemo.Memo;
-                    if (string.IsNullOrEmpty(memo) || memo == previousMemo) return;
-
-                    item.ItemMemo = memo;
-
-                    GenerateAuthorList();
-                    GenerateItems();
-                    DatabaseUtils.SaveItemsData(Items);
-                }
-            );
-
-            var implementedMenu = createContextMenu.AddItem(LanguageUtils.Translate("実装/未実装", CurrentLanguage), SharedImages.GetImage(SharedImages.Images.EditIcon));
-            foreach (var avatar in Items.Where(i => i.Type == ItemType.Avatar))
-            {
-                ToolStripMenuItem avatarToolStripMenuItem = new()
-                {
-                    Text = DatabaseUtils.GetAvatarNameFromPaths(Items, avatar.ItemPath),
-                    Tag = avatar.ItemPath,
-                    Checked = item.ImplementedAvatars.Contains(avatar.ItemPath)
+                    CurrentPath.CurrentSelectedItem = item;
+                    GenerateItemCategoryList();
+                    PathTextBox.Text = GeneratePath();
                 };
 
-                CreateContextMenu.AddDropDownItem(
-                    implementedMenu,
-                    avatarToolStripMenuItem,
-                    (sender, _) =>
-                    {
-                        if (sender is not ToolStripMenuItem toolStripMenuItem) return;
-                        if (toolStripMenuItem.Tag == null) return;
+                button.Click += ButtonClick;
+                button.Disposed += (_, _) =>
+                {
+                    button.Click -= ButtonClick;
+                    button.ContextMenuStrip?.Dispose();
+                };
 
-                        if (toolStripMenuItem.Checked)
+                var createContextMenu = new CreateContextMenu();
+
+                if (Directory.Exists(item.ItemPath))
+                {
+                    createContextMenu.AddItem(
+                        LanguageUtils.Translate("フォルダを開く", CurrentLanguage),
+                        SharedImages.GetImage(SharedImages.Images.OpenIcon),
+                        (_, _) => FileSystemUtils.OpenItemFolder(item, CurrentLanguage)
+                    );
+                }
+
+                if (item.BoothId != -1)
+                {
+                    createContextMenu.AddItem(
+                        LanguageUtils.Translate("Boothリンクのコピー", CurrentLanguage),
+                        SharedImages.GetImage(SharedImages.Images.CopyIcon),
+                        (_, _) => BoothUtils.CopyItemBoothLink(item, CurrentLanguage)
+                    );
+
+                    createContextMenu.AddItem(
+                        LanguageUtils.Translate("Boothリンクを開く", CurrentLanguage),
+                        SharedImages.GetImage(SharedImages.Images.CopyIcon),
+                        (_, _) => BoothUtils.OpenItenBoothLink(item, CurrentLanguage)
+                    );
+                }
+
+                createContextMenu.AddItem(
+                    LanguageUtils.Translate("この作者の他のアイテムを表示", CurrentLanguage),
+                    SharedImages.GetImage(SharedImages.Images.OpenIcon),
+                    (_, _) =>
+                    {
+                        SearchBox.Text = $"Author=\"{item.AuthorName}\"";
+                        SearchItems();
+                    }
+                );
+
+                createContextMenu.AddItem(
+                    LanguageUtils.Translate("サムネイル変更", CurrentLanguage),
+                    SharedImages.GetImage(SharedImages.Images.EditIcon),
+                    (_, _) =>
+                    {
+                        var previousPath = item.ImagePath;
+                        OpenFileDialog ofd = new()
                         {
-                            item.ImplementedAvatars.RemoveAll(avatarPath => avatarPath == (string)toolStripMenuItem.Tag);
-                            toolStripMenuItem.Checked = false;
+                            Filter = LanguageUtils.Translate("画像ファイル|*.png;*.jpg", CurrentLanguage),
+                            Title = LanguageUtils.Translate("サムネイル変更", CurrentLanguage),
+                            Multiselect = false
+                        };
+                        if (ofd.ShowDialog() != DialogResult.OK) return;
+
+                        item.ImagePath = ofd.FileName;
+
+                        FormUtils.ShowMessageBox(
+                            LanguageUtils.Translate("サムネイルを変更しました！", CurrentLanguage) + "\n\n" +
+                            LanguageUtils.Translate("変更前: ", CurrentLanguage) + previousPath + "\n\n" +
+                            LanguageUtils.Translate("変更後: ", CurrentLanguage) + ofd.FileName,
+                            LanguageUtils.Translate("完了", CurrentLanguage)
+                        );
+
+                        if (_isSearching)
+                        {
+                            SearchItems();
                         }
                         else
                         {
-                            item.ImplementedAvatars.Add((string)toolStripMenuItem.Tag);
-                            toolStripMenuItem.Checked = true;
+                            GenerateItems();
                         }
 
-                        if (SortingBox.SelectedIndex == 4 || SortingBox.SelectedIndex == 5)
-                        {
-                            var currentAvatar = CurrentPath.CurrentSelectedAvatarPath;
-                            if (!string.IsNullOrEmpty(currentAvatar))
-                            {
-                                button.BackColor = item.ImplementedAvatars.Contains(currentAvatar) ? Color.LightGreen : Color.LightPink;
-                            }
-                        }
-
+                        GenerateAvatarList();
                         DatabaseUtils.SaveItemsData(Items);
-                        FormUtils.ShowParentToolStrip(toolStripMenuItem, null!);
                     }
                 );
-            }
 
-            createContextMenu.AddItem(
-                LanguageUtils.Translate("削除", CurrentLanguage),
-                SharedImages.GetImage(SharedImages.Images.TrashIcon),
-                (_, _) =>
-                {
-                    var result = FormUtils.ShowConfirmDialog(
-                        LanguageUtils.Translate("本当に削除しますか？", CurrentLanguage),
-                        LanguageUtils.Translate("確認", CurrentLanguage)
-                    );
-                    if (!result) return;
-
-                    var undo = false;
-                    if (CurrentPath.CurrentSelectedAvatarPath == item.ItemPath && _leftWindow == LeftWindow.Default)
+                createContextMenu.AddItem(
+                    LanguageUtils.Translate("編集", CurrentLanguage),
+                    SharedImages.GetImage(SharedImages.Images.EditIcon),
+                    (_, _) =>
                     {
-                        CurrentPath = new CurrentPath();
-                        undo = true;
-                        PathTextBox.Text = GeneratePath();
+                        var prePath = item.ItemPath;
+
+                        AddItemForm addItem = new(this, CurrentPath.CurrentSelectedCategory, CurrentPath.CurrentSelectedCustomCategory, true, item, null);
+                        addItem.ShowDialog();
+
+                        // 対応アバターのパスを変えてあげる
+                        DatabaseUtils.ChangeAllItemPaths(ref Items, prePath);
+
+                        if (CurrentPath.CurrentSelectedAvatarPath == prePath)
+                        {
+                            CurrentPath.CurrentSelectedAvatar = item.Title;
+                            CurrentPath.CurrentSelectedAvatarPath = item.ItemPath;
+                        }
+
+                        if (!_isSearching) PathTextBox.Text = GeneratePath();
+                        RefleshWindow();
+                        DatabaseUtils.SaveItemsData(Items);
                     }
+                );
 
-                    if (item.Type == ItemType.Avatar)
+                createContextMenu.AddItem(
+                    LanguageUtils.Translate("メモの追加", CurrentLanguage),
+                    SharedImages.GetImage(SharedImages.Images.EditIcon),
+                    (_, _) =>
                     {
-                        var result2 = FormUtils.ShowConfirmDialog(
-                            LanguageUtils.Translate("このアバターを対応アバターとしているアイテムの対応アバターからこのアバターを削除しますか？", CurrentLanguage),
+                        var previousMemo = item.ItemMemo;
+                        AddNoteForm addMemo = new(this, item);
+                        addMemo.ShowDialog();
+
+                        var memo = addMemo.Memo;
+                        if (string.IsNullOrEmpty(memo) || memo == previousMemo) return;
+
+                        item.ItemMemo = memo;
+
+                        GenerateAuthorList();
+                        GenerateItems();
+                        DatabaseUtils.SaveItemsData(Items);
+                    }
+                );
+
+                var implementedMenu = createContextMenu.AddItem(LanguageUtils.Translate("実装/未実装", CurrentLanguage), SharedImages.GetImage(SharedImages.Images.EditIcon));
+                foreach (var avatar in Items.Where(i => i.Type == ItemType.Avatar))
+                {
+                    ToolStripMenuItem avatarToolStripMenuItem = new()
+                    {
+                        Text = DatabaseUtils.GetAvatarNameFromPaths(Items, avatar.ItemPath),
+                        Tag = avatar.ItemPath,
+                        Checked = item.ImplementedAvatars.Contains(avatar.ItemPath)
+                    };
+
+                    CreateContextMenu.AddDropDownItem(
+                        implementedMenu,
+                        avatarToolStripMenuItem,
+                        (sender, _) =>
+                        {
+                            if (sender is not ToolStripMenuItem toolStripMenuItem) return;
+                            if (toolStripMenuItem.Tag == null) return;
+
+                            if (toolStripMenuItem.Checked)
+                            {
+                                item.ImplementedAvatars.RemoveAll(avatarPath => avatarPath == (string)toolStripMenuItem.Tag);
+                                toolStripMenuItem.Checked = false;
+                            }
+                            else
+                            {
+                                item.ImplementedAvatars.Add((string)toolStripMenuItem.Tag);
+                                toolStripMenuItem.Checked = true;
+                            }
+
+                            if (SortingBox.SelectedIndex == 4 || SortingBox.SelectedIndex == 5)
+                            {
+                                var currentAvatar = CurrentPath.CurrentSelectedAvatarPath;
+                                if (!string.IsNullOrEmpty(currentAvatar))
+                                {
+                                    button.BackColor = item.ImplementedAvatars.Contains(currentAvatar) ? Color.LightGreen : Color.LightPink;
+                                }
+                            }
+
+                            DatabaseUtils.SaveItemsData(Items);
+                            FormUtils.ShowParentToolStrip(toolStripMenuItem, null!);
+                        }
+                    );
+                }
+
+                createContextMenu.AddItem(
+                    LanguageUtils.Translate("削除", CurrentLanguage),
+                    SharedImages.GetImage(SharedImages.Images.TrashIcon),
+                    (_, _) =>
+                    {
+                        var result = FormUtils.ShowConfirmDialog(
+                            LanguageUtils.Translate("本当に削除しますか？", CurrentLanguage),
                             LanguageUtils.Translate("確認", CurrentLanguage)
                         );
+                        if (!result) return;
 
-                        DatabaseUtils.DeleteAvatarFromItems(ref Items, item.ItemPath, result2);
-
-                        if (CommonAvatars.Any(commonAvatar => commonAvatar.Avatars.Contains(item.ItemPath)))
+                        var undo = false;
+                        if (CurrentPath.CurrentSelectedAvatarPath == item.ItemPath && _leftWindow == LeftWindow.Default)
                         {
-                            var result3 = FormUtils.ShowConfirmDialog(
-                                LanguageUtils.Translate("このアバターを共通素体グループから削除しますか？", CurrentLanguage),
+                            CurrentPath = new CurrentPath();
+                            undo = true;
+                            PathTextBox.Text = GeneratePath();
+                        }
+
+                        if (item.Type == ItemType.Avatar)
+                        {
+                            var result2 = FormUtils.ShowConfirmDialog(
+                                LanguageUtils.Translate("このアバターを対応アバターとしているアイテムの対応アバターからこのアバターを削除しますか？", CurrentLanguage),
                                 LanguageUtils.Translate("確認", CurrentLanguage)
                             );
 
-                            if (result3)
+                            DatabaseUtils.DeleteAvatarFromItems(ref Items, item.ItemPath, result2);
+
+                            if (CommonAvatars.Any(commonAvatar => commonAvatar.Avatars.Contains(item.ItemPath)))
                             {
-                                DatabaseUtils.DeleteAvatarFromCommonAvatars(ref CommonAvatars, item.ItemPath);
-                                DatabaseUtils.SaveCommonAvatarData(CommonAvatars);
+                                var result3 = FormUtils.ShowConfirmDialog(
+                                    LanguageUtils.Translate("このアバターを共通素体グループから削除しますか？", CurrentLanguage),
+                                    LanguageUtils.Translate("確認", CurrentLanguage)
+                                );
+
+                                if (result3)
+                                {
+                                    DatabaseUtils.DeleteAvatarFromCommonAvatars(ref CommonAvatars, item.ItemPath);
+                                    DatabaseUtils.SaveCommonAvatarData(CommonAvatars);
+                                }
                             }
                         }
+
+                        Items.RemoveAll(i => i.ItemPath == item.ItemPath);
+
+                        FormUtils.ShowMessageBox(
+                            LanguageUtils.Translate("削除が完了しました。", CurrentLanguage),
+                            LanguageUtils.Translate("完了", CurrentLanguage)
+                        );
+
+                        if (undo)
+                        {
+                            SearchBox.Text = "";
+                            SearchResultLabel.Text = "";
+                            _isSearching = false;
+
+                            GenerateAvatarList();
+                            GenerateAuthorList();
+                            GenerateCategoryListLeft();
+                            ResetAvatarExplorer(true);
+                        }
+                        else
+                        {
+                            RefleshWindow();
+                        }
+
+                        DatabaseUtils.SaveItemsData(Items);
                     }
+                );
 
-                    Items.RemoveAll(i => i.ItemPath == item.ItemPath);
-
-                    FormUtils.ShowMessageBox(
-                        LanguageUtils.Translate("削除が完了しました。", CurrentLanguage),
-                        LanguageUtils.Translate("完了", CurrentLanguage)
-                    );
-
-                    if (undo)
-                    {
-                        SearchBox.Text = "";
-                        SearchResultLabel.Text = "";
-                        _isSearching = false;
-
-                        GenerateAvatarList();
-                        GenerateAuthorList();
-                        GenerateCategoryListLeft();
-                        ResetAvatarExplorer(true);
-                    }
-                    else
-                    {
-                        RefleshWindow();
-                    }
-
-                    DatabaseUtils.SaveItemsData(Items);
-                }
-            );
-
-            button.ContextMenuStrip = createContextMenu.ContextMenuStrip;
-            AvatarItemExplorer.Controls.Add(button);
-            index++;
+                button.ContextMenuStrip = createContextMenu.ContextMenuStrip;
+                AvatarItemExplorer.Controls.Add(button);
+                index++;
+            }
+            catch (Exception ex)
+            {
+                FormUtils.ShowMessageBox("Error Occured while rendering item button\n\nError: " + ex, "Button Error", true);
+            }
         }
 
         AvatarItemExplorer.ResumeLayout();
@@ -1251,25 +1311,36 @@ internal sealed partial class MainForm : Form
         var index = 0;
         foreach (var itemType in types)
         {
-            var itemCount = itemFolderInfo.GetItemCount(itemType);
-            if (itemCount == 0) continue;
-
-            Button button = AEUtils.CreateButton(null, LanguageUtils.Translate(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, "", GetItemExplorerListWidth);
-            button.Location = new Point(0, (70 * index) + 2);
-            button.MouseClick += OnMouseClick;
-
-            EventHandler clickEvent = (_, _) =>
+            try
             {
-                CurrentPath.CurrentSelectedItemCategory = itemType;
-                GenerateItemFiles();
-                PathTextBox.Text = GeneratePath();
-            };
+                var itemCount = itemFolderInfo.GetItemCount(itemType);
+                if (itemCount == 0) continue;
 
-            button.Click += clickEvent;
-            button.Disposed += (_, _) => button.Click -= clickEvent;
+                Button button = AEUtils.CreateButton(null, LanguageUtils.Translate(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, "", GetItemExplorerListWidth);
+                button.Location = new Point(0, (70 * index) + 2);
+                button.MouseClick += OnMouseClick;
 
-            AvatarItemExplorer.Controls.Add(button);
-            index++;
+                void ButtonClick(object? sender, EventArgs? e)
+                {
+                    CurrentPath.CurrentSelectedItemCategory = itemType;
+                    GenerateItemFiles();
+                    PathTextBox.Text = GeneratePath();
+                };
+
+                button.Click += ButtonClick;
+                button.Disposed += (_, _) =>
+                {
+                    button.Click -= ButtonClick;
+                    button.ContextMenuStrip?.Dispose();
+                };
+
+                AvatarItemExplorer.Controls.Add(button);
+                index++;
+            }
+            catch (Exception ex)
+            {
+                FormUtils.ShowMessageBox("Error Occured while rendering item button\n\nError: " + ex, "Button Error", true);
+            }
         }
 
         AvatarItemExplorer.ResumeLayout();
@@ -1297,50 +1368,61 @@ internal sealed partial class MainForm : Form
         var index = 0;
         foreach (var file in files)
         {
-            var imagePath = file.FileExtension is ".png" or ".jpg" ? file.FilePath : "";
-            Button button = AEUtils.CreateButton(imagePath, file.FileName, file.FileExtension.Replace(".", "") + LanguageUtils.Translate("ファイル", CurrentLanguage), false, LanguageUtils.Translate("開くファイルのパス: ", CurrentLanguage) + file.FilePath, GetItemExplorerListWidth);
-            button.Location = new Point(0, (70 * index) + 2);
-            button.MouseClick += OnMouseClick;
-
-            EventHandler clickEvent2 = (_, _) =>
+            try
             {
-                try
+                var imagePath = file.FileExtension is ".png" or ".jpg" ? file.FilePath : "";
+                Button button = AEUtils.CreateButton(imagePath, file.FileName, file.FileExtension.Replace(".", "") + LanguageUtils.Translate("ファイル", CurrentLanguage), false, LanguageUtils.Translate("開くファイルのパス: ", CurrentLanguage) + file.FilePath, GetItemExplorerListWidth);
+                button.Location = new Point(0, (70 * index) + 2);
+                button.MouseClick += OnMouseClick;
+
+                void ButtonClick(object? sender, EventArgs? e)
                 {
-                    if (file.FileExtension is ".unitypackage")
+                    try
                     {
-                        _ = AEUtils.ModifyUnityPackageFilePathAsync(file, CurrentPath, CurrentLanguage);
+                        if (file.FileExtension is ".unitypackage")
+                        {
+                            _ = AEUtils.ModifyUnityPackageFilePathAsync(file, CurrentPath, CurrentLanguage);
+                        }
+                        else
+                        {
+                            FileSystemUtils.OpenItemFile(file, true, CurrentLanguage);
+                        }
                     }
-                    else
+                    catch
                     {
-                        FileSystemUtils.OpenItemFile(file, true, CurrentLanguage);
+                        FileSystemUtils.OpenItemFile(file, false, CurrentLanguage);
                     }
-                }
-                catch
+                };
+
+                button.Click += ButtonClick;
+                button.Disposed += (_, _) =>
                 {
-                    FileSystemUtils.OpenItemFile(file, false, CurrentLanguage);
-                }
-            };
+                    button.Click -= ButtonClick;
+                    button.ContextMenuStrip?.Dispose();
+                };
 
-            button.Click += clickEvent2;
-            button.Disposed += (_, _) => button.Click -= clickEvent2;
+                var createContextMenu = new CreateContextMenu();
 
-            var createContextMenu = new CreateContextMenu();
+                createContextMenu.AddItem(
+                    LanguageUtils.Translate("開く", CurrentLanguage),
+                    SharedImages.GetImage(SharedImages.Images.CopyIcon),
+                    (_, _) => FileSystemUtils.OpenItemFile(file, true, CurrentLanguage)
+                );
 
-            createContextMenu.AddItem(
-                LanguageUtils.Translate("開く", CurrentLanguage),
-                SharedImages.GetImage(SharedImages.Images.CopyIcon),
-                (_, _) => FileSystemUtils.OpenItemFile(file, true, CurrentLanguage)
-            );
+                createContextMenu.AddItem(
+                    LanguageUtils.Translate("ファイルのパスを開く", CurrentLanguage),
+                    SharedImages.GetImage(SharedImages.Images.CopyIcon),
+                    (_, _) => FileSystemUtils.OpenItemFile(file, false, CurrentLanguage)
+                );
 
-            createContextMenu.AddItem(
-                LanguageUtils.Translate("ファイルのパスを開く", CurrentLanguage),
-                SharedImages.GetImage(SharedImages.Images.CopyIcon),
-                (_, _) => FileSystemUtils.OpenItemFile(file, false, CurrentLanguage)
-            );
-
-            button.ContextMenuStrip = createContextMenu.ContextMenuStrip;
-            AvatarItemExplorer.Controls.Add(button);
-            index++;
+                button.ContextMenuStrip = createContextMenu.ContextMenuStrip;
+                AvatarItemExplorer.Controls.Add(button);
+                index++;
+            }
+            catch (Exception ex)
+            {
+                FormUtils.ShowMessageBox("Error Occured while rendering item button\n\nError: " + ex, "Button Error", true);
+            }
         }
 
         AvatarItemExplorer.ResumeLayout();
@@ -1365,8 +1447,7 @@ internal sealed partial class MainForm : Form
                 searchFilter.SearchWords.All(word =>
                     item.Title.Contains(word, StringComparison.CurrentCultureIgnoreCase) ||
                     item.AuthorName.Contains(word, StringComparison.CurrentCultureIgnoreCase) ||
-                    item.SupportedAvatar.Any(avatar =>
-                    {
+                    item.SupportedAvatar.Any(avatar => {
                         var supportedAvatarName = DatabaseUtils.GetAvatarNameFromPaths(Items, avatar);
                         if (supportedAvatarName == "") return false;
                         return supportedAvatarName.Contains(word, StringComparison.CurrentCultureIgnoreCase);
@@ -1413,274 +1494,281 @@ internal sealed partial class MainForm : Form
         var index = 0;
         foreach (Item item in filteredItems)
         {
-            var description = ItemUtils.GetItemDescription(item, CurrentLanguage);
-
-            Button button = AEUtils.CreateButton(item.ImagePath, item.Title, LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName, false, description, GetItemExplorerListWidth);
-            button.Location = new Point(0, (70 * index) + 2);
-            button.MouseClick += OnMouseClick;
-
-            EventHandler clickEvent = (_, _) =>
+            try
             {
-                if (!Directory.Exists(item.ItemPath))
+                var description = ItemUtils.GetItemDescription(item, CurrentLanguage);
+
+                Button button = AEUtils.CreateButton(item.ImagePath, item.Title, LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName, false, description, GetItemExplorerListWidth);
+                button.Location = new Point(0, (70 * index) + 2);
+                button.MouseClick += OnMouseClick;
+
+                void ButtonClick(object? sender, EventArgs? e)
                 {
-                    bool result = FormUtils.ShowConfirmDialog(
-                        LanguageUtils.Translate("フォルダが見つかりませんでした。編集しますか？", CurrentLanguage),
-                        LanguageUtils.Translate("エラー", CurrentLanguage)
-                    );
-                    if (!result) return;
-
-                    var prePath = item.ItemPath;
-
-                    AddItemForm addItem = new(this, CurrentPath.CurrentSelectedCategory, CurrentPath.CurrentSelectedCustomCategory, true, item, null);
-                    addItem.ShowDialog();
-
                     if (!Directory.Exists(item.ItemPath))
                     {
-                        FormUtils.ShowMessageBox(
-                            LanguageUtils.Translate("フォルダが見つかりませんでした。", CurrentLanguage),
-                            LanguageUtils.Translate("エラー", CurrentLanguage),
-                            true
+                        bool result = FormUtils.ShowConfirmDialog(
+                            LanguageUtils.Translate("フォルダが見つかりませんでした。編集しますか？", CurrentLanguage),
+                            LanguageUtils.Translate("エラー", CurrentLanguage)
                         );
-                        return;
+                        if (!result) return;
+
+                        var prePath = item.ItemPath;
+
+                        AddItemForm addItem = new(this, CurrentPath.CurrentSelectedCategory, CurrentPath.CurrentSelectedCustomCategory, true, item, null);
+                        addItem.ShowDialog();
+
+                        if (!Directory.Exists(item.ItemPath))
+                        {
+                            FormUtils.ShowMessageBox(
+                                LanguageUtils.Translate("フォルダが見つかりませんでした。", CurrentLanguage),
+                                LanguageUtils.Translate("エラー", CurrentLanguage),
+                                true
+                            );
+                            return;
+                        }
+
+                        // 対応アバターのパスを変えてあげる
+                        DatabaseUtils.ChangeAllItemPaths(ref Items, prePath);
+
+                        GenerateFilteredItem(searchFilter);
+                        GenerateAvatarList();
+                        GenerateAuthorList();
+                        GenerateCategoryListLeft();
+                        DatabaseUtils.SaveItemsData(Items);
                     }
 
-                    // 対応アバターのパスを変えてあげる
-                    DatabaseUtils.ChangeAllItemPaths(ref Items, prePath);
+                    _leftWindow = LeftWindow.Default;
 
-                    GenerateFilteredItem(searchFilter);
-                    GenerateAvatarList();
-                    GenerateAuthorList();
-                    GenerateCategoryListLeft();
-                    DatabaseUtils.SaveItemsData(Items);
-                }
+                    GeneratePathFromItem(item);
 
-                _leftWindow = LeftWindow.Default;
+                    SearchBox.Text = "";
+                    SearchResultLabel.Text = "";
+                    _isSearching = false;
 
-                GeneratePathFromItem(item);
-
-                SearchBox.Text = "";
-                SearchResultLabel.Text = "";
-                _isSearching = false;
-
-                GenerateItemCategoryList();
-                PathTextBox.Text = GeneratePath();
-            };
-
-            button.Click += clickEvent;
-            button.Disposed += (_, _) =>
-            {
-                button.Click -= clickEvent;
-                button.ContextMenuStrip?.Dispose();
-            };
-
-            var createContextMenu = new CreateContextMenu();
-
-            if (Directory.Exists(item.ItemPath))
-            {
-                createContextMenu.AddItem(
-                    LanguageUtils.Translate("フォルダを開く", CurrentLanguage),
-                    SharedImages.GetImage(SharedImages.Images.OpenIcon),
-                    (_, _) => FileSystemUtils.OpenItemFolder(item, CurrentLanguage)
-                );
-            }
-
-            if (item.BoothId != -1)
-            {
-                createContextMenu.AddItem(
-                    LanguageUtils.Translate("Boothリンクのコピー", CurrentLanguage),
-                    SharedImages.GetImage(SharedImages.Images.CopyIcon),
-                    (_, _) => BoothUtils.CopyItemBoothLink(item, CurrentLanguage)
-                );
-
-                createContextMenu.AddItem(
-                    LanguageUtils.Translate("Boothリンクを開く", CurrentLanguage),
-                    SharedImages.GetImage(SharedImages.Images.CopyIcon),
-                    (_, _) => BoothUtils.OpenItenBoothLink(item, CurrentLanguage)
-                );
-            }
-
-            createContextMenu.AddItem(
-                LanguageUtils.Translate("この作者の他のアイテムを表示", CurrentLanguage),
-                SharedImages.GetImage(SharedImages.Images.OpenIcon),
-                (_, _) =>
-                {
-                    SearchBox.Text = $"Author=\"{item.AuthorName}\"";
-                    SearchItems();
-                }
-            );
-
-            createContextMenu.AddItem(
-                LanguageUtils.Translate("サムネイル変更", CurrentLanguage),
-                SharedImages.GetImage(SharedImages.Images.EditIcon),
-                (_, _) =>
-                {
-                    var previousPath = item.ImagePath;
-                    OpenFileDialog ofd = new()
-                    {
-                        Filter = LanguageUtils.Translate("画像ファイル|*.png;*.jpg", CurrentLanguage),
-                        Title = LanguageUtils.Translate("サムネイル変更", CurrentLanguage),
-                        Multiselect = false
-                    };
-                    if (ofd.ShowDialog() != DialogResult.OK) return;
-
-                    item.ImagePath = ofd.FileName;
-
-                    FormUtils.ShowMessageBox(
-                        LanguageUtils.Translate("サムネイルを変更しました！", CurrentLanguage) + "\n\n" +
-                        LanguageUtils.Translate("変更前: ", CurrentLanguage) + previousPath + "\n\n" +
-                        LanguageUtils.Translate("変更後: ", CurrentLanguage) + ofd.FileName,
-                        LanguageUtils.Translate("完了", CurrentLanguage)
-                    );
-
-                    GenerateFilteredItem(searchFilter);
-                    GenerateAvatarList();
-                    DatabaseUtils.SaveItemsData(Items);
-                }
-            );
-
-            createContextMenu.AddItem(
-                LanguageUtils.Translate("編集", CurrentLanguage),
-                SharedImages.GetImage(SharedImages.Images.EditIcon),
-                (_, _) =>
-                {
-                    var prePath = item.ItemPath;
-                    AddItemForm addItem = new(this, item.Type, item.CustomCategory, true, item, null);
-                    addItem.ShowDialog();
-
-                    // 対応アバターのパスを変えてあげる
-                    DatabaseUtils.ChangeAllItemPaths(ref Items, prePath);
-
-                    if (CurrentPath.CurrentSelectedAvatarPath == prePath)
-                    {
-                        CurrentPath.CurrentSelectedAvatar = item.Title;
-                        CurrentPath.CurrentSelectedAvatarPath = item.ItemPath;
-                    }
-
-                    GenerateFilteredItem(searchFilter);
-                    GenerateAvatarList();
-                    GenerateAuthorList();
-                    GenerateCategoryListLeft();
-                    DatabaseUtils.SaveItemsData(Items);
-                }
-            );
-
-            createContextMenu.AddItem(
-                LanguageUtils.Translate("メモの追加", CurrentLanguage),
-                SharedImages.GetImage(SharedImages.Images.EditIcon),
-                (_, _) =>
-                {
-                    var previousMemo = item.ItemMemo;
-                    AddNoteForm addMemo = new(this, item);
-                    addMemo.ShowDialog();
-
-                    var memo = addMemo.Memo;
-                    if (string.IsNullOrEmpty(memo) || memo == previousMemo) return;
-
-                    item.ItemMemo = memo;
-
-                    GenerateFilteredItem(searchFilter);
-                    GenerateAvatarList();
-                    DatabaseUtils.SaveItemsData(Items);
-                }
-            );
-
-            var implementedMenu = createContextMenu.AddItem(LanguageUtils.Translate("実装/未実装", CurrentLanguage), SharedImages.GetImage(SharedImages.Images.EditIcon));
-            foreach (var avatar in Items.Where(i => i.Type == ItemType.Avatar))
-            {
-                ToolStripMenuItem avatarToolStripMenuItem = new()
-                {
-                    Text = DatabaseUtils.GetAvatarNameFromPaths(Items, avatar.ItemPath),
-                    Tag = avatar.ItemPath,
-                    Checked = item.ImplementedAvatars.Contains(avatar.ItemPath)
+                    GenerateItemCategoryList();
+                    PathTextBox.Text = GeneratePath();
                 };
 
-                CreateContextMenu.AddDropDownItem(
-                    implementedMenu,
-                    avatarToolStripMenuItem,
-                    (sender, _) =>
+                button.Click += ButtonClick;
+                button.Disposed += (_, _) =>
+                {
+                    button.Click -= ButtonClick;
+                    button.ContextMenuStrip?.Dispose();
+                };
+
+                var createContextMenu = new CreateContextMenu();
+
+                if (Directory.Exists(item.ItemPath))
+                {
+                    createContextMenu.AddItem(
+                        LanguageUtils.Translate("フォルダを開く", CurrentLanguage),
+                        SharedImages.GetImage(SharedImages.Images.OpenIcon),
+                        (_, _) => FileSystemUtils.OpenItemFolder(item, CurrentLanguage)
+                    );
+                }
+
+                if (item.BoothId != -1)
+                {
+                    createContextMenu.AddItem(
+                        LanguageUtils.Translate("Boothリンクのコピー", CurrentLanguage),
+                        SharedImages.GetImage(SharedImages.Images.CopyIcon),
+                        (_, _) => BoothUtils.CopyItemBoothLink(item, CurrentLanguage)
+                    );
+
+                    createContextMenu.AddItem(
+                        LanguageUtils.Translate("Boothリンクを開く", CurrentLanguage),
+                        SharedImages.GetImage(SharedImages.Images.CopyIcon),
+                        (_, _) => BoothUtils.OpenItenBoothLink(item, CurrentLanguage)
+                    );
+                }
+
+                createContextMenu.AddItem(
+                    LanguageUtils.Translate("この作者の他のアイテムを表示", CurrentLanguage),
+                    SharedImages.GetImage(SharedImages.Images.OpenIcon),
+                    (_, _) =>
                     {
-                        if (sender is not ToolStripMenuItem toolStripMenuItem) return;
-                        if (toolStripMenuItem.Tag == null) return;
-
-                        if (toolStripMenuItem.Checked)
-                        {
-                            item.ImplementedAvatars.RemoveAll(avatarPath => avatarPath == (string)toolStripMenuItem.Tag);
-                            toolStripMenuItem.Checked = false;
-                        }
-                        else
-                        {
-                            item.ImplementedAvatars.Add((string)toolStripMenuItem.Tag);
-                            toolStripMenuItem.Checked = true;
-                        }
-
-                        if (SortingBox.SelectedIndex == 4 || SortingBox.SelectedIndex == 5)
-                        {
-                            var currentAvatar = CurrentPath.CurrentSelectedAvatarPath;
-                            if (!string.IsNullOrEmpty(currentAvatar))
-                            {
-                                button.BackColor = item.ImplementedAvatars.Contains(currentAvatar) ? Color.LightGreen : Color.LightPink;
-                            }
-                        }
-
-                        DatabaseUtils.SaveItemsData(Items);
-                        FormUtils.ShowParentToolStrip(toolStripMenuItem, null!);
+                        SearchBox.Text = $"Author=\"{item.AuthorName}\"";
+                        SearchItems();
                     }
                 );
-            }
 
-            createContextMenu.AddItem(
-                LanguageUtils.Translate("削除", CurrentLanguage),
-                SharedImages.GetImage(SharedImages.Images.TrashIcon),
-                (_, _) =>
-                {
-                    bool result = FormUtils.ShowConfirmDialog(
-                        LanguageUtils.Translate("本当に削除しますか？", CurrentLanguage),
-                        LanguageUtils.Translate("確認", CurrentLanguage)
-                    );
-                    if (!result) return;
-
-                    if (item.Type == ItemType.Avatar)
+                createContextMenu.AddItem(
+                    LanguageUtils.Translate("サムネイル変更", CurrentLanguage),
+                    SharedImages.GetImage(SharedImages.Images.EditIcon),
+                    (_, _) =>
                     {
-                        var result2 = FormUtils.ShowConfirmDialog(
-                            LanguageUtils.Translate("このアバターを対応アバターとしているアイテムの対応アバターからこのアバターを削除しますか？", CurrentLanguage),
-                            LanguageUtils.Translate("確認", CurrentLanguage)
+                        var previousPath = item.ImagePath;
+                        OpenFileDialog ofd = new()
+                        {
+                            Filter = LanguageUtils.Translate("画像ファイル|*.png;*.jpg", CurrentLanguage),
+                            Title = LanguageUtils.Translate("サムネイル変更", CurrentLanguage),
+                            Multiselect = false
+                        };
+                        if (ofd.ShowDialog() != DialogResult.OK) return;
+
+                        item.ImagePath = ofd.FileName;
+
+                        FormUtils.ShowMessageBox(
+                            LanguageUtils.Translate("サムネイルを変更しました！", CurrentLanguage) + "\n\n" +
+                            LanguageUtils.Translate("変更前: ", CurrentLanguage) + previousPath + "\n\n" +
+                            LanguageUtils.Translate("変更後: ", CurrentLanguage) + ofd.FileName,
+                            LanguageUtils.Translate("完了", CurrentLanguage)
                         );
 
-                        DatabaseUtils.DeleteAvatarFromItems(ref Items, item.ItemPath, result2);
+                        GenerateFilteredItem(searchFilter);
+                        GenerateAvatarList();
+                        DatabaseUtils.SaveItemsData(Items);
+                    }
+                );
 
-                        if (CommonAvatars.Any(commonAvatar => commonAvatar.Avatars.Contains(item.ItemPath)))
+                createContextMenu.AddItem(
+                    LanguageUtils.Translate("編集", CurrentLanguage),
+                    SharedImages.GetImage(SharedImages.Images.EditIcon),
+                    (_, _) =>
+                    {
+                        var prePath = item.ItemPath;
+                        AddItemForm addItem = new(this, item.Type, item.CustomCategory, true, item, null);
+                        addItem.ShowDialog();
+
+                        // 対応アバターのパスを変えてあげる
+                        DatabaseUtils.ChangeAllItemPaths(ref Items, prePath);
+
+                        if (CurrentPath.CurrentSelectedAvatarPath == prePath)
                         {
-                            var result3 = FormUtils.ShowConfirmDialog(
-                                LanguageUtils.Translate("このアバターを共通素体グループから削除しますか？", CurrentLanguage),
+                            CurrentPath.CurrentSelectedAvatar = item.Title;
+                            CurrentPath.CurrentSelectedAvatarPath = item.ItemPath;
+                        }
+
+                        GenerateFilteredItem(searchFilter);
+                        GenerateAvatarList();
+                        GenerateAuthorList();
+                        GenerateCategoryListLeft();
+                        DatabaseUtils.SaveItemsData(Items);
+                    }
+                );
+
+                createContextMenu.AddItem(
+                    LanguageUtils.Translate("メモの追加", CurrentLanguage),
+                    SharedImages.GetImage(SharedImages.Images.EditIcon),
+                    (_, _) =>
+                    {
+                        var previousMemo = item.ItemMemo;
+                        AddNoteForm addMemo = new(this, item);
+                        addMemo.ShowDialog();
+
+                        var memo = addMemo.Memo;
+                        if (string.IsNullOrEmpty(memo) || memo == previousMemo) return;
+
+                        item.ItemMemo = memo;
+
+                        GenerateFilteredItem(searchFilter);
+                        GenerateAvatarList();
+                        DatabaseUtils.SaveItemsData(Items);
+                    }
+                );
+
+                var implementedMenu = createContextMenu.AddItem(LanguageUtils.Translate("実装/未実装", CurrentLanguage), SharedImages.GetImage(SharedImages.Images.EditIcon));
+                foreach (var avatar in Items.Where(i => i.Type == ItemType.Avatar))
+                {
+                    ToolStripMenuItem avatarToolStripMenuItem = new()
+                    {
+                        Text = DatabaseUtils.GetAvatarNameFromPaths(Items, avatar.ItemPath),
+                        Tag = avatar.ItemPath,
+                        Checked = item.ImplementedAvatars.Contains(avatar.ItemPath)
+                    };
+
+                    CreateContextMenu.AddDropDownItem(
+                        implementedMenu,
+                        avatarToolStripMenuItem,
+                        (sender, _) =>
+                        {
+                            if (sender is not ToolStripMenuItem toolStripMenuItem) return;
+                            if (toolStripMenuItem.Tag == null) return;
+
+                            if (toolStripMenuItem.Checked)
+                            {
+                                item.ImplementedAvatars.RemoveAll(avatarPath => avatarPath == (string)toolStripMenuItem.Tag);
+                                toolStripMenuItem.Checked = false;
+                            }
+                            else
+                            {
+                                item.ImplementedAvatars.Add((string)toolStripMenuItem.Tag);
+                                toolStripMenuItem.Checked = true;
+                            }
+
+                            if (SortingBox.SelectedIndex == 4 || SortingBox.SelectedIndex == 5)
+                            {
+                                var currentAvatar = CurrentPath.CurrentSelectedAvatarPath;
+                                if (!string.IsNullOrEmpty(currentAvatar))
+                                {
+                                    button.BackColor = item.ImplementedAvatars.Contains(currentAvatar) ? Color.LightGreen : Color.LightPink;
+                                }
+                            }
+
+                            DatabaseUtils.SaveItemsData(Items);
+                            FormUtils.ShowParentToolStrip(toolStripMenuItem, null!);
+                        }
+                    );
+                }
+
+                createContextMenu.AddItem(
+                    LanguageUtils.Translate("削除", CurrentLanguage),
+                    SharedImages.GetImage(SharedImages.Images.TrashIcon),
+                    (_, _) =>
+                    {
+                        bool result = FormUtils.ShowConfirmDialog(
+                            LanguageUtils.Translate("本当に削除しますか？", CurrentLanguage),
+                            LanguageUtils.Translate("確認", CurrentLanguage)
+                        );
+                        if (!result) return;
+
+                        if (item.Type == ItemType.Avatar)
+                        {
+                            var result2 = FormUtils.ShowConfirmDialog(
+                                LanguageUtils.Translate("このアバターを対応アバターとしているアイテムの対応アバターからこのアバターを削除しますか？", CurrentLanguage),
                                 LanguageUtils.Translate("確認", CurrentLanguage)
                             );
 
-                            if (result3)
+                            DatabaseUtils.DeleteAvatarFromItems(ref Items, item.ItemPath, result2);
+
+                            if (CommonAvatars.Any(commonAvatar => commonAvatar.Avatars.Contains(item.ItemPath)))
                             {
-                                DatabaseUtils.DeleteAvatarFromCommonAvatars(ref CommonAvatars, item.ItemPath);
-                                DatabaseUtils.SaveCommonAvatarData(CommonAvatars);
+                                var result3 = FormUtils.ShowConfirmDialog(
+                                    LanguageUtils.Translate("このアバターを共通素体グループから削除しますか？", CurrentLanguage),
+                                    LanguageUtils.Translate("確認", CurrentLanguage)
+                                );
+
+                                if (result3)
+                                {
+                                    DatabaseUtils.DeleteAvatarFromCommonAvatars(ref CommonAvatars, item.ItemPath);
+                                    DatabaseUtils.SaveCommonAvatarData(CommonAvatars);
+                                }
                             }
                         }
+
+                        Items.RemoveAll(i => i.ItemPath == item.ItemPath);
+
+                        FormUtils.ShowMessageBox(
+                            LanguageUtils.Translate("削除が完了しました。", CurrentLanguage),
+                            LanguageUtils.Translate("完了", CurrentLanguage)
+                        );
+
+                        GenerateFilteredItem(searchFilter);
+                        GenerateAvatarList();
+                        GenerateAuthorList();
+                        GenerateCategoryListLeft();
+                        DatabaseUtils.SaveItemsData(Items);
                     }
+                );
 
-                    Items.RemoveAll(i => i.ItemPath == item.ItemPath);
-
-                    FormUtils.ShowMessageBox(
-                        LanguageUtils.Translate("削除が完了しました。", CurrentLanguage),
-                        LanguageUtils.Translate("完了", CurrentLanguage)
-                    );
-
-                    GenerateFilteredItem(searchFilter);
-                    GenerateAvatarList();
-                    GenerateAuthorList();
-                    GenerateCategoryListLeft();
-                    DatabaseUtils.SaveItemsData(Items);
-                }
-            );
-
-            button.ContextMenuStrip = createContextMenu.ContextMenuStrip;
-            AvatarItemExplorer.Controls.Add(button);
-            index++;
+                button.ContextMenuStrip = createContextMenu.ContextMenuStrip;
+                AvatarItemExplorer.Controls.Add(button);
+                index++;
+            }
+            catch (Exception ex)
+            {
+                FormUtils.ShowMessageBox("Error Occured while rendering item button\n\nError: " + ex, "Button Error", true);
+            }
         }
 
         AvatarItemExplorer.ResumeLayout();
@@ -1720,28 +1808,47 @@ internal sealed partial class MainForm : Form
         var index = 0;
         foreach (var file in filteredFileData)
         {
-            var imagePath = file.FileExtension is ".png" or ".jpg" ? file.FilePath : "";
-            Button button = AEUtils.CreateButton(imagePath, file.FileName, file.FileExtension.Replace(".", "") + LanguageUtils.Translate("ファイル", CurrentLanguage), false, LanguageUtils.Translate("開くファイルのパス: ", CurrentLanguage) + file.FilePath, GetItemExplorerListWidth);
-            button.Location = new Point(0, (70 * index) + 2);
-            button.MouseClick += OnMouseClick;
+            try
+            {
+                var imagePath = file.FileExtension is ".png" or ".jpg" ? file.FilePath : "";
+                Button button = AEUtils.CreateButton(imagePath, file.FileName, file.FileExtension.Replace(".", "") + LanguageUtils.Translate("ファイル", CurrentLanguage), false, LanguageUtils.Translate("開くファイルのパス: ", CurrentLanguage) + file.FilePath, GetItemExplorerListWidth);
+                button.Location = new Point(0, (70 * index) + 2);
+                button.MouseClick += OnMouseClick;
 
-            var createContextMenu = new CreateContextMenu();
+                void ButtonClick(object? sender, EventArgs? e)
+                {
+                    FileSystemUtils.OpenItemFile(file, true, CurrentLanguage);
+                }
 
-            createContextMenu.AddItem(
-                LanguageUtils.Translate("開く", CurrentLanguage),
-                SharedImages.GetImage(SharedImages.Images.CopyIcon),
-                (_, _) => FileSystemUtils.OpenItemFile(file, true, CurrentLanguage)
-            );
+                button.Click += ButtonClick;
+                button.Disposed += (_, _) =>
+                {
+                    button.Click -= ButtonClick;
+                    button.ContextMenuStrip?.Dispose();
+                };
 
-            createContextMenu.AddItem(
-                LanguageUtils.Translate("ファイルのパスを開く", CurrentLanguage),
-                SharedImages.GetImage(SharedImages.Images.CopyIcon),
-                (_, _) => FileSystemUtils.OpenItemFile(file, false, CurrentLanguage)
-            );
+                var createContextMenu = new CreateContextMenu();
 
-            button.ContextMenuStrip = createContextMenu.ContextMenuStrip;
-            AvatarItemExplorer.Controls.Add(button);
-            index++;
+                createContextMenu.AddItem(
+                    LanguageUtils.Translate("開く", CurrentLanguage),
+                    SharedImages.GetImage(SharedImages.Images.CopyIcon),
+                    (_, _) => FileSystemUtils.OpenItemFile(file, true, CurrentLanguage)
+                );
+
+                createContextMenu.AddItem(
+                    LanguageUtils.Translate("ファイルのパスを開く", CurrentLanguage),
+                    SharedImages.GetImage(SharedImages.Images.CopyIcon),
+                    (_, _) => FileSystemUtils.OpenItemFile(file, false, CurrentLanguage)
+                );
+
+                button.ContextMenuStrip = createContextMenu.ContextMenuStrip;
+                AvatarItemExplorer.Controls.Add(button);
+                index++;
+            }
+            catch (Exception ex)
+            {
+                FormUtils.ShowMessageBox("Error Occured while rendering item button\n\nError: " + ex, "Button Error", true);
+            }
         }
 
         AvatarItemExplorer.ResumeLayout();
