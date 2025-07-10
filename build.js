@@ -55,5 +55,22 @@ console.log("Generating Empty CustomCategory");
 const customCategoryPath = path.join("Datas", "CustomCategory.txt");
 fs.writeFileSync(customCategoryPath, "", "utf8");
 
+const LICENSE_FILES = [
+    "../../../LICENSE.txt",
+    "../../../THIRD_PARTY_LICENSES.txt"
+];
+
+const LICENSE_DESTINATION = [
+    "LICENSE.txt",
+    "THIRD_PARTY_LICENSES.txt"
+];
+
+for (let i = 0; i < LICENSE_FILES.length; i++) {
+    const file = LICENSE_FILES[i];
+    const dest = LICENSE_DESTINATION[i];
+    fs.copyFileSync(file, dest);
+    console.log("Copying: " + dest);
+}
+
 fs.rmSync("build.js");
 console.log("Build Completed!");
