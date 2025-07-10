@@ -292,6 +292,7 @@ internal sealed partial class MainForm : Form
 
             Button button = AEUtils.CreateButton(item.ImagePath, item.Title, LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName, true, description, GetAvatarListWidth);
             button.Location = new Point(0, (70 * index) + 2);
+            button.MouseClick += OnMouseClick;
 
             EventHandler clickEvent = (_, _) =>
             {
@@ -610,6 +611,7 @@ internal sealed partial class MainForm : Form
         {
             Button button = AEUtils.CreateButton(author.AuthorImagePath, author.AuthorName,Items.Count(item => item.AuthorName == author.AuthorName) + LanguageUtils.Translate("個の項目", CurrentLanguage), true, author.AuthorName, GetAvatarListWidth);
             button.Location = new Point(0, (70 * index) + 2);
+            button.MouseClick += OnMouseClick;
 
             EventHandler clickEvent = (_, _) =>
             {
@@ -699,6 +701,7 @@ internal sealed partial class MainForm : Form
 
             Button button = AEUtils.CreateButton(null, ItemUtils.GetCategoryName(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), true, "", GetAvatarListWidth);
             button.Location = new Point(0, (70 * index) + 2);
+            button.MouseClick += OnMouseClick;
 
             EventHandler clickEvent = (_, _) =>
             {
@@ -733,6 +736,7 @@ internal sealed partial class MainForm : Form
 
                 Button button = AEUtils.CreateButton(null, customCategory, itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), true, "", GetAvatarListWidth);
                 button.Location = new Point(0, (70 * index) + 2);
+                button.MouseClick += OnMouseClick;
 
                 EventHandler clickEvent = (_, _) =>
                 {
@@ -801,6 +805,7 @@ internal sealed partial class MainForm : Form
 
             Button button = AEUtils.CreateButton(null, ItemUtils.GetCategoryName(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, "", GetItemExplorerListWidth);
             button.Location = new Point(0, (70 * index) + 2);
+            button.MouseClick += OnMouseClick;
 
             EventHandler clickEvent = (_, _) =>
             {
@@ -840,6 +845,7 @@ internal sealed partial class MainForm : Form
 
                 Button button = AEUtils.CreateButton(null, customCategory, itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, "", GetItemExplorerListWidth);
                 button.Location = new Point(0, (70 * index) + 2);
+                button.MouseClick += OnMouseClick;
 
                 EventHandler clickEvent = (_, _) =>
                 {
@@ -930,6 +936,7 @@ internal sealed partial class MainForm : Form
 
             Button button = AEUtils.CreateButton(item.ImagePath, item.Title, authorText, false, description,GetItemExplorerListWidth);
             button.Location = new Point(0, (70 * index) + 2);
+            button.MouseClick += OnMouseClick;
 
             if (SortingBox.SelectedIndex == 4 || SortingBox.SelectedIndex == 5)
             {
@@ -1071,7 +1078,7 @@ internal sealed partial class MainForm : Form
                 AddItemForm addItem = new(this, CurrentPath.CurrentSelectedCategory, CurrentPath.CurrentSelectedCustomCategory, true, item, null);
                 addItem.ShowDialog();
 
-                //対応アバターのパスを変えてあげる
+                // 対応アバターのパスを変えてあげる
                 DatabaseUtils.ChangeAllItemPath(ref Items, prePath);
 
                 if (CurrentPath.CurrentSelectedAvatarPath == prePath)
@@ -1273,6 +1280,7 @@ internal sealed partial class MainForm : Form
 
             Button button = AEUtils.CreateButton(null, LanguageUtils.Translate(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, "", GetItemExplorerListWidth);
             button.Location = new Point(0, (70 * index) + 2);
+            button.MouseClick += OnMouseClick;
 
             EventHandler clickEvent = (_, _) =>
             {
@@ -1316,6 +1324,7 @@ internal sealed partial class MainForm : Form
             var imagePath = file.FileExtension is ".png" or ".jpg" ? file.FilePath : "";
             Button button = AEUtils.CreateButton(imagePath, file.FileName, file.FileExtension.Replace(".", "") + LanguageUtils.Translate("ファイル", CurrentLanguage), false, LanguageUtils.Translate("開くファイルのパス: ", CurrentLanguage) + file.FilePath, GetItemExplorerListWidth);
             button.Location = new Point(0, (70 * index) + 2);
+            button.MouseClick += OnMouseClick;
 
             ContextMenuStrip contextMenuStrip = new();
 
@@ -1429,6 +1438,7 @@ internal sealed partial class MainForm : Form
 
             Button button = AEUtils.CreateButton(item.ImagePath, item.Title, LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName, false, description, GetItemExplorerListWidth);
             button.Location = new Point(0, (70 * index) + 2);
+            button.MouseClick += OnMouseClick;
 
             EventHandler clickEvent = (_, _) =>
             {
@@ -1736,6 +1746,7 @@ internal sealed partial class MainForm : Form
             var imagePath = file.FileExtension is ".png" or ".jpg" ? file.FilePath : "";
             Button button = AEUtils.CreateButton(imagePath, file.FileName, file.FileExtension.Replace(".", "") + LanguageUtils.Translate("ファイル", CurrentLanguage), false, LanguageUtils.Translate("開くファイルのパス: ", CurrentLanguage) + file.FilePath, GetItemExplorerListWidth);
             button.Location = new Point(0, (70 * index) + 2);
+            button.MouseClick += OnMouseClick;
 
             ContextMenuStrip contextMenuStrip = new();
 
@@ -1880,7 +1891,7 @@ internal sealed partial class MainForm : Form
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void UndoButton_Click(object sender, EventArgs e)
+    private void UndoButton_Click(object? sender, EventArgs? e)
     {
         // 検索中だった場合は前の画面までとりあえず戻してあげる
         if (_isSearching)
@@ -1983,6 +1994,17 @@ internal sealed partial class MainForm : Form
 
         ResetAvatarExplorer(true);
         PathTextBox.Text = GeneratePath();
+    }
+
+    /// <summary>
+    /// コントロール上でサイドボタンが押された際の処理を行います。
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void OnMouseClick(object? sender, MouseEventArgs? e)
+    {
+        if (e?.Button != MouseButtons.XButton1) return;
+        UndoButton_Click(null, null);
     }
     #endregion
 

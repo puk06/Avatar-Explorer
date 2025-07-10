@@ -146,6 +146,7 @@ namespace Avatar_Explorer.Forms
             ExplorerList.SelectedIndex = 0;
             ExplorerList.Size = new Size(899, 590);
             ExplorerList.TabIndex = 6;
+            ExplorerList.MouseClick += OnMouseClick;
             // 
             // AvatarItemExplorer
             // 
@@ -163,6 +164,7 @@ namespace Avatar_Explorer.Forms
             AvatarItemExplorer.DragEnter += FormUtils.DragEnter;
             AvatarItemExplorer.MouseWheel += AEUtils.OnScroll;
             AvatarItemExplorer.Scroll += AEUtils.OnScroll;
+            AvatarItemExplorer.MouseClick += OnMouseClick;
             // 
             // StartLabel
             // 
