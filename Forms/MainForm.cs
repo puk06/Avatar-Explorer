@@ -1773,36 +1773,35 @@ internal sealed partial class MainForm : Form
     /// <returns></returns>
     private string GeneratePath()
     {
-        string prefix = string.Empty;
         List<string> pathParts = new();
 
         switch (_leftWindow)
         {
             case LeftWindow.Author:
                 {
-                    prefix = LanguageUtils.Translate("作者", CurrentLanguage) + " | ";
+                    pathParts.Add(LanguageUtils.Translate("作者", CurrentLanguage));
 
                     var author = CurrentPath.CurrentSelectedAuthor;
                     if (author == null)
                         return LanguageUtils.Translate("ここには現在のパスが表示されます", CurrentLanguage);
 
-                    pathParts.Add(AEUtils.RemoveFormat(author.AuthorName));
+                    pathParts.Add(author.AuthorName);
                     break;
                 }
             case LeftWindow.Category:
                 {
-                    prefix = LanguageUtils.Translate("カテゴリ別", CurrentLanguage) + " | ";
+                    pathParts.Add(LanguageUtils.Translate("カテゴリ別", CurrentLanguage));
                     break;
                 }
             case LeftWindow.Default:
                 {
-                    prefix = LanguageUtils.Translate("アバター", CurrentLanguage) + " | ";
+                    pathParts.Add(LanguageUtils.Translate("アバター", CurrentLanguage));
 
                     var avatar = CurrentPath.CurrentSelectedAvatar;
                     if (avatar == null)
                         return LanguageUtils.Translate("ここには現在のパスが表示されます", CurrentLanguage);
 
-                    pathParts.Add(AEUtils.RemoveFormat(avatar));
+                    pathParts.Add(avatar);
                     break;
                 }
             default:
@@ -1812,7 +1811,7 @@ internal sealed partial class MainForm : Form
         }
 
         if (CurrentPath.CurrentSelectedCategory == ItemType.Unknown)
-            return prefix + (pathParts.Count > 0 ? AEUtils.GenerateSeparatedPath(pathParts.ToArray()) : LanguageUtils.Translate("ここには現在のパスが表示されます", CurrentLanguage));
+            return pathParts.Count > 1 ? AEUtils.GenerateSeparatedPath(pathParts.ToArray()) : LanguageUtils.Translate("ここには現在のパスが表示されます", CurrentLanguage);
 
         var categoryName = ItemUtils.GetCategoryName(
             CurrentPath.CurrentSelectedCategory,
@@ -1823,13 +1822,13 @@ internal sealed partial class MainForm : Form
 
         var item = CurrentPath.CurrentSelectedItem;
         if (item != null)
-            pathParts.Add(AEUtils.RemoveFormat(item.Title));
+            pathParts.Add(item.Title);
 
         var itemCategory = CurrentPath.CurrentSelectedItemCategory;
         if (itemCategory != null)
             pathParts.Add(LanguageUtils.Translate(itemCategory, CurrentLanguage));
 
-        return prefix + AEUtils.GenerateSeparatedPath(pathParts.ToArray());
+        return AEUtils.GenerateSeparatedPath(pathParts.ToArray());
     }
 
     /// <summary>

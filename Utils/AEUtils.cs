@@ -230,13 +230,6 @@ internal static class AEUtils
         return button;
     }
 
-    /// <summary>
-    /// 文字列からスペースを削除し、アンダースコアに変換します。
-    /// </summary>
-    /// <param name="str"></param>
-    /// <returns></returns>
-    internal static string RemoveFormat(string str) => str.Replace(' ', '_').Replace('/', '-');
-
 
     /// <summary>
     /// 起動時の引数から起動情報を取得します。
@@ -321,5 +314,5 @@ internal static class AEUtils
     /// 引数からスラッシュで区切られたパスを生成します。
     /// </summary>
     internal static string GenerateSeparatedPath(params string[] paths)
-        => string.Join(" / ", paths);
+        => string.Join(" > ", paths);
 }
