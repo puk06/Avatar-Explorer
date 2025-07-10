@@ -1382,18 +1382,24 @@ internal sealed partial class MainForm : Form
             .OrderByDescending(item =>
             {
                 var matchCount = 0;
+                var fieldsToSearch = new List<string>
+                {
+                    item.Title,
+                    item.AuthorName,
+                    item.ItemMemo,
+                    item.BoothId.ToString()
+                };
+
+                fieldsToSearch.AddRange(
+                    item.SupportedAvatar
+                        .Select(avatar => DatabaseUtils.GetAvatarNameFromPaths(Items, avatar))
+                        .Where(name => !string.IsNullOrEmpty(name))
+                );
+
                 foreach (var word in searchFilter.SearchWords)
                 {
-                    if (item.Title.Contains(word, StringComparison.CurrentCultureIgnoreCase)) matchCount++;
-                    if (item.AuthorName.Contains(word, StringComparison.CurrentCultureIgnoreCase)) matchCount++;
-                    if (item.SupportedAvatar.Any(avatar =>
-                    {
-                        var supportedAvatarName = DatabaseUtils.GetAvatarNameFromPaths(Items, avatar);
-                        if (supportedAvatarName == "") return false;
-                        return supportedAvatarName.Contains(word, StringComparison.CurrentCultureIgnoreCase);
-                    })) matchCount++;
-                    if (item.BoothId.ToString().Contains(word, StringComparison.CurrentCultureIgnoreCase)) matchCount++;
-                    if (item.ItemMemo.Contains(word, StringComparison.CurrentCultureIgnoreCase)) matchCount++;
+                    matchCount += fieldsToSearch.Count(field =>
+                        field.Contains(word, StringComparison.CurrentCultureIgnoreCase));
                 }
 
                 return matchCount;
