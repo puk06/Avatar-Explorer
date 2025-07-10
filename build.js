@@ -59,7 +59,6 @@ const LICENSE_FILES = [
     "../../../LICENSE.txt",
     "../../../THIRD_PARTY_LICENSES.txt"
 ];
-
 const LICENSE_DESTINATION = [
     "LICENSE.txt",
     "THIRD_PARTY_LICENSES.txt"
