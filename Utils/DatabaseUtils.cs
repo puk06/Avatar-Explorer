@@ -157,7 +157,7 @@ internal static class DatabaseUtils
     /// <param name="items"></param>
     /// <param name="path"></param>
     /// <returns></returns>
-    internal static string GetAvatarNameFromPath(List<Item> items, string? path)
+    internal static string GetAvatarNameFromPaths(List<Item> items, string? path)
     {
         if (string.IsNullOrEmpty(path)) return "";
         var item = items.FirstOrDefault(x => x.ItemPath == path);
@@ -169,7 +169,7 @@ internal static class DatabaseUtils
     /// </summary>
     /// <param name="items"></param>
     /// <param name="oldPath"></param>
-    internal static void ChangeAllItemPath(ref List<Item> items, string oldPath)
+    internal static void ChangeAllItemPaths(ref List<Item> items, string oldPath)
     {
         foreach (var item in items)
         {
@@ -195,7 +195,7 @@ internal static class DatabaseUtils
     /// <param name="items"></param>
     /// <param name="avatarPath"></param>
     /// <param name="deleteFromSupported"></param>
-    internal static void DeleteAvatarFromItem(ref List<Item> items, string avatarPath, bool deleteFromSupported)
+    internal static void DeleteAvatarFromItems(ref List<Item> items, string avatarPath, bool deleteFromSupported)
     {
         foreach (var item in items)
         {
@@ -241,7 +241,6 @@ internal static class DatabaseUtils
             }
         }
     }
-
 
     /// <summary>
     /// 空の登録日時と更新日時を現在の日時で埋めます。
@@ -312,7 +311,7 @@ internal static class DatabaseUtils
         {
             return item.SupportedAvatar.Any(supportedAvatar =>
             {
-                var supportedAvatarName = GetAvatarNameFromPath(items, supportedAvatar);
+                var supportedAvatarName = GetAvatarNameFromPaths(items, supportedAvatar);
                 if (supportedAvatarName == "") return false;
                 return supportedAvatarName.Contains(avatar, StringComparison.CurrentCultureIgnoreCase);
             });
@@ -362,7 +361,7 @@ internal static class DatabaseUtils
         {
             return item.ImplementedAvatars.Any(implementedAvatar =>
             {
-                var implementedAvatarName = GetAvatarNameFromPath(items, implementedAvatar);
+                var implementedAvatarName = GetAvatarNameFromPaths(items, implementedAvatar);
                 if (implementedAvatarName == "") return false;
                 return implementedAvatarName.Contains(avatar, StringComparison.CurrentCultureIgnoreCase);
             });
