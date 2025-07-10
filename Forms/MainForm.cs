@@ -2077,12 +2077,11 @@ internal sealed partial class MainForm : Form
         if (startLabelVisible)
         {
             _leftWindow = LeftWindow.Default;
-            CurrentPath = new CurrentPath();
             _openingWindow = Window.Nothing;
+            CurrentPath = new CurrentPath();
         }
 
-        var controls = AvatarItemExplorer.Controls.Cast<Control>().ToList();
-        controls.Reverse();
+        var controls = AvatarItemExplorer.Controls.Cast<Control>().Reverse().ToList();
 
         AvatarItemExplorer.SuspendLayout();
         AvatarItemExplorer.AutoScroll = false;
