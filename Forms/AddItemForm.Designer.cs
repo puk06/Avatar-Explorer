@@ -59,7 +59,7 @@ namespace Avatar_Explorer.Forms
             // label1
             // 
             label1.AutoSize = true;
-            label1.Font = new Font(_mainForm.GuiFont, 12F, FontStyle.Bold);
+            label1.Font = new Font(_mainForm.GuiFont, 12F);
             label1.Location = new Point(17, 85);
             label1.Name = "label1";
             label1.Size = new Size(74, 23);
@@ -69,7 +69,7 @@ namespace Avatar_Explorer.Forms
             // label2
             // 
             label2.AutoSize = true;
-            label2.Font = new Font(_mainForm.GuiFont, 12F, FontStyle.Bold);
+            label2.Font = new Font(_mainForm.GuiFont, 12F);
             label2.Location = new Point(18, 162);
             label2.Name = "label2";
             label2.Size = new Size(94, 23);
@@ -120,7 +120,7 @@ namespace Avatar_Explorer.Forms
             // label4
             // 
             label4.AutoSize = true;
-            label4.Font = new Font(_mainForm.GuiFont, 12F, FontStyle.Bold);
+            label4.Font = new Font(_mainForm.GuiFont, 12F);
             label4.Location = new Point(17, 332);
             label4.Name = "label4";
             label4.Size = new Size(58, 23);
@@ -141,7 +141,7 @@ namespace Avatar_Explorer.Forms
             // label5
             // 
             label5.AutoSize = true;
-            label5.Font = new Font(_mainForm.GuiFont, 12F, FontStyle.Bold);
+            label5.Font = new Font(_mainForm.GuiFont, 12F);
             label5.Location = new Point(16, 378);
             label5.Name = "label5";
             label5.Size = new Size(105, 23);
@@ -183,7 +183,7 @@ namespace Avatar_Explorer.Forms
             // label6
             // 
             label6.AutoSize = true;
-            label6.Font = new Font(_mainForm.GuiFont, 12F, FontStyle.Bold);
+            label6.Font = new Font(_mainForm.GuiFont, 12F);
             label6.Location = new Point(17, 294);
             label6.Name = "label6";
             label6.Size = new Size(42, 23);
@@ -193,7 +193,7 @@ namespace Avatar_Explorer.Forms
             // label7
             // 
             label7.AutoSize = true;
-            label7.Font = new Font(_mainForm.GuiFont, 12F, FontStyle.Bold);
+            label7.Font = new Font(_mainForm.GuiFont, 12F);
             label7.Location = new Point(17, 258);
             label7.Name = "label7";
             label7.Size = new Size(74, 23);
@@ -213,7 +213,7 @@ namespace Avatar_Explorer.Forms
             // ErrorLabel
             // 
             ErrorLabel.AutoSize = true;
-            ErrorLabel.Font = new Font(_mainForm.GuiFont, 11F, FontStyle.Bold);
+            ErrorLabel.Font = new Font(_mainForm.GuiFont, 11F);
             ErrorLabel.ForeColor = Color.Red;
             ErrorLabel.Location = new Point(17, 435);
             ErrorLabel.Name = "ErrorLabel";
@@ -255,7 +255,7 @@ namespace Avatar_Explorer.Forms
             // label9
             // 
             label9.AutoSize = true;
-            label9.Font = new Font(_mainForm.GuiFont, 9.3F, FontStyle.Bold);
+            label9.Font = new Font(_mainForm.GuiFont, 9.3F);
             label9.Location = new Point(19, 52);
             label9.Name = "label9";
             label9.Size = new Size(464, 19);
@@ -287,7 +287,7 @@ namespace Avatar_Explorer.Forms
             // label10
             // 
             label10.AutoSize = true;
-            label10.Font = new Font(_mainForm.GuiFont, 12F, FontStyle.Bold);
+            label10.Font = new Font(_mainForm.GuiFont, 12F);
             label10.Location = new Point(17, 122);
             label10.Name = "label10";
             label10.Size = new Size(90, 23);
