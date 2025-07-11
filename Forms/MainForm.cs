@@ -3034,6 +3034,8 @@ internal sealed partial class MainForm : Form
             }
         }
 
+        DatabaseUtils.CheckMissingCustomCategories(Items, ref CustomCategories, CurrentLanguage);
+
         SearchBox.Text = "";
         SearchResultLabel.Text = "";
         _isSearching = false;
