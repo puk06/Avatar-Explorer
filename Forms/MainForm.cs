@@ -665,7 +665,11 @@ internal sealed partial class MainForm : Form
             (_, _) => _currentPageAvatar++,
             (_, _) => _currentPageAvatar = 0,
             (_, _) => _currentPageAvatar = TabPageUtils.GetTotalPages(totalCount, _itemsPerPage) - 1,
-            (_, _) => GenerateAvatarList(false)
+            (sender, _) => 
+            {
+                if (sender is int pageCount) _currentPageAvatar = pageCount;
+                GenerateAvatarList(false);
+            }
         );
 
         AvatarPage.ResumeLayout();
@@ -777,7 +781,11 @@ internal sealed partial class MainForm : Form
             (_, _) => _currentPageAuthor++,
             (_, _) => _currentPageAuthor = 0,
             (_, _) => _currentPageAuthor = TabPageUtils.GetTotalPages(totalCount, _itemsPerPage) - 1,
-            (_, _) => GenerateAuthorList(false)
+            (sender, _) =>
+            {
+                if (sender is int pageCount) _currentPageAuthor = pageCount;
+                GenerateAuthorList(false);
+            }
         );
 
         AvatarAuthorPage.ResumeLayout();
@@ -1401,7 +1409,11 @@ internal sealed partial class MainForm : Form
             (_, _) => _currentPage++,
             (_, _) => _currentPage = 0,
             (_, _) => _currentPage = TabPageUtils.GetTotalPages(totalCount, _itemsPerPage) - 1,
-            (_, _) => GenerateItems(false)
+            (sender, _) =>
+            {
+                if (sender is int pageCount) _currentPage = pageCount;
+                GenerateItems(false);
+            }
         );
 
         AvatarItemExplorer.ResumeLayout();
@@ -1563,7 +1575,11 @@ internal sealed partial class MainForm : Form
             (_, _) => _currentPage++,
             (_, _) => _currentPage = 0,
             (_, _) => _currentPage = TabPageUtils.GetTotalPages(totalCount, _itemsPerPage) - 1,
-            (_, _) => GenerateItemFiles(false)
+            (sender, _) =>
+            {
+                if (sender is int pageCount) _currentPage = pageCount;
+                GenerateItemFiles(false);
+            }
         );
 
         AvatarItemExplorer.ResumeLayout();
@@ -1927,7 +1943,11 @@ internal sealed partial class MainForm : Form
             (_, _) => _currentPage++,
             (_, _) => _currentPage = 0,
             (_, _) => _currentPage = TabPageUtils.GetTotalPages(totalCount, _itemsPerPage) - 1,
-            (_, _) => GenerateFilteredItem(searchFilter, false)
+            (sender, _) =>
+            {
+                if (sender is int pageCount) _currentPage = pageCount;
+                GenerateFilteredItem(searchFilter, false);
+            }
         );
 
         AvatarItemExplorer.ResumeLayout();
@@ -2024,7 +2044,11 @@ internal sealed partial class MainForm : Form
             (_, _) => _currentPage++,
             (_, _) => _currentPage = 0,
             (_, _) => _currentPage = TabPageUtils.GetTotalPages(totalCount, _itemsPerPage) - 1,
-            (_, _) => GenerateFilteredFolderItems(searchWords, false)
+            (sender, _) =>
+            {
+                if (sender is int pageCount) _currentPage = pageCount;
+                GenerateFilteredFolderItems(searchWords, false);
+            }
         );
 
         AvatarItemExplorer.ResumeLayout();

@@ -54,6 +54,59 @@ internal static class TabPageUtils
         Size labelSize = TextRenderer.MeasureText(pageInfoLabel.Text, pageInfoLabel.Font);
         pageInfoLabel.Location = GetLabelLocation(tabPage.Width, labelSize, baseYLocation + (small ? 0 : 2));
 
+        pageInfoLabel.Click += (s, e) =>
+        {
+            TextBox inputBox = new()
+            {
+                Font = pageInfoLabel.Font,
+                Size = new Size(50, pageInfoLabel.Font.Height + 10),
+                Location = new Point((tabPage.Width - 50 - 60) / 2, pageInfoLabel.Location.Y + (pageInfoLabel.Font.Height / 2) - 3),
+                TextAlign = HorizontalAlignment.Center
+            };
+
+            Button goButton = new()
+            {
+                Text = LanguageUtils.Translate("移動", currentLanguage),
+                Font = pageInfoLabel.Font,
+                Size = new Size(60, inputBox.Height),
+                Location = new Point(inputBox.Right + 5,inputBox.Top)
+            };
+
+            void DoNavigation()
+            {
+                tabPage.Controls.Remove(inputBox);
+                tabPage.Controls.Remove(goButton);
+                pageInfoLabel.Visible = true;
+
+                if (int.TryParse(inputBox.Text, out int targetPage))
+                {
+                    targetPage--;
+                    Reload?.Invoke(targetPage, EventArgs.Empty);
+                }
+            }
+
+            inputBox.KeyDown += (s2, e2) =>
+            {
+                if (e2.KeyCode == Keys.Enter)
+                {
+                    DoNavigation();
+                }
+                else if (e2.KeyCode == Keys.Escape)
+                {
+                    tabPage.Controls.Remove(inputBox);
+                    tabPage.Controls.Remove(goButton);
+                    pageInfoLabel.Visible = true;
+                }
+            };
+
+            goButton.Click += (s2, e2) => DoNavigation();
+
+            tabPage.Controls.Add(inputBox);
+            tabPage.Controls.Add(goButton);
+            pageInfoLabel.Visible = false;
+            inputBox.Focus();
+        };
+
         if (enableFirstButton || enableBackButton || enableNextButton || enableLastButton)
         {
             tabPage.Controls.Add(pageInfoLabel);

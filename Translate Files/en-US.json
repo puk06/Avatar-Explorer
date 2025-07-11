@@ -168,5 +168,6 @@
   "このバックアップを復元": "Restore this backup",
   "バックアップデータの取得に失敗しました": "Failed to retrieve backup data",
   "ページ": " Page",
-  "無効なページ": "Invalid page"
+  "無効なページ": "Invalid page",
+  "移動": "Go"
 }
