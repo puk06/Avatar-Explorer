@@ -3072,9 +3072,9 @@ internal sealed partial class MainForm : Form
         var previousFont = control.Font;
         var familyName = previousFont.FontFamily.Name;
         if (familyName == "Yu Gothic UI") return;
-        var previousSize = control.Font.Size;
+        var previousSize = previousFont.Size;
         if (previousSize is <= 0 or >= float.MaxValue) return;
-        control.Font = new Font(GuiFont, previousSize, FontStyle.Bold);
+        control.Font = new Font(GuiFont, previousSize, previousFont.Style);
     }
 
     /// <summary>

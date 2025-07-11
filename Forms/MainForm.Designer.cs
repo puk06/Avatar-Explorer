@@ -199,7 +199,7 @@ namespace Avatar_Explorer.Forms
             // SearchResultLabel
             // 
             SearchResultLabel.AutoSize = true;
-            SearchResultLabel.Font = new Font(GuiFont, 10F, FontStyle.Bold);
+            SearchResultLabel.Font = new Font(GuiFont, 10F);
             SearchResultLabel.Location = new Point(930, 45);
             SearchResultLabel.Name = "SearchResultLabel";
             SearchResultLabel.Size = new Size(0, 20);

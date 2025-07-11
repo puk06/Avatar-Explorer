@@ -89,7 +89,7 @@ namespace Avatar_Explorer.Forms
             // FolderTextBox
             // 
             FolderTextBox.AllowDrop = true;
-            FolderTextBox.Font = new Font(_mainForm.GuiFont, 12F, FontStyle.Bold);
+            FolderTextBox.Font = new Font(_mainForm.GuiFont, 12F);
             FolderTextBox.Location = new Point(121, 82);
             FolderTextBox.Name = "FolderTextBox";
             FolderTextBox.Size = new Size(227, 31);
@@ -100,7 +100,7 @@ namespace Avatar_Explorer.Forms
             // 
             // BoothURLTextBox
             // 
-            BoothURLTextBox.Font = new Font(_mainForm.GuiFont, 12F, FontStyle.Bold);
+            BoothURLTextBox.Font = new Font(_mainForm.GuiFont, 12F);
             BoothURLTextBox.Location = new Point(120, 159);
             BoothURLTextBox.Name = "BoothURLTextBox";
             BoothURLTextBox.Size = new Size(415, 31);
@@ -161,7 +161,7 @@ namespace Avatar_Explorer.Forms
             // AuthorTextBox
             // 
             AuthorTextBox.Enabled = false;
-            AuthorTextBox.Font = new Font(_mainForm.GuiFont, 10F, FontStyle.Bold);
+            AuthorTextBox.Font = new Font(_mainForm.GuiFont, 10F);
             AuthorTextBox.Location = new Point(128, 294);
             AuthorTextBox.Name = "AuthorTextBox";
             AuthorTextBox.Size = new Size(407, 27);
@@ -172,7 +172,7 @@ namespace Avatar_Explorer.Forms
             // TitleTextBox
             // 
             TitleTextBox.Enabled = false;
-            TitleTextBox.Font = new Font(_mainForm.GuiFont, 10F, FontStyle.Bold);
+            TitleTextBox.Font = new Font(_mainForm.GuiFont, 10F);
             TitleTextBox.Location = new Point(128, 258);
             TitleTextBox.Name = "TitleTextBox";
             TitleTextBox.Size = new Size(407, 27);
@@ -204,7 +204,7 @@ namespace Avatar_Explorer.Forms
             // 
             label8.AutoSize = true;
             label8.Font = new Font(_mainForm.GuiFont, 18F, FontStyle.Bold);
-            label8.Location = new Point(21, 213);
+            label8.Location = new Point(12, 213);
             label8.Name = "label8";
             label8.Size = new Size(232, 35);
             label8.TabIndex = 15;
@@ -275,7 +275,7 @@ namespace Avatar_Explorer.Forms
             // MaterialTextBox
             // 
             MaterialTextBox.AllowDrop = true;
-            MaterialTextBox.Font = new Font(_mainForm.GuiFont, 12F, FontStyle.Bold);
+            MaterialTextBox.Font = new Font(_mainForm.GuiFont, 12F);
             MaterialTextBox.Location = new Point(120, 119);
             MaterialTextBox.Name = "MaterialTextBox";
             MaterialTextBox.Size = new Size(326, 31);
@@ -297,7 +297,7 @@ namespace Avatar_Explorer.Forms
             // otherFolderCount
             // 
             otherFolderCount.AutoSize = true;
-            otherFolderCount.Font = new Font(_mainForm.GuiFont, 12F, FontStyle.Bold);
+            otherFolderCount.Font = new Font(_mainForm.GuiFont, 12F);
             otherFolderCount.Location = new Point(350, 85);
             otherFolderCount.Name = "otherFolderCount";
             otherFolderCount.Size = new Size(0, 23);

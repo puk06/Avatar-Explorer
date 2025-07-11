@@ -67,7 +67,7 @@
             // 
             // SelectBackup
             // 
-            SelectBackup.Font = new Font(_mainForm.GuiFont, 11F, FontStyle.Bold);
+            SelectBackup.Font = new Font(_mainForm.GuiFont, 11F);
             SelectBackup.FormattingEnabled = true;
             SelectBackup.Location = new Point(12, 85);
             SelectBackup.Name = "SelectBackup";
@@ -78,7 +78,7 @@
             // 
             // SelectButton
             // 
-            SelectButton.Font = new Font(_mainForm.GuiFont, 10F, FontStyle.Bold);
+            SelectButton.Font = new Font(_mainForm.GuiFont, 10F);
             SelectButton.Location = new Point(84, 236);
             SelectButton.Name = "SelectButton";
             SelectButton.Size = new Size(184, 53);

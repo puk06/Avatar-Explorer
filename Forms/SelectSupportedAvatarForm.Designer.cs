@@ -61,10 +61,10 @@ namespace Avatar_Explorer.Forms
             // tabControl1
             // 
             tabControl1.Controls.Add(AvatarList);
-            tabControl1.Location = new Point(12, 54);
+            tabControl1.Location = new Point(12, 65);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(1019, 502);
+            tabControl1.Size = new Size(1019, 495);
             tabControl1.TabIndex = 3;
             // 
             // AvatarList
