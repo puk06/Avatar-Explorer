@@ -38,8 +38,16 @@ internal static class DatabaseUtils
     /// <param name="items"></param>
     internal static void SaveItemsData(List<Item> items)
     {
-        string json = JsonSerializer.Serialize(items, jsonSerializerOptions);
-        File.WriteAllText("./Datas/ItemsData.json", json);
+        try
+        {
+            string json = JsonSerializer.Serialize(items, jsonSerializerOptions);
+            File.WriteAllText("./Datas/ItemsData.json", json);
+        }
+        catch (Exception ex)
+        {
+            FormUtils.ShowMessageBox("アイテムデータの保存に失敗しました。詳細はErrorLog.txtをご覧ください。", "エラー", true);
+            LogUtils.ErrorLogger("アイテムデータの保存に失敗しました", ex);
+        }
     }
 
     /// <summary>
@@ -57,8 +65,10 @@ internal static class DatabaseUtils
             string json = File.ReadAllText(path);
             return JsonSerializer.Deserialize<List<CommonAvatar>>(json) ?? [];
         }
-        catch
+        catch (Exception ex)
         {
+            FormUtils.ShowMessageBox("共通素体データの読み込みに失敗しました。詳細はErrorLog.txtをご覧ください。", "エラー", true);
+            LogUtils.ErrorLogger("共通素体データの読み込みに失敗しました", ex);
             return [];
         }
     }
@@ -69,8 +79,16 @@ internal static class DatabaseUtils
     /// <param name="commonAvatars"></param>
     internal static void SaveCommonAvatarData(List<CommonAvatar> commonAvatars)
     {
-        string json = JsonSerializer.Serialize(commonAvatars, jsonSerializerOptions);
-        File.WriteAllText("./Datas/CommonAvatar.json", json);
+        try
+        {
+            string json = JsonSerializer.Serialize(commonAvatars, jsonSerializerOptions);
+            File.WriteAllText("./Datas/CommonAvatar.json", json);
+        }
+        catch (Exception ex)
+        {
+            FormUtils.ShowMessageBox("共通素体データの保存に失敗しました。詳細はErrorLog.txtをご覧ください。", "エラー", true);
+            LogUtils.ErrorLogger("共通素体データの保存に失敗しました", ex);
+        }
     }
 
     /// <summary>
@@ -100,8 +118,10 @@ internal static class DatabaseUtils
 
             return categories;
         }
-        catch
+        catch (Exception ex)
         {
+            FormUtils.ShowMessageBox("カスタムカテゴリデータの読み込みに失敗しました。詳細はErrorLog.txtをご覧ください。", "エラー", true);
+            LogUtils.ErrorLogger("カスタムカテゴリデータの読み込みに失敗しました", ex);
             return [];
         }
     }
@@ -124,7 +144,8 @@ internal static class DatabaseUtils
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[SaveCustomCategoriesData] 保存失敗: {ex.Message}");
+            FormUtils.ShowMessageBox("カスタムカテゴリデータの保存に失敗しました。詳細はErrorLog.txtをご覧ください。", "エラー", true);
+            LogUtils.ErrorLogger("カスタムカテゴリデータの保存に失敗しました", ex);
         }
     }
 
