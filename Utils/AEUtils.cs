@@ -19,15 +19,22 @@ internal static partial class AEUtils
     {
         Interval = 200
     };
-    private static object? _lastScrollSender;
+    private static readonly HashSet<object> _pendingScrollSenders = new();
 
     static AEUtils()
     {
         ThumbnailUpdateTimer.Tick += (s, e) =>
         {
             ThumbnailUpdateTimer.Stop();
-            if (_lastScrollSender == null) return;
-            UpdateExplorerThumbnails(_lastScrollSender);
+            if (_pendingScrollSenders.Count == 0) return;
+
+            var toProcess = _pendingScrollSenders.ToList();
+            _pendingScrollSenders.Clear();
+
+            foreach (var sender in toProcess)
+            {
+                UpdateExplorerThumbnails(sender);
+            }
         };
     }
 
@@ -38,7 +45,10 @@ internal static partial class AEUtils
     /// <param name="e"></param>
     internal static void OnScroll(object sender, EventArgs e)
     {
-        _lastScrollSender = sender;
+        lock (_pendingScrollSenders)
+        {
+            _pendingScrollSenders.Add(sender);
+        }
         ThumbnailUpdateTimer.Stop();
         ThumbnailUpdateTimer.Start();
     }
