@@ -2948,7 +2948,7 @@ internal sealed partial class MainForm : Form
                     LanguageUtils.Translate("Šm”F", CurrentLanguage)
                 );
 
-                if (result2)
+                if (!result2)
                 {
                     SearchBox.Text = "";
                     SearchResultLabel.Text = "";
