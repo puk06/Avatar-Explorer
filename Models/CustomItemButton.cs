@@ -11,6 +11,8 @@ internal class CustomItemButton : Button
     private PictureBox? _previewPictureBox;
     private Image? _loadedPicture;
 
+    internal float PreviewScale { get; set; } = 1.0f;
+
     internal string? ImagePath { get; set; }
 
     internal string TitleText
@@ -140,7 +142,7 @@ internal class CustomItemButton : Button
             {
                 FormBorderStyle = FormBorderStyle.None,
                 StartPosition = FormStartPosition.Manual,
-                Size = new Size(200, 200),
+                Size = new Size((int)(200 * PreviewScale), (int)(200 * PreviewScale)),
                 BackColor = Color.Black,
                 ShowInTaskbar = false,
                 TopMost = true

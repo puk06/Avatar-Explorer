@@ -12,7 +12,7 @@ const files = [
 files.forEach(({ path, replacement }) => {
     try {
         const data = fs.readFileSync(path, "utf-8");
-        const replacedData = data.replace(new RegExp(`"${target}"`, "g"), `"Noto Sans JP"`);
+        const replacedData = data.replace(new RegExp(`"${replacement}"`, "g"), `"Noto Sans JP"`);
         fs.writeFileSync(path, replacedData);
         console.log(`Replaced in ${path}`);
     } catch (err) {

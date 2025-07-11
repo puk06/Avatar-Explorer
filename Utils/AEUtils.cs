@@ -10,8 +10,11 @@ using Timer = System.Windows.Forms.Timer;
 
 namespace Avatar_Explorer.Utils;
 
-internal static class AEUtils
+internal static partial class AEUtils
 {
+    [GeneratedRegex(@"(?<key>Author|Title|Booth|Avatar|Category|Memo|Folder|File|Implemented)=(?:""(?<value>.*?)""|(?<value>[^\s]+))|(?<word>[^\s]+)")]
+    private static partial Regex SearchFilterRegex();
+
     private static readonly Timer _thumbnailUpdateTimer = new()
     {
         Interval = 200
@@ -214,17 +217,19 @@ internal static class AEUtils
     /// <param name="tooltip"></param>
     /// <param name="listWidthDiff"></param>
     /// <returns></returns>
-    internal static CustomItemButton CreateButton(string? imagePath, string labelTitle, string? description, bool @short = false, string tooltip = "", int listWidthDiff = 0)
+    internal static CustomItemButton CreateButton(float previewScale, string? imagePath, string labelTitle, string? description, bool @short = false, string tooltip = "", int listWidthDiff = 0)
     {
         var buttonWidth = @short ? 303 : 874;
         if (listWidthDiff != 0) buttonWidth += listWidthDiff;
+
         CustomItemButton button = new(buttonWidth)
         {
+            PreviewScale = previewScale,
             ImagePath = imagePath,
             TitleText = labelTitle
         };
 
-        if (description != null) button.AuthorName = description;
+        if (!string.IsNullOrEmpty(description)) button.AuthorName = description;
         if (!string.IsNullOrEmpty(tooltip)) button.ToolTipText = tooltip;
 
         return button;
@@ -260,7 +265,7 @@ internal static class AEUtils
     internal static SearchFilter GetSearchFilter(string searchWord)
     {
         var searchFilter = new SearchFilter();
-        var regex = new Regex(@"(?<key>Author|Title|Booth|Avatar|Category|Memo|Folder|File|Implemented)=(?:""(?<value>.*?)""|(?<value>[^\s]+))|(?<word>[^\s]+)");
+        var regex = SearchFilterRegex();
         var matches = regex.Matches(searchWord);
 
         foreach (Match match in matches)
