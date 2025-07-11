@@ -52,7 +52,7 @@ internal static class TabPageUtils
         };
 
         Size labelSize = TextRenderer.MeasureText(pageInfoLabel.Text, pageInfoLabel.Font);
-        pageInfoLabel.Location = GetLabelLocation(tabPage.Width, labelSize, baseYLocation + 4);
+        pageInfoLabel.Location = GetLabelLocation(tabPage.Width, labelSize, baseYLocation + (small ? 0 : 2));
 
         if (enableFirstButton || enableBackButton || enableNextButton || enableLastButton)
         {
