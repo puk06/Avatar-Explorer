@@ -18,16 +18,17 @@ internal static class DatabaseUtils
     /// <returns></returns>
     internal static List<Item> LoadItemsData(string path = "./Datas/ItemsData.json")
     {
+        if (!File.Exists(path))
+            return [];
+
         try
         {
-            if (!File.Exists(path)) return new List<Item>();
-            using var sr = new StreamReader(path);
-            var data = JsonSerializer.Deserialize<List<Item>>(sr.ReadToEnd());
-            return data ?? new List<Item>();
+            string json = File.ReadAllText(path);
+            return JsonSerializer.Deserialize<List<Item>>(json) ?? [];
         }
         catch
         {
-            return new List<Item>();
+            return [];
         }
     }
 
@@ -37,8 +38,8 @@ internal static class DatabaseUtils
     /// <param name="items"></param>
     internal static void SaveItemsData(List<Item> items)
     {
-        using var sw = new StreamWriter("./Datas/ItemsData.json");
-        sw.Write(JsonSerializer.Serialize(items, jsonSerializerOptions));
+        string json = JsonSerializer.Serialize(items, jsonSerializerOptions);
+        File.WriteAllText("./Datas/ItemsData.json", json);
     }
 
     /// <summary>
@@ -48,16 +49,17 @@ internal static class DatabaseUtils
     /// <returns></returns>
     internal static List<CommonAvatar> LoadCommonAvatarData(string path = "./Datas/CommonAvatar.json")
     {
+        if (!File.Exists(path))
+            return [];
+
         try
         {
-            if (!File.Exists(path)) return new List<CommonAvatar>();
-            using var sr = new StreamReader(path);
-            var data = JsonSerializer.Deserialize<List<CommonAvatar>>(sr.ReadToEnd());
-            return data ?? new List<CommonAvatar>();
+            string json = File.ReadAllText(path);
+            return JsonSerializer.Deserialize<List<CommonAvatar>>(json) ?? [];
         }
         catch
         {
-            return new List<CommonAvatar>();
+            return [];
         }
     }
 
@@ -67,8 +69,8 @@ internal static class DatabaseUtils
     /// <param name="commonAvatars"></param>
     internal static void SaveCommonAvatarData(List<CommonAvatar> commonAvatars)
     {
-        using var sw = new StreamWriter("./Datas/CommonAvatar.json");
-        sw.Write(JsonSerializer.Serialize(commonAvatars, jsonSerializerOptions));
+        string json = JsonSerializer.Serialize(commonAvatars, jsonSerializerOptions);
+        File.WriteAllText("./Datas/CommonAvatar.json", json);
     }
 
     /// <summary>
@@ -77,16 +79,31 @@ internal static class DatabaseUtils
     /// <returns></returns>
     internal static List<string> LoadCustomCategoriesData(string path = "./Datas/CustomCategory.txt", bool createNewFile = true)
     {
-        if (!File.Exists(path))
+        try
         {
-            if (createNewFile) File.Create(path).Close();
-            return new List<string>();
+            if (!File.Exists(path))
+            {
+                if (createNewFile)
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+                    File.WriteAllText(path, "", Encoding.UTF8);
+                }
+
+                return [];
+            }
+
+            var categories = File.ReadAllLines(path, Encoding.UTF8)
+                .Select(line => line.Trim())
+                .Where(line => !string.IsNullOrEmpty(line))
+                .Distinct()
+                .ToList();
+
+            return categories;
         }
-
-        var categories = File.ReadAllLines(path, Encoding.UTF8).ToList();
-        categories.RemoveAll(string.IsNullOrEmpty);
-
-        return categories;
+        catch
+        {
+            return [];
+        }
     }
 
     /// <summary>
@@ -95,10 +112,19 @@ internal static class DatabaseUtils
     /// <param name="customCategories"></param>
     internal static void SaveCustomCategoriesData(List<string> customCategories)
     {
-        using var sw = new StreamWriter("./Datas/CustomCategory.txt", false, Encoding.UTF8);
-        foreach (var category in customCategories)
+        try
         {
-            sw.WriteLine(category);
+            Directory.CreateDirectory("./Datas");
+
+            File.WriteAllLines(
+                "./Datas/CustomCategory.txt",
+                customCategories.Distinct().Where(c => !string.IsNullOrWhiteSpace(c)),
+                Encoding.UTF8
+            );
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[SaveCustomCategoriesData] 保存失敗: {ex.Message}");
         }
     }
 

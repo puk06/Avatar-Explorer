@@ -1,4 +1,6 @@
-﻿namespace Avatar_Explorer.Utils;
+﻿using System.Text;
+
+namespace Avatar_Explorer.Utils;
 
 internal class ConfigurationManager
 {
@@ -72,12 +74,25 @@ internal class ConfigurationManager
 
     private void Save(string path)
     {
-        using StreamWriter writer = new(path);
-        foreach (var kvp in _data)
+        try
         {
-            writer.WriteLine(_defaultKeysDescriptions[kvp.Key]);
-            writer.WriteLine($"{kvp.Key} = {kvp.Value}");
-            writer.WriteLine();
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+
+            using StreamWriter writer = new(path, false, Encoding.UTF8);
+            foreach (var kvp in _data)
+            {
+                if (_defaultKeysDescriptions.TryGetValue(kvp.Key, out var description))
+                {
+                    writer.WriteLine(description);
+                }
+
+                writer.WriteLine($"{kvp.Key} = {kvp.Value}");
+                writer.WriteLine();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Save] 設定保存エラー: {ex.Message}");
         }
     }
 }
