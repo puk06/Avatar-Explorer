@@ -1,4 +1,4 @@
-﻿namespace Avatar_Explorer.Utils;
+namespace Avatar_Explorer.Utils;
 
 internal static class TabPageUtils
 {
@@ -23,7 +23,7 @@ internal static class TabPageUtils
     )
     {
         int totalPages = (int)Math.Ceiling((double)totalCount / itemsPerPage);
-        int start = pageCount * itemsPerPage + 1;
+        int start = (pageCount * itemsPerPage) + 1;
         int end = Math.Min(start + itemsPerPage - 1, totalCount);
 
         bool enableFirstButton = pageCount != 0;
