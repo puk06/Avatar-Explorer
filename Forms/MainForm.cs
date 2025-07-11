@@ -214,8 +214,11 @@ internal sealed partial class MainForm : Form
             CommonAvatars = DatabaseUtils.LoadCommonAvatarData();
             CustomCategories = DatabaseUtils.LoadCustomCategoriesData();
 
+            // Fix Item Relative Path
+            DatabaseUtils.FixItemRelativePaths(ref Items);
+
             // Fix Supported Avatar Path (Title => Path)
-            DatabaseUtils.FixSupportedAvatarPath(ref Items);
+            DatabaseUtils.FixSupportedAvatarPaths(ref Items);
 
             // Update Empty Dates
             DatabaseUtils.UpdateEmptyDates(ref Items);
@@ -224,7 +227,7 @@ internal sealed partial class MainForm : Form
             DatabaseUtils.FixItemDates(ref Items);
 
             // Fix Relative Path Escape
-            DatabaseUtils.FixRelativePathEscape(ref Items);
+            DatabaseUtils.FixRelativePathEscapes(ref Items);
 
             AddFontFile();
             InitializeComponent();
@@ -2806,10 +2809,11 @@ internal sealed partial class MainForm : Form
                 else
                 {
                     Items = DatabaseUtils.LoadItemsData(filePath);
-                    DatabaseUtils.FixSupportedAvatarPath(ref Items);
+                    DatabaseUtils.FixItemRelativePaths(ref Items);
+                    DatabaseUtils.FixSupportedAvatarPaths(ref Items);
                     DatabaseUtils.UpdateEmptyDates(ref Items);
                     DatabaseUtils.FixItemDates(ref Items);
-                    DatabaseUtils.FixRelativePathEscape(ref Items);
+                    DatabaseUtils.FixRelativePathEscapes(ref Items);
                     DatabaseUtils.SaveItemsData(Items);
                 }
 
@@ -2887,10 +2891,11 @@ internal sealed partial class MainForm : Form
                 else
                 {
                     Items = DatabaseUtils.LoadItemsData(filePath);
-                    DatabaseUtils.FixSupportedAvatarPath(ref Items);
+                    DatabaseUtils.FixItemRelativePaths(ref Items);
+                    DatabaseUtils.FixSupportedAvatarPaths(ref Items);
                     DatabaseUtils.UpdateEmptyDates(ref Items);
                     DatabaseUtils.FixItemDates(ref Items);
-                    DatabaseUtils.FixRelativePathEscape(ref Items);
+                    DatabaseUtils.FixRelativePathEscapes(ref Items);
                     DatabaseUtils.SaveItemsData(Items);
                 }
 

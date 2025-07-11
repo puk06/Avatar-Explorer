@@ -265,7 +265,36 @@ internal static class DatabaseUtils
         }
     }
 
-    internal static void FixRelativePathEscape(ref List<Item> items)
+    /// <summary>
+    /// アイテムパスの絶対パスが./Datasと同じだった場合、自動で相対パスに変換するものです。
+    /// </summary>
+    /// <param name="items"></param>
+    internal static void FixItemRelativePaths(ref List<Item> items)
+    {
+        string currentDirectory = Path.GetFullPath(".");
+
+        foreach (var item in items)
+        {
+            if (string.IsNullOrEmpty(item.ItemPath)) continue;
+
+            string fullItemPath = Path.GetFullPath(item.ItemPath);
+
+            string datasFolder = Path.Combine(currentDirectory, "Datas");
+            string datasFolderFull = Path.GetFullPath(datasFolder);
+
+            if (fullItemPath.StartsWith(datasFolderFull, StringComparison.OrdinalIgnoreCase))
+            {
+                string relativePath = Path.GetRelativePath(currentDirectory, fullItemPath);
+                item.ItemPath = FixPath(relativePath);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 相対パスのエスケープを直してくれます。
+    /// </summary>
+    /// <param name="items"></param>
+    internal static void FixRelativePathEscapes(ref List<Item> items)
     {
         foreach (var item in items)
         {
@@ -378,7 +407,7 @@ internal static class DatabaseUtils
     /// </summary>
     /// <param name="items"></param>
     /// <returns></returns>
-    internal static void FixSupportedAvatarPath(ref List<Item> items)
+    internal static void FixSupportedAvatarPaths(ref List<Item> items)
     {
         var avatars = items.Where(x => x.Type == ItemType.Avatar).ToArray();
         foreach (var item in items)
