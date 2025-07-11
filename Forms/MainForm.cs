@@ -498,11 +498,11 @@ internal sealed partial class MainForm : Form
                 (_, _) =>
                 {
                     var previousMemo = item.ItemMemo;
-                    AddNoteForm addMemo = new(this, item);
+                    AddMemoForm addMemo = new(this, item);
                     addMemo.ShowDialog();
 
                     var memo = addMemo.Memo;
-                    if (string.IsNullOrEmpty(memo) || memo == previousMemo) return;
+                    if (memo == previousMemo) return;
 
                     item.ItemMemo = memo;
                     item.UpdatedDate = DateUtils.GetUnixTime();
@@ -1259,11 +1259,11 @@ internal sealed partial class MainForm : Form
                     (_, _) =>
                     {
                         var previousMemo = item.ItemMemo;
-                        AddNoteForm addMemo = new(this, item);
+                        AddMemoForm addMemo = new(this, item);
                         addMemo.ShowDialog();
 
                         var memo = addMemo.Memo;
-                        if (string.IsNullOrEmpty(memo) || memo == previousMemo) return;
+                        if (memo == previousMemo) return;
 
                         item.ItemMemo = memo;
 
@@ -1811,11 +1811,11 @@ internal sealed partial class MainForm : Form
                     (_, _) =>
                     {
                         var previousMemo = item.ItemMemo;
-                        AddNoteForm addMemo = new(this, item);
+                        AddMemoForm addMemo = new(this, item);
                         addMemo.ShowDialog();
 
                         var memo = addMemo.Memo;
-                        if (string.IsNullOrEmpty(memo) || memo == previousMemo) return;
+                        if (memo == previousMemo) return;
 
                         item.ItemMemo = memo;
 

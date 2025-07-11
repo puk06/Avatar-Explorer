@@ -1,6 +1,6 @@
 ﻿namespace Avatar_Explorer.Forms
 {
-    partial class AddNoteForm
+    partial class AddMemoForm
     {
         /// <summary>
         /// Required designer variable.

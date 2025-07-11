@@ -3,7 +3,7 @@ using Avatar_Explorer.Utils;
 
 namespace Avatar_Explorer.Forms;
 
-internal partial class AddNoteForm : Form
+internal partial class AddMemoForm : Form
 {
     /// <summary>
     /// アイテムのメモを取得または設定します。
@@ -20,7 +20,7 @@ internal partial class AddNoteForm : Form
     /// </summary>
     /// <param name="MainForm"></param>
     /// <param name="item"></param>
-    internal AddNoteForm(MainForm MainForm, Item item)
+    internal AddMemoForm(MainForm MainForm, Item item)
     {
         _mainForm = MainForm;
         InitializeComponent();
