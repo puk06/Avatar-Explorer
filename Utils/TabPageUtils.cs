@@ -23,17 +23,28 @@ internal static class TabPageUtils
     )
     {
         int totalPages = (int)Math.Ceiling((double)totalCount / itemsPerPage);
-        int start = (pageCount * itemsPerPage) + 1;
-        int end = Math.Min(start + itemsPerPage - 1, totalCount);
 
-        bool enableFirstButton = pageCount != 0;
-        bool enableBackButton = pageCount != 0;
+        int start = 0;
+        int end = 0;
+
+        bool isValidPage = pageCount >= 0 && pageCount < totalPages;
+
+        if (isValidPage)
+        {
+            start = (pageCount * itemsPerPage) + 1;
+            end = Math.Min(start + itemsPerPage - 1, totalCount);
+        }
+
+        bool enableFirstButton = pageCount > 0;
+        bool enableBackButton = pageCount > 0;
         bool enableNextButton = pageCount < totalPages - 1;
         bool enableLastButton = pageCount < totalPages - 1;
 
         Label pageInfoLabel = new()
         {
-            Text = $"{pageCount + 1} / {totalPages}{LanguageUtils.Translate("ページ", currentLanguage)}\n{start} - {end} / {totalCount}{LanguageUtils.Translate("個の項目", currentLanguage)}",
+            Text = isValidPage
+                ? $"{pageCount + 1} / {totalPages}{LanguageUtils.Translate("ページ", currentLanguage)}\n{start} - {end} / {totalCount}{LanguageUtils.Translate("個の項目", currentLanguage)}"
+                : $"{LanguageUtils.Translate("無効なページ", currentLanguage)}",
             Name = "PageInfoLabel",
             Font = small ? new Font("Yu Gothic UI", 9.2F) : new Font("Yu Gothic UI", 12F),
             AutoSize = true,
@@ -41,7 +52,7 @@ internal static class TabPageUtils
         };
 
         Size labelSize = TextRenderer.MeasureText(pageInfoLabel.Text, pageInfoLabel.Font);
-        pageInfoLabel.Location = GetLabelLocation(tabPage.Width, labelSize, baseYLocation);
+        pageInfoLabel.Location = GetLabelLocation(tabPage.Width, labelSize, baseYLocation + 4);
 
         if (enableFirstButton || enableBackButton || enableNextButton || enableLastButton)
         {
@@ -171,4 +182,7 @@ internal static class TabPageUtils
 
     internal static Point GetLabelLocation(int tabWidth, Size labelSize, int baseYLocation = 0)
         => new((tabWidth / 2) - (labelSize.Width / 2), baseYLocation + 20 - (labelSize.Height / 2) - 5);
+
+    internal static int GetTotalPages(int totalCount, int itemsPerPage)
+        => (int)Math.Ceiling((double)totalCount / itemsPerPage);
 }

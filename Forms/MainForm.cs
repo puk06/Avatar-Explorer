@@ -359,6 +359,7 @@ internal sealed partial class MainForm : Form
         };
 
         int totalCount = items.Count();
+        _currentPageAvatar = Math.Clamp(_currentPageAvatar, 0, TabPageUtils.GetTotalPages(totalCount, _itemsPerPage) - 1);
 
         AvatarPage.SuspendLayout();
         AvatarPage.AutoScroll = false;
@@ -663,11 +664,7 @@ internal sealed partial class MainForm : Form
             (_, _) => _currentPageAvatar--,
             (_, _) => _currentPageAvatar++,
             (_, _) => _currentPageAvatar = 0,
-            (_, _) =>
-            {
-                int totalPages = (int)Math.Ceiling((double)totalCount / _itemsPerPage);
-                _currentPageAvatar = totalPages - 1;
-            },
+            (_, _) => _currentPageAvatar = TabPageUtils.GetTotalPages(totalCount, _itemsPerPage) - 1,
             (_, _) => GenerateAvatarList(false)
         );
 
@@ -690,6 +687,7 @@ internal sealed partial class MainForm : Form
 
         authors.Sort((a, b) => string.Compare(a.AuthorName, b.AuthorName, StringComparison.OrdinalIgnoreCase));
         int totalCount = authors.Count;
+        _currentPageAuthor = Math.Clamp(_currentPageAuthor, 0, TabPageUtils.GetTotalPages(totalCount, _itemsPerPage) - 1);
 
         AvatarAuthorPage.SuspendLayout();
         AvatarAuthorPage.AutoScroll = false;
@@ -778,11 +776,7 @@ internal sealed partial class MainForm : Form
             (_, _) => _currentPageAuthor--,
             (_, _) => _currentPageAuthor++,
             (_, _) => _currentPageAuthor = 0,
-            (_, _) =>
-            {
-                int totalPages = (int)Math.Ceiling((double)totalCount / _itemsPerPage);
-                _currentPageAuthor = totalPages - 1;
-            },
+            (_, _) => _currentPageAuthor = TabPageUtils.GetTotalPages(totalCount, _itemsPerPage) - 1,
             (_, _) => GenerateAuthorList(false)
         );
 
@@ -1069,6 +1063,7 @@ internal sealed partial class MainForm : Form
         if (!filteredItems.Any()) return;
 
         int totalCount = filteredItems.Count();
+        _currentPage = Math.Clamp(_currentPage, 0, TabPageUtils.GetTotalPages(totalCount, _itemsPerPage) - 1);
 
         AvatarItemExplorer.SuspendLayout();
         AvatarItemExplorer.AutoScroll = false;
@@ -1405,11 +1400,7 @@ internal sealed partial class MainForm : Form
             (_, _) => _currentPage--,
             (_, _) => _currentPage++,
             (_, _) => _currentPage = 0,
-            (_, _) =>
-            {
-                int totalPages = (int)Math.Ceiling((double)totalCount / _itemsPerPage);
-                _currentPage = totalPages - 1;
-            },
+            (_, _) => _currentPage = TabPageUtils.GetTotalPages(totalCount, _itemsPerPage) - 1,
             (_, _) => GenerateItems(false)
         );
 
@@ -1498,6 +1489,7 @@ internal sealed partial class MainForm : Form
         if (!files.Any()) return;
 
         int totalCount = files.Count();
+        _currentPage = Math.Clamp(_currentPage, 0, TabPageUtils.GetTotalPages(totalCount, _itemsPerPage) - 1);
 
         AvatarItemExplorer.SuspendLayout();
         AvatarItemExplorer.AutoScroll = false;
@@ -1570,11 +1562,7 @@ internal sealed partial class MainForm : Form
             (_, _) => _currentPage--,
             (_, _) => _currentPage++,
             (_, _) => _currentPage = 0,
-            (_, _) =>
-            {
-                int totalPages = (int)Math.Ceiling((double)totalCount / _itemsPerPage);
-                _currentPage = totalPages - 1;
-            },
+            (_, _) => _currentPage = TabPageUtils.GetTotalPages(totalCount, _itemsPerPage) - 1,
             (_, _) => GenerateItemFiles(false)
         );
 
@@ -1645,6 +1633,7 @@ internal sealed partial class MainForm : Form
         if (!filteredItems.Any()) return;
 
         int totalCount = filteredItems.Count();
+        _currentPage = Math.Clamp(_currentPage, 0, TabPageUtils.GetTotalPages(totalCount, _itemsPerPage) - 1);
 
         AvatarItemExplorer.SuspendLayout();
         AvatarItemExplorer.AutoScroll = false;
@@ -1937,11 +1926,7 @@ internal sealed partial class MainForm : Form
             (_, _) => _currentPage--,
             (_, _) => _currentPage++,
             (_, _) => _currentPage = 0,
-            (_, _) =>
-            {
-                int totalPages = (int)Math.Ceiling((double)totalCount / _itemsPerPage);
-                _currentPage = totalPages - 1;
-            },
+            (_, _) => _currentPage = TabPageUtils.GetTotalPages(totalCount, _itemsPerPage) - 1,
             (_, _) => GenerateFilteredItem(searchFilter, false)
         );
 
@@ -1979,6 +1964,7 @@ internal sealed partial class MainForm : Form
         if (!filteredFileData.Any()) return;
 
         int totalCount = filteredFileData.Count();
+        _currentPage = Math.Clamp(_currentPage, 0, TabPageUtils.GetTotalPages(totalCount, _itemsPerPage) - 1);
 
         AvatarItemExplorer.SuspendLayout();
         AvatarItemExplorer.AutoScroll = false;
@@ -2037,11 +2023,7 @@ internal sealed partial class MainForm : Form
             (_, _) => _currentPage--,
             (_, _) => _currentPage++,
             (_, _) => _currentPage = 0,
-            (_, _) =>
-            {
-                int totalPages = (int)Math.Ceiling((double)totalCount / _itemsPerPage);
-                _currentPage = totalPages - 1;
-            },
+            (_, _) => _currentPage = TabPageUtils.GetTotalPages(totalCount, _itemsPerPage) - 1,
             (_, _) => GenerateFilteredFolderItems(searchWords, false)
         );
 

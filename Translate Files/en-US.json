@@ -167,5 +167,6 @@
   "共通素体データ": "Common Avatar Data",
   "このバックアップを復元": "Restore this backup",
   "バックアップデータの取得に失敗しました": "Failed to retrieve backup data",
-  "ページ": " Page"
+  "ページ": " Page",
+  "無効なページ": "Invalid page"
 }
