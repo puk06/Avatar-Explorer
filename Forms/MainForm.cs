@@ -987,7 +987,7 @@ internal sealed partial class MainForm : Form
                         CurrentPath.CurrentSelectedCustomCategory = customCategory;
                         GenerateItems();
                         PathTextBox.Text = GeneratePath();
-                    };
+                    }
 
                     button.Click += ButtonClick;
                     button.Disposed += (_, _) =>
@@ -1135,7 +1135,7 @@ internal sealed partial class MainForm : Form
                     CurrentPath.CurrentSelectedItem = item;
                     GenerateItemCategoryList();
                     PathTextBox.Text = GeneratePath();
-                };
+                }
 
                 button.Click += ButtonClick;
                 button.Disposed += (_, _) =>
@@ -1450,7 +1450,7 @@ internal sealed partial class MainForm : Form
                     CurrentPath.CurrentSelectedItemCategory = itemType;
                     GenerateItemFiles();
                     PathTextBox.Text = GeneratePath();
-                };
+                }
 
                 button.Click += ButtonClick;
                 button.Disposed += (_, _) =>
@@ -1518,7 +1518,7 @@ internal sealed partial class MainForm : Form
                     {
                         FileSystemUtils.OpenItemFile(file, false, CurrentLanguage);
                     }
-                };
+                }
 
                 button.Click += ButtonClick;
                 button.Disposed += (_, _) =>
@@ -1694,7 +1694,7 @@ internal sealed partial class MainForm : Form
 
                     GenerateItemCategoryList();
                     PathTextBox.Text = GeneratePath();
-                };
+                }
 
                 button.Click += ButtonClick;
                 button.Disposed += (_, _) =>
