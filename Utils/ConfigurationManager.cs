@@ -10,13 +10,17 @@ internal class ConfigurationManager
         { "PreviewScale", "1" },
         { "DefaultLanguage", "1" },
         { "DefaultSortOrder", "1" },
+        { "ThumbnailUpdateTimeout", "200" },
+        { "BackupInterval", "5" }
     };
     private readonly Dictionary<string, string> _defaultKeysDescriptions = new()
     {
-        { "ItemsPerPage", "# 1ページあたりに表示するアイテムの量を指定できます。デフォルトは30です。" },
-        { "PreviewScale", "# アイテムのサムネイルプレビューサイズを何倍にするかを決めることが出来ます。" },
+        { "ItemsPerPage", "# 1ページあたりに表示するアイテムの量を指定できます。デフォルトは30です。範囲: 1 - 1000" },
+        { "PreviewScale", "# アイテムのサムネイルプレビューサイズを何倍にするかを決めることが出来ます。範囲: 0.1 - 10" },
         { "DefaultLanguage", "# デフォルトの言語を指定できます。1: 日本語, 2: 한국어, 3: English" },
-        { "DefaultSortOrder", "# デフォルトの並び替え順を変更できます。1: タイトル, 2: 作者, 3: 作成日時, 4: 更新日時, 5: 実装済み, 6: 未実装" }
+        { "DefaultSortOrder", "# デフォルトの並び替え順を変更できます。1: タイトル, 2: 作者, 3: 作成日時, 4: 更新日時, 5: 実装済み, 6: 未実装" },
+        { "ThumbnailUpdateTimeout", "# スクロール終了後、何ms後にサムネイルを描画し直すかを変えることが出来ます。デフォルトは200msです。範囲: 1 - 10000" },
+        { "BackupInterval", "# 自動バックアップの間隔を変更することが出来ます。単位は分で、デフォルトは5分です。範囲: 1 - 1000" }
     };
 
     internal string? this[string key]
@@ -72,7 +76,7 @@ internal class ConfigurationManager
         foreach (var kvp in _data)
         {
             writer.WriteLine(_defaultKeysDescriptions[kvp.Key]);
-            writer.WriteLine($"{kvp.Key}={kvp.Value}");
+            writer.WriteLine($"{kvp.Key} = {kvp.Value}");
             writer.WriteLine();
         }
     }

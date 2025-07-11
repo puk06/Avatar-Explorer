@@ -15,7 +15,7 @@ internal static partial class AEUtils
     [GeneratedRegex(@"(?<key>Author|Title|Booth|Avatar|Category|Memo|Folder|File|Implemented)=(?:""(?<value>.*?)""|(?<value>[^\s]+))|(?<word>[^\s]+)")]
     private static partial Regex SearchFilterRegex();
 
-    private static readonly Timer _thumbnailUpdateTimer = new()
+    internal static readonly Timer ThumbnailUpdateTimer = new()
     {
         Interval = 200
     };
@@ -23,9 +23,9 @@ internal static partial class AEUtils
 
     static AEUtils()
     {
-        _thumbnailUpdateTimer.Tick += (s, e) =>
+        ThumbnailUpdateTimer.Tick += (s, e) =>
         {
-            _thumbnailUpdateTimer.Stop();
+            ThumbnailUpdateTimer.Stop();
             if (_lastScrollSender == null) return;
             UpdateExplorerThumbnails(_lastScrollSender);
         };
@@ -39,8 +39,8 @@ internal static partial class AEUtils
     internal static void OnScroll(object sender, EventArgs e)
     {
         _lastScrollSender = sender;
-        _thumbnailUpdateTimer.Stop();
-        _thumbnailUpdateTimer.Start();
+        ThumbnailUpdateTimer.Stop();
+        ThumbnailUpdateTimer.Start();
     }
 
     /// <summary>

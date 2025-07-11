@@ -424,4 +424,33 @@ internal static class DatabaseUtils
             }
         }
     }
+
+    /// <summary>
+    /// 不足しているカスタムカテゴリを検知して、自動で追加します。
+    /// </summary>
+    /// <param name="items"></param>
+    /// <param name="categories"></param>
+    /// <param name="currentLanguage"></param>
+    /// <returns></returns>
+    internal static bool CheckMissingCustomCategories(List<Item> items, ref List<string> categories, string currentLanguage)
+    {
+        List<string> missingCategories = new();
+
+        foreach (var item in items)
+        {
+            if (item.Type != ItemType.Custom || string.IsNullOrEmpty(item.CustomCategory)) continue;
+            if (missingCategories.Contains(item.CustomCategory) || categories.Contains(item.CustomCategory)) continue;
+
+            missingCategories.Add(item.CustomCategory);
+        }
+
+        if (missingCategories.Count == 0) return false;
+
+        foreach (var item in missingCategories)
+        {
+            categories.Add(item);
+        }
+
+        return true;
+    }
 }

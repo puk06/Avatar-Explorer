@@ -136,7 +136,7 @@ internal sealed partial class MainForm : Form
     /// <summary>
     /// バックアップする間隔(ms)
     /// </summary>
-    private const int BackupInterval = 300000; // 5 Minutes
+    private int _backupInterval = 300000; // 5 Minutes
 
     /// <summary>
     /// 最後のバックアップ時刻を取得または設定します。
@@ -213,6 +213,10 @@ internal sealed partial class MainForm : Form
             Items = DatabaseUtils.LoadItemsData();
             CommonAvatars = DatabaseUtils.LoadCommonAvatarData();
             CustomCategories = DatabaseUtils.LoadCustomCategoriesData();
+
+            // Add Missing Custom Categories
+            var addedResult = DatabaseUtils.CheckMissingCustomCategories(Items, ref CustomCategories, CurrentLanguage);
+            if (addedResult) DatabaseUtils.SaveCustomCategoriesData(CustomCategories);
 
             // Fix Item Relative Path
             DatabaseUtils.FixItemRelativePaths(ref Items);
@@ -316,15 +320,19 @@ internal sealed partial class MainForm : Form
 
     private void SetConfigulationValue()
     {
-        int itemsPerPage = int.TryParse(Configuration["ItemsPerPage"], out var ipp) ? ipp : 30;
-        float previewScale = float.TryParse(Configuration["PreviewScale"], out var ps) ? ps : 1.0f;
+        int itemsPerPage = int.TryParse(Configuration["ItemsPerPage"], out var ipp) ? Math.Clamp(ipp, 1, 1000) : 30;
+        float previewScale = float.TryParse(Configuration["PreviewScale"], out var ps) ? Math.Clamp(ps, 0.1f, 10f) : 1.0f;
         int defaultLanguage = int.TryParse(Configuration["DefaultLanguage"], out var dl) ? dl : 1;
         int defaultSortOrder = int.TryParse(Configuration["DefaultSortOrder"], out var dso) ? dso : 1;
+        int thumbnailUpdateTimeout = int.TryParse(Configuration["ThumbnailUpdateTimeout"], out var tut) ? Math.Clamp(tut, 0, 10000) : 200;
+        int backupInterval = int.TryParse(Configuration["BackupInterval"], out var bi) ? Math.Clamp(bi, 1, 1000) : 5;
 
         _itemsPerPage = itemsPerPage;
         _previewScale = previewScale;
         _defaultLanguage = defaultLanguage;
         _defaultSortOrder = defaultSortOrder;
+        AEUtils.ThumbnailUpdateTimer.Interval = thumbnailUpdateTimeout;
+        _backupInterval = backupInterval;
     }
 
     #endregion
@@ -747,7 +755,7 @@ internal sealed partial class MainForm : Form
                             "完了"
                         );
 
-                        GenerateAuthorList();
+                        GenerateAuthorList(false);
                         DatabaseUtils.SaveItemsData(Items);
                     }
                 );
@@ -3267,7 +3275,7 @@ internal sealed partial class MainForm : Form
         BackupFile();
         Timer timer = new()
         {
-            Interval = BackupInterval
+            Interval = _backupInterval
         };
 
         timer.Tick += (_, _) => BackupFile();
