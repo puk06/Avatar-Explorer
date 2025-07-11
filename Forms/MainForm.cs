@@ -3206,11 +3206,9 @@ internal sealed partial class MainForm : Form
                 case CustomItemButton customButton:
                     customButton.Size = customButton.Size with { Width = buttonWidth };
                     break;
-
                 case Button navButton:
                     navButton.Location = navButton.Location with { X = GetUpdatedX(navButton.Name, listWidth, labelSize.Width, small) };
                     break;
-
                 case Label label when label.Name == "PageInfoLabel":
                     label.Location = label.Location with { X = TabPageUtils.GetLabelLocation(listWidth, label.Size).X };
                     break;
