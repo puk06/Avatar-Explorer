@@ -3184,7 +3184,7 @@ internal sealed partial class MainForm : Form
         SearchResultLabel.Location = SearchResultLabel.Location with
         {
             X = label1.Location.X,
-            Y = SearchBox.Location.Y + SearchBox.Height + 2
+            Y = SearchBox.Location.Y + SearchBox.Height
         };
     }
 
