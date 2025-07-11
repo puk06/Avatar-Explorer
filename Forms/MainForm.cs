@@ -332,7 +332,7 @@ internal sealed partial class MainForm : Form
         _defaultLanguage = defaultLanguage;
         _defaultSortOrder = defaultSortOrder;
         AEUtils.ThumbnailUpdateTimer.Interval = thumbnailUpdateTimeout;
-        _backupInterval = backupInterval;
+        _backupInterval = backupInterval * 1000 * 60;
     }
 
     #endregion
