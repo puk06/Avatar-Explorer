@@ -26,8 +26,10 @@ internal static class DatabaseUtils
             string json = File.ReadAllText(path);
             return JsonSerializer.Deserialize<List<Item>>(json) ?? [];
         }
-        catch
+        catch (Exception ex)
         {
+            FormUtils.ShowMessageBox("アイテムデータの読み込みに失敗しました。詳細はErrorLog.txtをご覧ください。", "エラー", true);
+            LogUtils.ErrorLogger("アイテムデータの読み込みに失敗しました", ex);
             return [];
         }
     }
