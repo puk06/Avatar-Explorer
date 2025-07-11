@@ -76,8 +76,6 @@ internal class ConfigurationManager
     {
         try
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-
             using StreamWriter writer = new(path, false, Encoding.UTF8);
             foreach (var kvp in _data)
             {
@@ -92,7 +90,8 @@ internal class ConfigurationManager
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[Save] 設定保存エラー: {ex.Message}");
+            FormUtils.ShowMessageBox("設定ファイルの保存に失敗しました。詳細はErrorLog.txtをご覧ください。", "エラー", true);
+            LogUtils.ErrorLogger("設定ファイルの保存に失敗しました", ex);
         }
     }
 }

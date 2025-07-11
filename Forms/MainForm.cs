@@ -207,7 +207,7 @@ internal sealed partial class MainForm : Form
         try
         {
             // Load Configulation
-            Configuration.Load("settings.conf");
+            Configuration.Load("settings.cfg");
             SetConfigulationValue();
 
             Items = DatabaseUtils.LoadItemsData();

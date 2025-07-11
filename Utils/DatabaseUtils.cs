@@ -105,7 +105,6 @@ internal static class DatabaseUtils
             {
                 if (createNewFile)
                 {
-                    Directory.CreateDirectory(Path.GetDirectoryName(path)!);
                     File.WriteAllText(path, "", Encoding.UTF8);
                 }
 
