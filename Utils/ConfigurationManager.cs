@@ -24,7 +24,7 @@ internal class ConfigurationManager
         { "ThumbnailUpdateTimeout", "# スクロール終了後、何ms後にサムネイルを描画し直すかを変えることが出来ます。デフォルトは200msです。範囲: 1 - 10000" },
         { "BackupInterval", "# 自動バックアップの間隔を変更することが出来ます。単位は分で、デフォルトは5分です。範囲: 1 - 1000" }
     };
-    private const string _configulationDescription = "# このファイルはAvatar Explorerの起動時に読み込まれる設定ファイルです。書き換えた際は再起動してください。";
+    private const string _configulationDescription = "# このファイルはAvatar Explorerの起動時に読み込まれる設定ファイルです。書き換えた際はAvatar Explorerを再起動してください。";
 
     internal string? this[string key]
     {
