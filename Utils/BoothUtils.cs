@@ -1,7 +1,8 @@
 ﻿using Avatar_Explorer.Models;
-using Newtonsoft.Json.Linq;
+using Avatar_Explorer.Models.Booth;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace Avatar_Explorer.Utils;
@@ -9,6 +10,10 @@ namespace Avatar_Explorer.Utils;
 internal static class BoothUtils
 {
     private static readonly HttpClient _httpClient = new();
+    private static readonly JsonSerializerOptions jsonSerializerOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
     private static readonly Dictionary<string[], ItemType> TITLE_MAPPINGS = new()
     {
         { new[] { "オリジナル3Dモデル", "オリジナル", "Avatar", "Original" }, ItemType.Avatar },
@@ -31,15 +36,16 @@ internal static class BoothUtils
     {
         var url = $"https://booth.pm/ja/items/{id}.json";
         var response = await _httpClient.GetStringAsync(url);
-        var json = JObject.Parse(response);
 
-        var title = json["name"]?.ToString() ?? "";
-        var author = json["shop"]?["name"]?.ToString() ?? "";
-        var authorUrl = json["shop"]?["url"]?.ToString() ?? "";
-        var imageUrl = json["images"]?.Count() > 0 ? json["images"]?[0]?["original"]?.ToString() ?? "" : "";
-        var authorIcon = json["shop"]?["thumbnail_url"]?.ToString() ?? "";
+        var itemJson = JsonSerializer.Deserialize<BoothItemResponse>(response, jsonSerializerOptions);
+
+        var title = itemJson?.Name ?? "";
+        var author = itemJson?.Shop?.Name ?? "";
+        var authorUrl = itemJson?.Shop?.Url ?? "";
+        var imageUrl = itemJson?.Images?.FirstOrDefault()?.Original ?? "";
+        var authorIcon = itemJson?.Shop?.ThumbnailUrl ?? "";
         var authorId = GetAuthorId(authorUrl);
-        var category = json["category"]?["name"]?.ToString() ?? "";
+        var category = itemJson?.Category?.Name ?? "";
         var estimatedCategory = GetItemType(title, category);
 
         return new Item
