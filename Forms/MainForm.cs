@@ -258,6 +258,16 @@ internal sealed partial class MainForm : Form
 
             Text = $"VRChat Avatar Explorer {CurrentVersion} by ‚Õ‚±‚é‚Ó";
 
+            if (_defaultLanguage != 1 && _defaultLanguage > 0 && _defaultLanguage <= LanguageBox.Items.Count)
+            {
+                LanguageBox.SelectedIndex = _defaultLanguage - 1;
+            }
+
+            if (_defaultSortOrder != 1 && _defaultSortOrder > 0 && _defaultSortOrder <= SortingBox.Items.Count)
+            {
+                SortingBox.SelectedIndex = _defaultSortOrder - 1;
+            }
+
             // Check if the software is launched with a URL
             if (launchInfo.launchedWithUrl && launchInfo.assetDirs.Length != 0 && !string.IsNullOrEmpty(launchInfo.assetId))
             {
@@ -269,16 +279,6 @@ internal sealed partial class MainForm : Form
             }
 
             AdjustLabelPosition();
-
-            if (_defaultLanguage != 1 && _defaultLanguage > 0 && _defaultLanguage <= LanguageBox.Items.Count)
-            {
-               LanguageBox.SelectedIndex = _defaultLanguage - 1;
-            }
-
-            if (_defaultSortOrder != 1 && _defaultSortOrder > 0 && _defaultSortOrder <= SortingBox.Items.Count)
-            {
-                SortingBox.SelectedIndex = _defaultSortOrder - 1;
-            }
         }
         catch (Exception ex)
         {
