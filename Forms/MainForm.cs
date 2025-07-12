@@ -314,8 +314,7 @@ internal sealed partial class MainForm : Form
             }
         }
 
-        var newFont = _fontFamilies.TryGetValue(CurrentLanguage, out var family) ? family : _fontFamilies["ja-JP"];
-        GuiFont = newFont;
+        GuiFont = _fontFamilies.TryGetValue(CurrentLanguage, out var family) ? family : new FontFamily("Yu Gothic UI");
     }
 
     private void SetConfigulationValue()
@@ -2717,8 +2716,7 @@ internal sealed partial class MainForm : Form
             _ => CurrentLanguage
         };
 
-        var newFont = _fontFamilies.TryGetValue(CurrentLanguage, out var family) ? family : _fontFamilies["ja-JP"];
-        GuiFont = newFont;
+        GuiFont = _fontFamilies.TryGetValue(CurrentLanguage, out var family) ? family : new FontFamily("Yu Gothic UI");
 
         foreach (Control control in Controls)
         {

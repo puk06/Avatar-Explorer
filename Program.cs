@@ -22,18 +22,6 @@ internal static class Program
             var currentDirectory = Path.GetDirectoryName(Process.GetCurrentProcess()?.MainModule?.FileName);
             if (currentDirectory != null) Directory.SetCurrentDirectory(currentDirectory);
 
-            if (!File.Exists("./Datas/Fonts/NotoSansJP-Regular.ttf") ||
-                !File.Exists("./Datas/Fonts/NotoSans-Regular.ttf") ||
-                !File.Exists("./Datas/Fonts/NotoSansKR-Regular.ttf"))
-            {
-                FormUtils.ShowMessageBox(
-                    "必要なフォントがフォルダ内に存在しませんでした。ソフトをもう一度入れ直してください。",
-                    "エラー",
-                    true
-                );
-                return;
-            }
-
             // Check if the schema is registered in the registry
             SchemeUtils.CheckScheme();
 
