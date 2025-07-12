@@ -27,7 +27,13 @@ internal sealed partial class SelectSupportedAvatarForm : Form
         InitializeComponent();
 
         Text = LanguageUtils.Translate("対応アバターの選択", _mainForm.CurrentLanguage);
+        TranslateControls();
 
+        GenerateAvatarList();
+    }
+
+    private void TranslateControls()
+    {
         if (_mainForm.CurrentLanguage != "ja-JP")
         {
             foreach (Control control in Controls)
@@ -40,8 +46,6 @@ internal sealed partial class SelectSupportedAvatarForm : Form
 
             AvatarList.Text = LanguageUtils.Translate(AvatarList.Text, _mainForm.CurrentLanguage);
         }
-
-        GenerateAvatarList();
     }
 
     /// <summary>

@@ -28,6 +28,13 @@ internal partial class AddMemoForm : Form
         Text = LanguageUtils.Translate(Text, _mainForm.CurrentLanguage);
         Text += " - " + item.Title;
 
+        TranslateControls();
+
+        MemoTextBox.Text = item.ItemMemo;
+    }
+
+    private void TranslateControls()
+    {
         if (_mainForm.CurrentLanguage != "ja-JP")
         {
             foreach (Control control in Controls)
@@ -38,8 +45,6 @@ internal partial class AddMemoForm : Form
                 }
             }
         }
-
-        MemoTextBox.Text = item.ItemMemo;
     }
 
     /// <summary>

@@ -122,24 +122,7 @@ internal sealed partial class AddItemForm : Form
         InitializeComponent();
 
         ValidCheck();
-
-        if (_mainForm.CurrentLanguage != "ja-JP")
-        {
-            foreach (Control control in Controls)
-            {
-                if (!string.IsNullOrEmpty(control.Text))
-                {
-                    control.Text = LanguageUtils.Translate(control.Text, _mainForm.CurrentLanguage);
-                }
-            }
-
-            for (var i = 0; i < TypeComboBox.Items.Count; i++)
-            {
-                var text = TypeComboBox.Items[i]?.ToString();
-                if (text == null) continue;
-                TypeComboBox.Items[i] = LanguageUtils.Translate(text, _mainForm.CurrentLanguage);
-            }
-        }
+        TranslateControls();
 
         for (var i = 0; i < mainForm.CustomCategories.Count; i++)
         {
@@ -220,6 +203,27 @@ internal sealed partial class AddItemForm : Form
         TitleTextBox.Enabled = true;
         AuthorTextBox.Enabled = true;
         _addButtonEnabled = true;
+    }
+
+    private void TranslateControls()
+    {
+        if (_mainForm.CurrentLanguage != "ja-JP")
+        {
+            foreach (Control control in Controls)
+            {
+                if (!string.IsNullOrEmpty(control.Text))
+                {
+                    control.Text = LanguageUtils.Translate(control.Text, _mainForm.CurrentLanguage);
+                }
+            }
+
+            for (var i = 0; i < TypeComboBox.Items.Count; i++)
+            {
+                var text = TypeComboBox.Items[i]?.ToString();
+                if (text == null) continue;
+                TypeComboBox.Items[i] = LanguageUtils.Translate(text, _mainForm.CurrentLanguage);
+            }
+        }
     }
 
     /// <summary>

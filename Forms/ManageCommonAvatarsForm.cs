@@ -26,19 +26,7 @@ internal sealed partial class ManageCommonAvatarsForm : Form
         InitializeComponent();
 
         Text = LanguageUtils.Translate("共通素体の管理", _mainForm.CurrentLanguage);
-
-        if (_mainForm.CurrentLanguage != "ja-JP")
-        {
-            foreach (Control control in Controls)
-            {
-                if (!string.IsNullOrEmpty(control.Text))
-                {
-                    control.Text = LanguageUtils.Translate(control.Text, _mainForm.CurrentLanguage);
-                }
-            }
-
-            AvatarList.Text = LanguageUtils.Translate(AvatarList.Text, _mainForm.CurrentLanguage);
-        }
+        TranslateControls();
 
         foreach (var commonAvatar in _commonAvatars)
         {
@@ -52,6 +40,22 @@ internal sealed partial class ManageCommonAvatarsForm : Form
 
         GenerateAvatarList();
         RefleshCommonAvatarButtonColor();
+    }
+
+    private void TranslateControls()
+    {
+        if (_mainForm.CurrentLanguage != "ja-JP")
+        {
+            foreach (Control control in Controls)
+            {
+                if (!string.IsNullOrEmpty(control.Text))
+                {
+                    control.Text = LanguageUtils.Translate(control.Text, _mainForm.CurrentLanguage);
+                }
+            }
+
+            AvatarList.Text = LanguageUtils.Translate(AvatarList.Text, _mainForm.CurrentLanguage);
+        }
     }
 
     /// <summary>

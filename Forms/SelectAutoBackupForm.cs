@@ -28,7 +28,21 @@ internal partial class SelectAutoBackupForm : Form
     {
         _mainForm = mainForm;
         InitializeComponent();
+        TranslateControls();
 
+        _backupPaths = GetBackupPaths(AUTO_BACKUP_PATH);
+        SelectBackup.Items.Clear();
+
+        foreach (var backup in _backupPaths)
+        {
+            SelectBackup.Items.Add(backup.Key);
+        }
+
+        if (SelectBackup.Items.Count > 0) SelectBackup.SelectedIndex = 0;
+    }
+
+    private void TranslateControls()
+    {
         if (_mainForm.CurrentLanguage != "ja-JP")
         {
             foreach (Control control in Controls)
@@ -41,16 +55,6 @@ internal partial class SelectAutoBackupForm : Form
 
             Text = LanguageUtils.Translate("自動バックアップから復元", _mainForm.CurrentLanguage);
         }
-
-        _backupPaths = GetBackupPaths(AUTO_BACKUP_PATH);
-        SelectBackup.Items.Clear();
-
-        foreach (var backup in _backupPaths)
-        {
-            SelectBackup.Items.Add(backup.Key);
-        }
-
-        if (SelectBackup.Items.Count > 0) SelectBackup.SelectedIndex = 0;
     }
 
     private void SelectBackup_SelectedIndexChanged(object sender, EventArgs e)
