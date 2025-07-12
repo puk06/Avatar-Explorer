@@ -62,7 +62,7 @@ internal static partial class AEUtils
     /// <returns></returns>
     internal static async Task ModifyUnityPackageFilePathAsync(FileData file, CurrentPath currentPath, string currentLanguage)
     {
-        ProgressForm progressForm = new(currentLanguage);
+        ProgressForm progressForm = new(LanguageUtils.Translate("Unitypackageのインポート先の変更中", currentLanguage));
         progressForm.Show();
 
         try
@@ -104,7 +104,7 @@ internal static partial class AEUtils
         }
         finally
         {
-            progressForm.Close();
+            progressForm.ForceClose();
         }
     }
 

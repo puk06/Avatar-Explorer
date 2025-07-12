@@ -215,8 +215,8 @@ internal sealed partial class MainForm : Form
             CustomCategories = DatabaseUtils.LoadCustomCategoriesData();
 
             // Add Missing Custom Categories
-            var addedResult = DatabaseUtils.CheckMissingCustomCategories(Items, ref CustomCategories, CurrentLanguage);
-            if (addedResult) DatabaseUtils.SaveCustomCategoriesData(CustomCategories);
+            var added = DatabaseUtils.CheckMissingCustomCategories(Items, ref CustomCategories, CurrentLanguage);
+            if (added) DatabaseUtils.SaveCustomCategoriesData(CustomCategories);
 
             // Fix Item Relative Path
             DatabaseUtils.FixItemRelativePaths(ref Items);
@@ -2781,7 +2781,7 @@ internal sealed partial class MainForm : Form
     /// <summary>
     /// フォルダ選択ダイアログを表示し、選択されたフォルダからデータを読み込みます。
     /// </summary>
-    private void LoadDataFromFolder()
+    private async void LoadDataFromFolder()
     {
         // 自動バックアップフォルダから復元するか聞く
         var result = FormUtils.ShowConfirmDialog(
@@ -3011,12 +3011,17 @@ internal sealed partial class MainForm : Form
                 {
                     try
                     {
-                        FileSystemUtils.CopyDirectory(itemsPath, "./Datas/Items");
+                        Enabled = false;
+                        await FileSystemUtils.CopyDirectoryWithProgress(itemsPath, "./Datas/Items", CurrentLanguage, LanguageUtils.Translate("データの移行中", CurrentLanguage), true);
                     }
                     catch (Exception ex)
                     {
                         LogUtils.ErrorLogger("Itemsのコピーに失敗しました。", ex);
                         itemsResult = false;
+                    }
+                    finally
+                    {
+                        Enabled = true;
                     }
                 }
 
@@ -3024,9 +3029,15 @@ internal sealed partial class MainForm : Form
                 var authorImageResultText = authorImageResult ? "" : "\n" + LanguageUtils.Translate("作者画像のコピーに一部失敗しています。", CurrentLanguage);
                 var itemsResultText = itemsResult ? "" : "\n" + LanguageUtils.Translate("Itemsのコピーに一部失敗しています。", CurrentLanguage);
 
+                var resultMessage = LanguageUtils.Translate("コピーが完了しました。", CurrentLanguage);
+                if (!thumbnailResult || !authorImageResult || !itemsResult)
+                {
+                    resultMessage += "\n\n" + LanguageUtils.Translate("コピー失敗一覧: ", CurrentLanguage) +
+                    thumbilResultText + authorImageResultText + itemsResultText;
+                }
+
                 FormUtils.ShowMessageBox(
-                    LanguageUtils.Translate("コピーが完了しました。", CurrentLanguage) + "\n\n" + LanguageUtils.Translate("コピー失敗一覧: ", CurrentLanguage) +
-                    thumbilResultText + authorImageResultText + itemsResultText,
+                    resultMessage,
                     LanguageUtils.Translate("完了", CurrentLanguage)
                 );
             }

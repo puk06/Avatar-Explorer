@@ -1,16 +1,16 @@
-﻿using Avatar_Explorer.Utils;
-
-namespace Avatar_Explorer.Forms;
+﻿namespace Avatar_Explorer.Forms;
 
 internal sealed class ProgressForm : Form
 {
     private readonly ProgressBar _progressBar;
     private readonly Label _progressLabel;
     private readonly string _formTitle;
+    
+    private bool _allowClose = false;
 
-    internal ProgressForm(string currentLanguage)
+    internal ProgressForm(string progressFormTitle)
     {
-        _formTitle = LanguageUtils.Translate("Unitypackageのインポート先の変更中", currentLanguage);
+        _formTitle = progressFormTitle;
 
         Text = _formTitle;
         Size = new Size(400, 90);
@@ -51,5 +51,16 @@ internal sealed class ProgressForm : Form
         _progressBar.Value = percentage;
         _progressLabel.Text = $"{percentage}% {message}";
         Text = $"{_formTitle} - {percentage}%";
+    }
+
+    protected override void OnFormClosing(FormClosingEventArgs e)
+    {
+        if (e.CloseReason == CloseReason.UserClosing && !_allowClose) e.Cancel = true;
+    }
+
+    public void ForceClose()
+    {
+        _allowClose = true;
+        Close();
     }
 }

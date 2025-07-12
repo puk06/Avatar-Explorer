@@ -1,4 +1,5 @@
-﻿using Avatar_Explorer.Models;
+﻿using Avatar_Explorer.Forms;
+using Avatar_Explorer.Models;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Tar;
 using SharpCompress.Common;
@@ -95,28 +96,83 @@ internal static class FileSystemUtils
     /// </summary>
     /// <param name="sourceDirName"></param>
     /// <param name="destDirName"></param>
-    internal static void CopyDirectory(string sourceDirName, string destDirName)
+    internal static async Task CopyDirectoryWithProgress(string sourceDirName, string destDirName, string currentLanguage = "", string progressFormTitle = "", bool showProgress = false)
     {
-        if (!Directory.Exists(destDirName))
+        ProgressForm progressForm = new(progressFormTitle);
+        if (showProgress) progressForm.Show();
+
+        try
         {
-            Directory.CreateDirectory(destDirName);
+            void UpdateProgress(int percent, string message)
+            {
+                if (showProgress)
+                {
+                    if (progressForm.InvokeRequired)
+                    {
+                        progressForm.Invoke(() => progressForm.UpdateProgress(percent, message));
+                    }
+                    else
+                    {
+                        progressForm.UpdateProgress(percent, message);
+                    }
+                }
+            }
+
+            UpdateProgress(0, LanguageUtils.Translate("準備中", currentLanguage));
+
+            var totalFiles = CountFiles(sourceDirName);
+            int copiedFiles = 0;
+
+            await Task.Run(() =>
+            {
+                void Copy(string source, string dest)
+                {
+                    if (!Directory.Exists(dest))
+                        Directory.CreateDirectory(dest);
+
+                    var dir = new DirectoryInfo(source);
+
+                    foreach (var file in dir.GetFiles())
+                    {
+                        var temppath = Path.Combine(dest, file.Name);
+                        file.CopyTo(temppath, true);
+                        copiedFiles++;
+
+                        int percent = (int)((copiedFiles / (double)totalFiles) * 100);
+                        UpdateProgress(percent, $"{copiedFiles}/{totalFiles} {LanguageUtils.Translate("コピー中", currentLanguage)}");
+                    }
+
+                    foreach (var subdir in dir.GetDirectories())
+                    {
+                        var temppath = Path.Combine(dest, subdir.Name);
+                        Copy(subdir.FullName, temppath);
+                    }
+                }
+
+                Copy(sourceDirName, destDirName);
+            });
+
+            UpdateProgress(100, LanguageUtils.Translate("完了", currentLanguage));
+        }
+        finally
+        {
+            progressForm.ForceClose();
+        }
+    }
+
+    private static int CountFiles(string path)
+    {
+        int count = 0;
+        var dir = new DirectoryInfo(path);
+
+        count += dir.GetFiles().Length;
+
+        foreach (var subdir in dir.GetDirectories())
+        {
+            count += CountFiles(subdir.FullName);
         }
 
-        var dir = new DirectoryInfo(sourceDirName);
-        var files = dir.GetFiles();
-
-        foreach (var file in files)
-        {
-            var temppath = Path.Combine(destDirName, file.Name);
-            file.CopyTo(temppath, true);
-        }
-
-        var dirs = dir.GetDirectories();
-        foreach (var subdir in dirs)
-        {
-            var temppath = Path.Combine(destDirName, subdir.Name);
-            CopyDirectory(subdir.FullName, temppath);
-        }
+        return count;
     }
 
     /// <summary>

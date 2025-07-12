@@ -360,7 +360,7 @@ internal sealed partial class AddItemForm : Form
                 var folderName = Path.GetFileName(itemFolderArray[i]);
                 var newPath = Path.Combine(parentFolder, "Others", folderName);
 
-                FileSystemUtils.CopyDirectory(Path.GetFullPath(itemFolderArray[i]), newPath);
+                await FileSystemUtils.CopyDirectoryWithProgress(Path.GetFullPath(itemFolderArray[i]), newPath);
             }
         }
 
