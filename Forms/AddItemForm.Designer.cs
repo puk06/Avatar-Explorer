@@ -97,6 +97,7 @@ namespace Avatar_Explorer.Forms
             FolderTextBox.TextChanged += CheckText;
             FolderTextBox.DragDrop += FolderTextBox_DragDrop;
             FolderTextBox.DragEnter += FormUtils.DragEnter;
+            FolderTextBox.KeyDown += AddItem_KeyDown;
             // 
             // BoothURLTextBox
             // 
@@ -106,6 +107,7 @@ namespace Avatar_Explorer.Forms
             BoothURLTextBox.Size = new Size(415, 31);
             BoothURLTextBox.TabIndex = 4;
             BoothURLTextBox.KeyDown += BoothURLTextBox_KeyDown;
+            BoothURLTextBox.KeyDown += AddItem_KeyDown;
             // 
             // GetButton
             // 
@@ -168,6 +170,7 @@ namespace Avatar_Explorer.Forms
             AuthorTextBox.TabIndex = 14;
             AuthorTextBox.Text = "作者未取得";
             AuthorTextBox.TextChanged += CheckText;
+            AuthorTextBox.KeyDown += AddItem_KeyDown;
             // 
             // TitleTextBox
             // 
@@ -179,6 +182,7 @@ namespace Avatar_Explorer.Forms
             TitleTextBox.TabIndex = 13;
             TitleTextBox.Text = "タイトル未取得";
             TitleTextBox.TextChanged += CheckText;
+            TitleTextBox.KeyDown += AddItem_KeyDown;
             // 
             // label6
             // 
@@ -283,6 +287,7 @@ namespace Avatar_Explorer.Forms
             MaterialTextBox.TextChanged += CheckText;
             MaterialTextBox.DragDrop += MaterialTextBox_DragDrop;
             MaterialTextBox.DragEnter += FormUtils.DragEnter;
+            MaterialTextBox.KeyDown += AddItem_KeyDown;
             // 
             // label10
             // 
@@ -338,6 +343,7 @@ namespace Avatar_Explorer.Forms
             Name = "AddItem";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "AddItem";
+            KeyDown += AddItem_KeyDown;
             FormClosing += AddItem_FormClosing;
             ResumeLayout(false);
             PerformLayout();

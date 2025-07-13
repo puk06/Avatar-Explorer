@@ -621,7 +621,8 @@ internal sealed partial class AddItemForm : Form
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void CheckText(object sender, EventArgs e) => ValidCheck();
+    private void CheckText(object sender, EventArgs e)
+        => ValidCheck();
 
     /// <summary>
     /// パスなどのテキストボックス内のテキストが有効かどうかをチェックします。
@@ -703,5 +704,14 @@ internal sealed partial class AddItemForm : Form
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void AddItem_FormClosing(object sender, FormClosingEventArgs e) => ItemAdded?.Invoke(this, EventArgs.Empty);
+    private void AddItem_FormClosing(object sender, FormClosingEventArgs e) 
+        => ItemAdded?.Invoke(this, EventArgs.Empty);
+
+    private void AddItem_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Control && e.KeyCode == Keys.Enter && AddButton.Enabled)
+        {
+            AddButton_Click(this, EventArgs.Empty);
+        }
+    }
 }
