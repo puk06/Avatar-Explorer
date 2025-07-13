@@ -120,7 +120,7 @@ internal static class ItemUtils
                 case ".clip":
                 case ".blend":
                 case ".fbx":
-                    itemFolderInfo.ModifyFiles.Add(item);
+                    itemFolderInfo.FilesForModification.Add(item);
                     break;
                 case ".png":
                 case ".jpg":
@@ -135,7 +135,7 @@ internal static class ItemUtils
                     itemFolderInfo.UnityPackageFiles.Add(item);
                     break;
                 default:
-                    itemFolderInfo.UnkownFiles.Add(item);
+                    itemFolderInfo.UnknownFiles.Add(item);
                     break;
             }
         }

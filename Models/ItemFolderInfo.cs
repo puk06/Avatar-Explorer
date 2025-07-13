@@ -8,7 +8,7 @@ internal class ItemFolderInfo
     /// <summary>
     /// 改変用のデータが入ったパス配列を取得または設定します。
     /// </summary>
-    internal List<FileData> ModifyFiles { get; set; } = new List<FileData>();
+    internal List<FileData> FilesForModification { get; set; } = new List<FileData>();
 
     /// <summary>
     /// テクスチャが入ったパス配列を取得または設定します。
@@ -32,7 +32,7 @@ internal class ItemFolderInfo
     /// <summary>
     /// 不明なファイルが入ったパス配列を取得または設定します。
     /// </summary>
-    internal List<FileData> UnkownFiles { get; set; } = new List<FileData>();
+    internal List<FileData> UnknownFiles { get; set; } = new List<FileData>();
 
     /// <summary>
     /// フォルダ内の指定されたタイプのアイテムの数を取得します。
@@ -43,12 +43,12 @@ internal class ItemFolderInfo
     {
         return type switch
         {
-            "改変用データ" => ModifyFiles.Count,
+            "改変用データ" => FilesForModification.Count,
             "テクスチャ" => TextureFiles.Count,
             "ドキュメント" => DocumentFiles.Count,
             "Unityパッケージ" => UnityPackageFiles.Count,
             "マテリアル" => MaterialFiles.Count,
-            "不明" => UnkownFiles.Count,
+            "不明" => UnknownFiles.Count,
             _ => 0
         };
     }
@@ -62,12 +62,12 @@ internal class ItemFolderInfo
     {
         return type switch
         {
-            "改変用データ" => ModifyFiles,
+            "改変用データ" => FilesForModification,
             "テクスチャ" => TextureFiles,
             "ドキュメント" => DocumentFiles,
             "Unityパッケージ" => UnityPackageFiles,
             "マテリアル" => MaterialFiles,
-            "不明" => UnkownFiles,
+            "不明" => UnknownFiles,
             _ => new List<FileData>()
         };
     }
@@ -78,11 +78,11 @@ internal class ItemFolderInfo
     /// <returns></returns>
     internal IEnumerable<FileData> GetAllItem()
     {
-        return ModifyFiles
+        return FilesForModification
             .Concat(TextureFiles)
             .Concat(DocumentFiles)
             .Concat(UnityPackageFiles)
             .Concat(MaterialFiles)
-            .Concat(UnkownFiles);
+            .Concat(UnknownFiles);
     }
 }
