@@ -15,6 +15,9 @@ internal static partial class AEUtils
     [GeneratedRegex(@"(?<key>Author|Title|Booth|Avatar|Category|Memo|Folder|File|Implemented)=(?:""(?<value>.*?)""|(?<value>[^\s]+))|(?<word>[^\s]+)")]
     private static partial Regex SearchFilterRegex();
 
+    [GeneratedRegex(@"\u3010[^\u3011]+\u3011")]
+    private static partial Regex BracketsRegex();
+
     internal static readonly Timer ThumbnailUpdateTimer = new()
     {
         Interval = 200
@@ -330,4 +333,12 @@ internal static partial class AEUtils
     /// </summary>
     internal static string GenerateSeparatedPath(params string[] paths)
         => string.Join(" > ", paths);
+
+    /// <summary>
+    /// 与えられたタイトルから括弧を削除します。
+    /// </summary>
+    /// <param name="itemTitle"></param>
+    /// <returns></returns>
+    internal static string RemoveBrackets(string itemTitle)
+        => BracketsRegex().Replace(itemTitle, "");
 }

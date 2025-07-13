@@ -1,4 +1,6 @@
-﻿namespace Avatar_Explorer.Models;
+﻿using Avatar_Explorer.Utils;
+
+namespace Avatar_Explorer.Models;
 
 /// <summary>
 /// アイテム情報を表します。
@@ -89,4 +91,10 @@ public class Item
     /// アイテムが実装済みかどうかを管理する配列を取得または設定します。
     /// </summary>
     public List<string> ImplementedAvatars { get; set; } = new List<string>();
+
+    /// <summary>
+    /// タイトルに含まれる括弧をbool値に応じて削除する機能です。
+    /// </summary>
+    public string GetTitle(bool removeBrackets)
+        => removeBrackets ? AEUtils.RemoveBrackets(Title) : Title;
 }

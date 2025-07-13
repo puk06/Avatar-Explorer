@@ -13,7 +13,8 @@ internal class ConfigurationManager
         { "DefaultLanguage", "1" },
         { "DefaultSortOrder", "1" },
         { "ThumbnailUpdateTimeout", "200" },
-        { "BackupInterval", "5" }
+        { "BackupInterval", "5" },
+        { "RemoveBrackets", "false" }
     };
     private readonly Dictionary<string, string> _defaultKeysDescriptions = new()
     {
@@ -22,7 +23,8 @@ internal class ConfigurationManager
         { "DefaultLanguage", "# デフォルトの言語を指定できます。1: 日本語, 2: 한국어, 3: English" },
         { "DefaultSortOrder", "# デフォルトの並び替え順を変更できます。1: タイトル, 2: 作者, 3: 作成日時, 4: 更新日時, 5: 実装済み, 6: 未実装" },
         { "ThumbnailUpdateTimeout", "# スクロール終了後、何ms後にサムネイルを描画し直すかを変えることが出来ます。デフォルトは200msです。範囲: 1 - 10000" },
-        { "BackupInterval", "# 自動バックアップの間隔を変更することが出来ます。単位は分で、デフォルトは5分です。範囲: 1 - 1000" }
+        { "BackupInterval", "# 自動バックアップの間隔を変更することが出来ます。単位は分で、デフォルトは5分です。範囲: 1 - 1000" },
+        { "RemoveBrackets", "# 商品タイトルに含まれる【】のような括弧を非表示にします。表示上のみ影響され、データベースに影響はありません。trueで括弧の非表示、falseで表示です。" }
     };
     private const string _configulationDescription = "# このファイルはAvatar Explorerの起動時に読み込まれる設定ファイルです。書き換えた際はAvatar Explorerを再起動してください。";
 

@@ -14,7 +14,7 @@ internal sealed partial class MainForm : Form
     /// <summary>
     /// ソフトの現在のバージョン
     /// </summary>
-    private const string CurrentVersion = "v1.1.1";
+    private const string CurrentVersion = "v1.1.2";
 
     /// <summary>
     /// デフォルトのフォームテキスト
@@ -196,6 +196,11 @@ internal sealed partial class MainForm : Form
     /// デフォルトの並び替え順です。
     /// </summary>
     private int _defaultSortOrder = 1;
+
+    /// <summary>
+    /// 商品名の括弧を削除するか決めることが出来ます。
+    /// </summary>
+    private bool _removeBrackets = true;
     #endregion
 
     #region フォームの初期化
@@ -325,6 +330,7 @@ internal sealed partial class MainForm : Form
         int defaultSortOrder = int.TryParse(Configuration["DefaultSortOrder"], out var dso) ? dso : 1;
         int thumbnailUpdateTimeout = int.TryParse(Configuration["ThumbnailUpdateTimeout"], out var tut) ? Math.Clamp(tut, 0, 10000) : 200;
         int backupInterval = int.TryParse(Configuration["BackupInterval"], out var bi) ? Math.Clamp(bi, 1, 1000) : 5;
+        bool removeBrackets = Configuration["RemoveBrackets"] == "true";
 
         _itemsPerPage = itemsPerPage;
         _previewScale = previewScale;
@@ -332,6 +338,7 @@ internal sealed partial class MainForm : Form
         _defaultSortOrder = defaultSortOrder;
         AEUtils.ThumbnailUpdateTimer.Interval = thumbnailUpdateTimeout;
         _backupInterval = backupInterval * 60000; // ms -> min
+        _removeBrackets = removeBrackets;
     }
 
     #endregion
@@ -350,11 +357,11 @@ internal sealed partial class MainForm : Form
 
         items = SortingBox.SelectedIndex switch
         {
-            0 => items.OrderBy(item => item.Title),
+            0 => items.OrderBy(item => item.GetTitle(_removeBrackets)),
             1 => items.OrderBy(item => item.AuthorName),
             2 => items.OrderByDescending(item => item.CreatedDate),
             3 => items.OrderByDescending(item => item.UpdatedDate),
-            _ => items.OrderBy(item => item.Title),
+            _ => items.OrderBy(item => item.GetTitle(_removeBrackets)),
         };
 
         int totalCount = items.Count();
@@ -368,7 +375,7 @@ internal sealed partial class MainForm : Form
         {
             var description = ItemUtils.GetItemDescription(item, CurrentLanguage);
 
-            Button button = AEUtils.CreateButton(_previewScale, item.ImagePath, item.Title, LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName, true, description, GetAvatarListWidth);
+            Button button = AEUtils.CreateButton(_previewScale, item.ImagePath, item.GetTitle(_removeBrackets), LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName, true, description, GetAvatarListWidth);
             button.Location = new Point(0, (70 * index) + 2);
             button.MouseClick += OnMouseClick;
 
@@ -404,13 +411,15 @@ internal sealed partial class MainForm : Form
                 createContextMenu.AddItem(
                     LanguageUtils.Translate("Boothリンクのコピー", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.CopyIcon),
-                    (_, _) => BoothUtils.CopyItemBoothLink(item, CurrentLanguage)
+                    (_, _) => BoothUtils.CopyItemBoothLink(item, CurrentLanguage),
+                    Keys.C
                 );
 
                 createContextMenu.AddItem(
                     LanguageUtils.Translate("Boothリンクを開く", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.CopyIcon),
-                    (_, _) => BoothUtils.OpenItenBoothLink(item, CurrentLanguage)
+                    (_, _) => BoothUtils.OpenItenBoothLink(item, CurrentLanguage),
+                    Keys.B
                 );
             }
 
@@ -421,7 +430,8 @@ internal sealed partial class MainForm : Form
                 {
                     SearchBox.Text = $"Author=\"{item.AuthorName}\"";
                     SearchItems();
-                }
+                },
+                Keys.A
             );
 
             createContextMenu.AddItem(
@@ -455,7 +465,8 @@ internal sealed partial class MainForm : Form
 
                     GenerateAvatarList();
                     DatabaseUtils.SaveItemsData(Items);
-                }
+                },
+                Keys.T
             );
 
             createContextMenu.AddItem(
@@ -489,7 +500,8 @@ internal sealed partial class MainForm : Form
 
                     RefleshWindow();
                     DatabaseUtils.SaveItemsData(Items);
-                }
+                },
+                Keys.E
             );
 
             createContextMenu.AddItem(
@@ -509,7 +521,8 @@ internal sealed partial class MainForm : Form
 
                     RefleshWindow();
                     DatabaseUtils.SaveItemsData(Items);
-                }
+                },
+                Keys.M
             );
 
             createContextMenu.AddItem(
@@ -647,7 +660,8 @@ internal sealed partial class MainForm : Form
 
                         DatabaseUtils.SaveItemsData(Items);
                     }
-                }
+                },
+                Keys.D
             );
 
             button.ContextMenuStrip = createContextMenu.ContextMenuStrip;
@@ -758,7 +772,8 @@ internal sealed partial class MainForm : Form
 
                         GenerateAuthorList(false);
                         DatabaseUtils.SaveItemsData(Items);
-                    }
+                    },
+                    Keys.T
                 );
 
                 button.ContextMenuStrip = createContextMenu.ContextMenuStrip;
@@ -1058,13 +1073,13 @@ internal sealed partial class MainForm : Form
 
         filteredItems = SortingBox.SelectedIndex switch
         {
-            0 => filteredItems.OrderBy(item => item.Title).ToArray(),
+            0 => filteredItems.OrderBy(item => item.GetTitle(_removeBrackets)).ToArray(),
             1 => filteredItems.OrderBy(item => item.AuthorName).ToArray(),
             2 => filteredItems.OrderByDescending(item => item.CreatedDate).ToArray(),
             3 => filteredItems.OrderByDescending(item => item.UpdatedDate).ToArray(),
             4 => filteredItems.OrderBy(item => ItemUtils.ContainsSelectedAvatar(item, CurrentPath.CurrentSelectedAvatarPath) ? 0 : 1),
             5 => filteredItems.OrderBy(item => ItemUtils.ContainsSelectedAvatar(item, CurrentPath.CurrentSelectedAvatarPath) ? 1 : 0),
-            _ => filteredItems.OrderBy(item => item.Title).ToArray(),
+            _ => filteredItems.OrderBy(item => item.GetTitle(_removeBrackets)).ToArray(),
         };
 
         if (!filteredItems.Any()) return;
@@ -1094,7 +1109,7 @@ internal sealed partial class MainForm : Form
 
                 var description = ItemUtils.GetItemDescription(item, CurrentLanguage);
 
-                Button button = AEUtils.CreateButton(_previewScale, item.ImagePath, item.Title, authorText, false, description, GetItemExplorerListWidth);
+                Button button = AEUtils.CreateButton(_previewScale, item.ImagePath, item.GetTitle(_removeBrackets), authorText, false, description, GetItemExplorerListWidth);
                 button.Location = new Point(0, (70 * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -1164,7 +1179,8 @@ internal sealed partial class MainForm : Form
                     createContextMenu.AddItem(
                         LanguageUtils.Translate("フォルダを開く", CurrentLanguage),
                         SharedImages.GetImage(SharedImages.Images.OpenIcon),
-                        (_, _) => FileSystemUtils.OpenItemFolder(item, CurrentLanguage)
+                        (_, _) => FileSystemUtils.OpenItemFolder(item, CurrentLanguage),
+                        Keys.O
                     );
                 }
 
@@ -1173,13 +1189,15 @@ internal sealed partial class MainForm : Form
                     createContextMenu.AddItem(
                         LanguageUtils.Translate("Boothリンクのコピー", CurrentLanguage),
                         SharedImages.GetImage(SharedImages.Images.CopyIcon),
-                        (_, _) => BoothUtils.CopyItemBoothLink(item, CurrentLanguage)
+                        (_, _) => BoothUtils.CopyItemBoothLink(item, CurrentLanguage),
+                        Keys.C
                     );
 
                     createContextMenu.AddItem(
                         LanguageUtils.Translate("Boothリンクを開く", CurrentLanguage),
                         SharedImages.GetImage(SharedImages.Images.CopyIcon),
-                        (_, _) => BoothUtils.OpenItenBoothLink(item, CurrentLanguage)
+                        (_, _) => BoothUtils.OpenItenBoothLink(item, CurrentLanguage),
+                        Keys.B
                     );
                 }
 
@@ -1190,7 +1208,8 @@ internal sealed partial class MainForm : Form
                     {
                         SearchBox.Text = $"Author=\"{item.AuthorName}\"";
                         SearchItems();
-                    }
+                    },
+                    Keys.A
                 );
 
                 createContextMenu.AddItem(
@@ -1227,7 +1246,8 @@ internal sealed partial class MainForm : Form
 
                         GenerateAvatarList(false);
                         DatabaseUtils.SaveItemsData(Items);
-                    }
+                    },
+                    Keys.T
                 );
 
                 createContextMenu.AddItem(
@@ -1252,7 +1272,8 @@ internal sealed partial class MainForm : Form
                         if (!_isSearching) PathTextBox.Text = GeneratePath();
                         RefleshWindow();
                         DatabaseUtils.SaveItemsData(Items);
-                    }
+                    },
+                    Keys.E
                 );
 
                 createContextMenu.AddItem(
@@ -1272,7 +1293,8 @@ internal sealed partial class MainForm : Form
                         GenerateAuthorList(false);
                         GenerateItems(false);
                         DatabaseUtils.SaveItemsData(Items);
-                    }
+                    },
+                    Keys.E
                 );
 
                 var implementedMenu = createContextMenu.AddItem(LanguageUtils.Translate("実装/未実装", CurrentLanguage), SharedImages.GetImage(SharedImages.Images.EditIcon));
@@ -1386,7 +1408,8 @@ internal sealed partial class MainForm : Form
                         }
 
                         DatabaseUtils.SaveItemsData(Items);
-                    }
+                    },
+                    Keys.D
                 );
 
                 button.ContextMenuStrip = createContextMenu.ContextMenuStrip;
@@ -1546,13 +1569,15 @@ internal sealed partial class MainForm : Form
                 createContextMenu.AddItem(
                     LanguageUtils.Translate("開く", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.CopyIcon),
-                    (_, _) => FileSystemUtils.OpenItemFile(file, true, CurrentLanguage)
+                    (_, _) => FileSystemUtils.OpenItemFile(file, true, CurrentLanguage),
+                    Keys.O
                 );
 
                 createContextMenu.AddItem(
                     LanguageUtils.Translate("ファイルのパスを開く", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.CopyIcon),
-                    (_, _) => FileSystemUtils.OpenItemFile(file, false, CurrentLanguage)
+                    (_, _) => FileSystemUtils.OpenItemFile(file, false, CurrentLanguage),
+                    Keys.P
                 );
 
                 button.ContextMenuStrip = createContextMenu.ContextMenuStrip;
@@ -1660,7 +1685,7 @@ internal sealed partial class MainForm : Form
             {
                 var description = ItemUtils.GetItemDescription(item, CurrentLanguage);
 
-                Button button = AEUtils.CreateButton(_previewScale, item.ImagePath, item.Title, LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName, false, description, GetItemExplorerListWidth);
+                Button button = AEUtils.CreateButton(_previewScale, item.ImagePath, item.GetTitle(_removeBrackets), LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName, false, description, GetItemExplorerListWidth);
                 button.Location = new Point(0, (70 * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -1725,7 +1750,8 @@ internal sealed partial class MainForm : Form
                     createContextMenu.AddItem(
                         LanguageUtils.Translate("フォルダを開く", CurrentLanguage),
                         SharedImages.GetImage(SharedImages.Images.OpenIcon),
-                        (_, _) => FileSystemUtils.OpenItemFolder(item, CurrentLanguage)
+                        (_, _) => FileSystemUtils.OpenItemFolder(item, CurrentLanguage),
+                        Keys.O
                     );
                 }
 
@@ -1734,13 +1760,15 @@ internal sealed partial class MainForm : Form
                     createContextMenu.AddItem(
                         LanguageUtils.Translate("Boothリンクのコピー", CurrentLanguage),
                         SharedImages.GetImage(SharedImages.Images.CopyIcon),
-                        (_, _) => BoothUtils.CopyItemBoothLink(item, CurrentLanguage)
+                        (_, _) => BoothUtils.CopyItemBoothLink(item, CurrentLanguage),
+                        Keys.C
                     );
 
                     createContextMenu.AddItem(
                         LanguageUtils.Translate("Boothリンクを開く", CurrentLanguage),
                         SharedImages.GetImage(SharedImages.Images.CopyIcon),
-                        (_, _) => BoothUtils.OpenItenBoothLink(item, CurrentLanguage)
+                        (_, _) => BoothUtils.OpenItenBoothLink(item, CurrentLanguage),
+                        Keys.B
                     );
                 }
 
@@ -1751,7 +1779,8 @@ internal sealed partial class MainForm : Form
                     {
                         SearchBox.Text = $"Author=\"{item.AuthorName}\"";
                         SearchItems();
-                    }
+                    },
+                    Keys.A
                 );
 
                 createContextMenu.AddItem(
@@ -1780,7 +1809,8 @@ internal sealed partial class MainForm : Form
                         GenerateFilteredItem(searchFilter, false);
                         GenerateAvatarList(false);
                         DatabaseUtils.SaveItemsData(Items);
-                    }
+                    },
+                    Keys.T
                 );
 
                 createContextMenu.AddItem(
@@ -1806,7 +1836,8 @@ internal sealed partial class MainForm : Form
                         GenerateAuthorList(false);
                         GenerateCategoryListLeft();
                         DatabaseUtils.SaveItemsData(Items);
-                    }
+                    },
+                    Keys.E
                 );
 
                 createContextMenu.AddItem(
@@ -1826,7 +1857,8 @@ internal sealed partial class MainForm : Form
                         GenerateFilteredItem(searchFilter, false);
                         GenerateAvatarList(false);
                         DatabaseUtils.SaveItemsData(Items);
-                    }
+                    },
+                    Keys.M
                 );
 
                 var implementedMenu = createContextMenu.AddItem(LanguageUtils.Translate("実装/未実装", CurrentLanguage), SharedImages.GetImage(SharedImages.Images.EditIcon));
@@ -1920,7 +1952,8 @@ internal sealed partial class MainForm : Form
                         GenerateAuthorList(false);
                         GenerateCategoryListLeft();
                         DatabaseUtils.SaveItemsData(Items);
-                    }
+                    },
+                    Keys.D
                 );
 
                 button.ContextMenuStrip = createContextMenu.ContextMenuStrip;
@@ -2015,13 +2048,15 @@ internal sealed partial class MainForm : Form
                 createContextMenu.AddItem(
                     LanguageUtils.Translate("開く", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.CopyIcon),
-                    (_, _) => FileSystemUtils.OpenItemFile(file, true, CurrentLanguage)
+                    (_, _) => FileSystemUtils.OpenItemFile(file, true, CurrentLanguage),
+                    Keys.O
                 );
 
                 createContextMenu.AddItem(
                     LanguageUtils.Translate("ファイルのパスを開く", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.CopyIcon),
-                    (_, _) => FileSystemUtils.OpenItemFile(file, false, CurrentLanguage)
+                    (_, _) => FileSystemUtils.OpenItemFile(file, false, CurrentLanguage),
+                    Keys.P
                 );
 
                 button.ContextMenuStrip = createContextMenu.ContextMenuStrip;

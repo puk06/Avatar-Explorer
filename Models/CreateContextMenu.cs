@@ -19,11 +19,25 @@ internal class CreateContextMenu
     /// <param name="icon"></param>
     /// <param name="onClick"></param>
     /// <returns></returns>
-    internal CreateContextMenu AddItem(string text, Image icon, EventHandler onClick)
+    internal CreateContextMenu AddItem(string text, Image icon, EventHandler onClick, Keys keys = Keys.None)
     {
+        if (keys != Keys.None) text += $"({keys})";
+
         var item = new ToolStripMenuItem(text, icon);
         item.Click += onClick;
         item.Disposed += (_, _) => item.Click -= onClick;
+
+        if (keys != Keys.None)
+        {
+            _contextMenuStrip.KeyDown += (sender, e) =>
+            {
+                if (e.KeyCode != keys) return;
+
+                _contextMenuStrip.Close();
+                onClick?.Invoke(null, EventArgs.Empty);
+            };
+        }
+
         _contextMenuStrip.Items.Add(item);
 
         return this;
