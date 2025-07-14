@@ -127,7 +127,6 @@ internal sealed partial class AddItemForm : Form
         _mainForm = mainForm;
 
         InitializeComponent();
-
         TranslateControls();
 
         for (var i = 0; i < mainForm.CustomCategories.Count; i++)
@@ -135,10 +134,10 @@ internal sealed partial class AddItemForm : Form
             TypeComboBox.Items.Add(mainForm.CustomCategories[i]);
         }
 
+        SetTypeCombobox(type, customCategory);
+
         ItemFolderPaths = itemFolderPaths ?? Array.Empty<string>();
         if (boothId != "") BoothURLTextBox.Text = "https://booth.pm/ja/items/" + boothId;
-
-        SetTypeCombobox(type, customCategory);
 
         Text = LanguageUtils.Translate("アイテムの追加", _mainForm.CurrentLanguage);
 
@@ -154,7 +153,7 @@ internal sealed partial class AddItemForm : Form
             AuthorTextBox.Enabled = true;
             CustomButton.Enabled = false;
 
-            BoothURLTextBox.Text = item.BoothId != -1 ? $"https://booth.pm/ja/items/{item.BoothId}" : "";
+            BoothURLTextBox.Text = item.BoothId != -1 ? $"https://booth.pm/ja/items/{item.BoothId}" : string.Empty;
             FolderTextBox.Text = item.ItemPath;
             MaterialTextBox.Text = item.MaterialPath;
             FolderTextBox.ReadOnly = true;
@@ -168,7 +167,7 @@ internal sealed partial class AddItemForm : Form
             SelectAvatar.Text = LanguageUtils.Translate("選択中: ", _mainForm.CurrentLanguage) + SupportedAvatar.Count +
                                 LanguageUtils.Translate("個", _mainForm.CurrentLanguage);
 
-            if (Directory.Exists(FolderTextBox.Text))
+            if (!Directory.Exists(FolderTextBox.Text))
             {
                 FolderTextBox.ReadOnly = false;
                 openFolderButton.Enabled = true;
@@ -604,6 +603,11 @@ internal sealed partial class AddItemForm : Form
         AddButton.Enabled = true;
     }
 
+    /// <summary>
+    /// アイテムタイプ、カスタムカテゴリから、TypeComboBoxのIndexを設定します。
+    /// </summary>
+    /// <param name="itemType"></param>
+    /// <param name="customCategory"></param>
     private void SetTypeCombobox(ItemType itemType, string? customCategory)
     {
         if (itemType == ItemType.Custom)
