@@ -2698,28 +2698,17 @@ internal sealed partial class MainForm : Form
         SortingBox.Items.AddRange(sortingItems.Select(item => LanguageUtils.Translate(item, CurrentLanguage)).ToArray());
         SortingBox.SelectedIndex = selected;
 
-        foreach (Control control in AvatarSearchFilterList.Controls)
-        {
-            if (string.IsNullOrEmpty(control.Text)) continue;
-            _controlNames.TryAdd(control.Name, control.Text);
-            control.Text = LanguageUtils.Translate(_controlNames[control.Name], CurrentLanguage);
-            ChangeControlFont(control);
-        }
+        Control[] listPages = { AvatarSearchFilterList, ExplorerList, AvatarItemExplorer };
 
-        foreach (Control control in ExplorerList.Controls)
+        foreach (Control control in listPages)
         {
-            if (string.IsNullOrEmpty(control.Text)) continue;
-            _controlNames.TryAdd(control.Name, control.Text);
-            control.Text = LanguageUtils.Translate(_controlNames[control.Name], CurrentLanguage);
-            ChangeControlFont(control);
-        }
-
-        foreach (Control control in AvatarItemExplorer.Controls)
-        {
-            if (string.IsNullOrEmpty(control.Text)) continue;
-            _controlNames.TryAdd(control.Name, control.Text);
-            control.Text = LanguageUtils.Translate(_controlNames[control.Name], CurrentLanguage);
-            ChangeControlFont(control);
+            foreach (Control control1 in control.Controls)
+            {
+                if (string.IsNullOrEmpty(control1.Text)) continue;
+                _controlNames.TryAdd(control1.Name, control1.Text);
+                control1.Text = LanguageUtils.Translate(_controlNames[control1.Name], CurrentLanguage);
+                ChangeControlFont(control1);
+            }
         }
 
         ResizeControl();
@@ -2755,10 +2744,10 @@ internal sealed partial class MainForm : Form
 
         if (result)
         {
-            var selectedBackupForm = new SelectAutoBackupForm(this);
-            selectedBackupForm.ShowDialog();
+            var selectBackupForm = new SelectAutoBackupForm(this);
+            selectBackupForm.ShowDialog();
 
-            var backupPath = selectedBackupForm.SelectedBackupPath;
+            var backupPath = selectBackupForm.SelectedBackupPath;
 
             if (string.IsNullOrEmpty(backupPath)) return;
 
@@ -2787,11 +2776,6 @@ internal sealed partial class MainForm : Form
                 else
                 {
                     Items = DatabaseUtils.LoadItemsData(filePath);
-                    DatabaseUtils.FixItemRelativePaths(Items);
-                    DatabaseUtils.FixSupportedAvatarPaths(Items);
-                    DatabaseUtils.UpdateEmptyDates(Items);
-                    DatabaseUtils.FixItemDates(Items);
-                    DatabaseUtils.FixRelativePathEscapes(Items);
                     DatabaseUtils.SaveItemsData(Items);
                 }
 
@@ -2869,11 +2853,6 @@ internal sealed partial class MainForm : Form
                 else
                 {
                     Items = DatabaseUtils.LoadItemsData(filePath);
-                    DatabaseUtils.FixItemRelativePaths(Items);
-                    DatabaseUtils.FixSupportedAvatarPaths(Items);
-                    DatabaseUtils.UpdateEmptyDates(Items);
-                    DatabaseUtils.FixItemDates(Items);
-                    DatabaseUtils.FixRelativePathEscapes(Items);
                     DatabaseUtils.SaveItemsData(Items);
                 }
 
