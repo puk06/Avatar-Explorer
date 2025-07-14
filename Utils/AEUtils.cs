@@ -107,7 +107,7 @@ internal static partial class AEUtils
         }
         finally
         {
-            progressForm.ForceClose();
+            progressForm.Close();
         }
     }
 

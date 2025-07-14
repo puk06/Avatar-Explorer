@@ -217,7 +217,7 @@ internal static class DatabaseUtils
     /// </summary>
     /// <param name="items"></param>
     /// <param name="oldPath"></param>
-    internal static void ChangeAllItemPaths(ref List<Item> items, string oldPath)
+    internal static void ChangeAllItemPaths(List<Item> items, string oldPath)
     {
         foreach (var item in items)
         {
@@ -243,7 +243,7 @@ internal static class DatabaseUtils
     /// <param name="items"></param>
     /// <param name="avatarPath"></param>
     /// <param name="deleteFromSupported"></param>
-    internal static void DeleteAvatarFromItems(ref List<Item> items, string avatarPath, bool deleteFromSupported)
+    internal static void DeleteAvatarFromItems(List<Item> items, string avatarPath, bool deleteFromSupported)
     {
         foreach (var item in items)
         {
@@ -264,7 +264,7 @@ internal static class DatabaseUtils
     /// </summary>
     /// <param name="commonAvatars"></param>
     /// <param name="avatarPath"></param>
-    internal static void DeleteAvatarFromCommonAvatars(ref List<CommonAvatar> commonAvatars, string avatarPath)
+    internal static void DeleteAvatarFromCommonAvatars(List<CommonAvatar> commonAvatars, string avatarPath)
     {
         foreach (var commonAvatar in commonAvatars)
         {
@@ -272,7 +272,7 @@ internal static class DatabaseUtils
         }
     }
 
-    internal static void FixItemDates(ref List<Item> items)
+    internal static void FixItemDates(List<Item> items)
     {
         foreach (var item in items)
         {
@@ -295,7 +295,7 @@ internal static class DatabaseUtils
     /// </summary>
     /// <param name="items"></param>
     /// <returns></returns>
-    internal static void UpdateEmptyDates(ref List<Item> items)
+    internal static void UpdateEmptyDates(List<Item> items)
     {
         string now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
 
@@ -317,7 +317,7 @@ internal static class DatabaseUtils
     /// アイテムパスの絶対パスが./Datasと同じだった場合、自動で相対パスに変換するものです。
     /// </summary>
     /// <param name="items"></param>
-    internal static void FixItemRelativePaths(ref List<Item> items)
+    internal static void FixItemRelativePaths(List<Item> items)
     {
         string currentDirectory = Path.GetFullPath(".");
 
@@ -342,7 +342,7 @@ internal static class DatabaseUtils
     /// 相対パスのエスケープを直してくれます。
     /// </summary>
     /// <param name="items"></param>
-    internal static void FixRelativePathEscapes(ref List<Item> items)
+    internal static void FixRelativePathEscapes(List<Item> items)
     {
         foreach (var item in items)
         {
@@ -455,7 +455,7 @@ internal static class DatabaseUtils
     /// </summary>
     /// <param name="items"></param>
     /// <returns></returns>
-    internal static void FixSupportedAvatarPaths(ref List<Item> items)
+    internal static void FixSupportedAvatarPaths(List<Item> items)
     {
         var avatars = items.Where(x => x.Type == ItemType.Avatar).ToArray();
         foreach (var item in items)
@@ -478,9 +478,8 @@ internal static class DatabaseUtils
     /// </summary>
     /// <param name="items"></param>
     /// <param name="categories"></param>
-    /// <param name="currentLanguage"></param>
     /// <returns></returns>
-    internal static bool CheckMissingCustomCategories(List<Item> items, ref List<string> categories, string currentLanguage)
+    internal static bool CheckMissingCustomCategories(List<Item> items, List<string> categories)
     {
         List<string> missingCategories = new();
 

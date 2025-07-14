@@ -5,8 +5,6 @@ internal sealed class ProgressForm : Form
     private readonly ProgressBar _progressBar;
     private readonly Label _progressLabel;
     private readonly string _formTitle;
-    
-    private bool _allowClose = false;
 
     internal ProgressForm(string progressFormTitle)
     {
@@ -51,16 +49,5 @@ internal sealed class ProgressForm : Form
         _progressBar.Value = percentage;
         _progressLabel.Text = $"{percentage}% {message}";
         Text = $"{_formTitle} - {percentage}%";
-    }
-
-    protected override void OnFormClosing(FormClosingEventArgs e)
-    {
-        if (e.CloseReason == CloseReason.UserClosing && !_allowClose) e.Cancel = true;
-    }
-
-    public void ForceClose()
-    {
-        _allowClose = true;
-        Close();
     }
 }

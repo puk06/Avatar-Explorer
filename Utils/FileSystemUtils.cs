@@ -98,7 +98,15 @@ internal static class FileSystemUtils
     /// <param name="destDirName"></param>
     internal static async Task CopyDirectoryWithProgress(string sourceDirName, string destDirName, string currentLanguage = "", string progressFormTitle = "", bool showProgress = false)
     {
+        var cts = new CancellationTokenSource();
+
         ProgressForm progressForm = new(progressFormTitle);
+
+        progressForm.FormClosing += (s, e) =>
+        {
+            cts.Cancel();
+        };
+
         if (showProgress) progressForm.Show();
 
         try
@@ -127,6 +135,9 @@ internal static class FileSystemUtils
             {
                 void Copy(string source, string dest)
                 {
+                    if (cts.Token.IsCancellationRequested)
+                        cts.Token.ThrowIfCancellationRequested();
+
                     if (!Directory.Exists(dest))
                         Directory.CreateDirectory(dest);
 
@@ -134,6 +145,9 @@ internal static class FileSystemUtils
 
                     foreach (var file in dir.GetFiles())
                     {
+                        if (cts.Token.IsCancellationRequested)
+                            cts.Token.ThrowIfCancellationRequested();
+
                         var temppath = Path.Combine(dest, file.Name);
                         file.CopyTo(temppath, true);
                         copiedFiles++;
@@ -144,19 +158,22 @@ internal static class FileSystemUtils
 
                     foreach (var subdir in dir.GetDirectories())
                     {
+                        if (cts.Token.IsCancellationRequested)
+                            cts.Token.ThrowIfCancellationRequested();
+
                         var temppath = Path.Combine(dest, subdir.Name);
                         Copy(subdir.FullName, temppath);
                     }
                 }
 
                 Copy(sourceDirName, destDirName);
-            });
+            }, cts.Token);
 
             UpdateProgress(100, LanguageUtils.Translate("完了", currentLanguage));
         }
         finally
         {
-            progressForm.ForceClose();
+            progressForm.Close();
         }
     }
 

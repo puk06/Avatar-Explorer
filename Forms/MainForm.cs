@@ -220,23 +220,23 @@ internal sealed partial class MainForm : Form
             CustomCategories = DatabaseUtils.LoadCustomCategoriesData();
 
             // Add Missing Custom Categories
-            var added = DatabaseUtils.CheckMissingCustomCategories(Items, ref CustomCategories, CurrentLanguage);
+            var added = DatabaseUtils.CheckMissingCustomCategories(Items, CustomCategories);
             if (added) DatabaseUtils.SaveCustomCategoriesData(CustomCategories);
 
             // Fix Item Relative Path
-            DatabaseUtils.FixItemRelativePaths(ref Items);
+            DatabaseUtils.FixItemRelativePaths(Items);
 
             // Fix Supported Avatar Path (Title => Path)
-            DatabaseUtils.FixSupportedAvatarPaths(ref Items);
+            DatabaseUtils.FixSupportedAvatarPaths(Items);
 
             // Update Empty Dates
-            DatabaseUtils.UpdateEmptyDates(ref Items);
+            DatabaseUtils.UpdateEmptyDates(Items);
 
             // Fix Item Dates
-            DatabaseUtils.FixItemDates(ref Items);
+            DatabaseUtils.FixItemDates(Items);
 
             // Fix Relative Path Escape
-            DatabaseUtils.FixRelativePathEscapes(ref Items);
+            DatabaseUtils.FixRelativePathEscapes(Items);
 
             AddFontFile();
             InitializeComponent();
@@ -426,11 +426,7 @@ internal sealed partial class MainForm : Form
             createContextMenu.AddItem(
                 LanguageUtils.Translate("この作者の他のアイテムを表示", CurrentLanguage),
                 SharedImages.GetImage(SharedImages.Images.OpenIcon),
-                (_, _) =>
-                {
-                    SearchBox.Text = $"Author=\"{item.AuthorName}\"";
-                    SearchItems();
-                },
+                (_, _) => SearchByAuthorName(item),
                 Keys.A
             );
 
@@ -439,23 +435,7 @@ internal sealed partial class MainForm : Form
                 SharedImages.GetImage(SharedImages.Images.EditIcon),
                 (_, _) =>
                 {
-                    var previousPath = item.ImagePath;
-                    OpenFileDialog ofd = new()
-                    {
-                        Filter = LanguageUtils.Translate("画像ファイル|*.png;*.jpg", CurrentLanguage),
-                        Title = LanguageUtils.Translate("サムネイル変更", CurrentLanguage),
-                        Multiselect = false
-                    };
-                    if (ofd.ShowDialog() != DialogResult.OK) return;
-
-                    item.ImagePath = ofd.FileName;
-
-                    FormUtils.ShowMessageBox(
-                        LanguageUtils.Translate("サムネイルを変更しました！", CurrentLanguage) + "\n\n" +
-                        LanguageUtils.Translate("変更前: ", CurrentLanguage) + previousPath + "\n\n" +
-                        LanguageUtils.Translate("変更後: ", CurrentLanguage) + ofd.FileName,
-                        LanguageUtils.Translate("完了", CurrentLanguage)
-                    );
+                    if (!ChangeThumbnail(item)) return;
 
                     // もしアバターの欄を右で開いていたら、そのサムネイルも更新しないといけないため。
                     if (_openingWindow == Window.ItemList && !_isSearching) GenerateItems();
@@ -480,7 +460,7 @@ internal sealed partial class MainForm : Form
                     addItem.ShowDialog();
 
                     // 対応アバターのパスを変えてあげる
-                    DatabaseUtils.ChangeAllItemPaths(ref Items, prePath);
+                    DatabaseUtils.ChangeAllItemPaths(Items, prePath);
 
                     // もしアイテムで編集されたアイテムを開いていたら、パスなどに使用される文字列も更新しないといけないため
                     if (CurrentPath.CurrentSelectedAvatarPath == prePath)
@@ -509,15 +489,7 @@ internal sealed partial class MainForm : Form
                 SharedImages.GetImage(SharedImages.Images.EditIcon),
                 (_, _) =>
                 {
-                    var previousMemo = item.ItemMemo;
-                    AddMemoForm addMemo = new(this, item);
-                    addMemo.ShowDialog();
-
-                    var memo = addMemo.Memo;
-                    if (memo == previousMemo) return;
-
-                    item.ItemMemo = memo;
-                    item.UpdatedDate = DateUtils.GetUnixTime();
+                    if (!AddMemoToItem(item)) return;
 
                     RefleshWindow();
                     DatabaseUtils.SaveItemsData(Items);
@@ -552,29 +524,7 @@ internal sealed partial class MainForm : Form
                     }
 
                     // アバターのときは対応アバター削除、共通素体グループから削除用の処理を実行する
-                    if (item.Type == ItemType.Avatar)
-                    {
-                        var result2 = FormUtils.ShowConfirmDialog(
-                            LanguageUtils.Translate("このアバターを対応アバターとしているアイテムの対応アバターからこのアバターを削除しますか？", CurrentLanguage),
-                            LanguageUtils.Translate("確認", CurrentLanguage)
-                        );
-
-                        DatabaseUtils.DeleteAvatarFromItems(ref Items, item.ItemPath, result2);
-
-                        if (CommonAvatars.Any(commonAvatar => commonAvatar.Avatars.Contains(item.ItemPath)))
-                        {
-                            var result3 = FormUtils.ShowConfirmDialog(
-                                LanguageUtils.Translate("このアバターを共通素体グループから削除しますか？", CurrentLanguage),
-                                LanguageUtils.Translate("確認", CurrentLanguage)
-                            );
-
-                            if (result3)
-                            {
-                                DatabaseUtils.DeleteAvatarFromCommonAvatars(ref CommonAvatars, item.ItemPath);
-                                DatabaseUtils.SaveCommonAvatarData(CommonAvatars);
-                            }
-                        }
-                    }
+                    if (item.Type == ItemType.Avatar) DeleteAvatarFromSupported(item);
 
                     Items.RemoveAll(i => i.ItemPath == item.ItemPath);
 
@@ -749,26 +699,7 @@ internal sealed partial class MainForm : Form
                     SharedImages.GetImage(SharedImages.Images.EditIcon),
                     (_, _) =>
                     {
-                        var previousPath = author.AuthorImagePath;
-                        OpenFileDialog ofd = new()
-                        {
-                            Filter = LanguageUtils.Translate("画像ファイル|*.png;*.jpg", CurrentLanguage),
-                            Title = LanguageUtils.Translate("サムネイル変更", CurrentLanguage),
-                            Multiselect = false
-                        };
-                        if (ofd.ShowDialog() != DialogResult.OK) return;
-
-                        foreach (var item in Items.Where(item => item.AuthorName == author.AuthorName))
-                        {
-                            item.AuthorImageFilePath = ofd.FileName;
-                        }
-
-                        FormUtils.ShowMessageBox(
-                            LanguageUtils.Translate("サムネイルを変更しました！", CurrentLanguage) + "\n\n" +
-                            LanguageUtils.Translate("変更前: ", CurrentLanguage) + previousPath + "\n\n" +
-                            LanguageUtils.Translate("変更後: ", CurrentLanguage) + ofd.FileName,
-                            "完了"
-                        );
+                        if (!ChangeThumbnail(author)) return;
 
                         GenerateAuthorList(false);
                         DatabaseUtils.SaveItemsData(Items);
@@ -1148,7 +1079,7 @@ internal sealed partial class MainForm : Form
                         }
 
                         // 対応アバターのパスを変えてあげる
-                        DatabaseUtils.ChangeAllItemPaths(ref Items, prePath);
+                        DatabaseUtils.ChangeAllItemPaths(Items, prePath);
 
                         if (CurrentPath.CurrentSelectedAvatarPath == prePath)
                         {
@@ -1204,11 +1135,7 @@ internal sealed partial class MainForm : Form
                 createContextMenu.AddItem(
                     LanguageUtils.Translate("この作者の他のアイテムを表示", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.OpenIcon),
-                    (_, _) =>
-                    {
-                        SearchBox.Text = $"Author=\"{item.AuthorName}\"";
-                        SearchItems();
-                    },
+                    (_, _) => SearchByAuthorName(item),
                     Keys.A
                 );
 
@@ -1217,23 +1144,7 @@ internal sealed partial class MainForm : Form
                     SharedImages.GetImage(SharedImages.Images.EditIcon),
                     (_, _) =>
                     {
-                        var previousPath = item.ImagePath;
-                        OpenFileDialog ofd = new()
-                        {
-                            Filter = LanguageUtils.Translate("画像ファイル|*.png;*.jpg", CurrentLanguage),
-                            Title = LanguageUtils.Translate("サムネイル変更", CurrentLanguage),
-                            Multiselect = false
-                        };
-                        if (ofd.ShowDialog() != DialogResult.OK) return;
-
-                        item.ImagePath = ofd.FileName;
-
-                        FormUtils.ShowMessageBox(
-                            LanguageUtils.Translate("サムネイルを変更しました！", CurrentLanguage) + "\n\n" +
-                            LanguageUtils.Translate("変更前: ", CurrentLanguage) + previousPath + "\n\n" +
-                            LanguageUtils.Translate("変更後: ", CurrentLanguage) + ofd.FileName,
-                            LanguageUtils.Translate("完了", CurrentLanguage)
-                        );
+                        if (!ChangeThumbnail(item)) return;
 
                         if (_isSearching)
                         {
@@ -1261,7 +1172,7 @@ internal sealed partial class MainForm : Form
                         addItem.ShowDialog();
 
                         // 対応アバターのパスを変えてあげる
-                        DatabaseUtils.ChangeAllItemPaths(ref Items, prePath);
+                        DatabaseUtils.ChangeAllItemPaths(Items, prePath);
 
                         if (CurrentPath.CurrentSelectedAvatarPath == prePath)
                         {
@@ -1281,14 +1192,7 @@ internal sealed partial class MainForm : Form
                     SharedImages.GetImage(SharedImages.Images.EditIcon),
                     (_, _) =>
                     {
-                        var previousMemo = item.ItemMemo;
-                        AddMemoForm addMemo = new(this, item);
-                        addMemo.ShowDialog();
-
-                        var memo = addMemo.Memo;
-                        if (memo == previousMemo) return;
-
-                        item.ItemMemo = memo;
+                        if (!AddMemoToItem(item)) return;
 
                         GenerateAuthorList(false);
                         GenerateItems(false);
@@ -1360,29 +1264,8 @@ internal sealed partial class MainForm : Form
                             PathTextBox.Text = GeneratePath();
                         }
 
-                        if (item.Type == ItemType.Avatar)
-                        {
-                            var result2 = FormUtils.ShowConfirmDialog(
-                                LanguageUtils.Translate("このアバターを対応アバターとしているアイテムの対応アバターからこのアバターを削除しますか？", CurrentLanguage),
-                                LanguageUtils.Translate("確認", CurrentLanguage)
-                            );
-
-                            DatabaseUtils.DeleteAvatarFromItems(ref Items, item.ItemPath, result2);
-
-                            if (CommonAvatars.Any(commonAvatar => commonAvatar.Avatars.Contains(item.ItemPath)))
-                            {
-                                var result3 = FormUtils.ShowConfirmDialog(
-                                    LanguageUtils.Translate("このアバターを共通素体グループから削除しますか？", CurrentLanguage),
-                                    LanguageUtils.Translate("確認", CurrentLanguage)
-                                );
-
-                                if (result3)
-                                {
-                                    DatabaseUtils.DeleteAvatarFromCommonAvatars(ref CommonAvatars, item.ItemPath);
-                                    DatabaseUtils.SaveCommonAvatarData(CommonAvatars);
-                                }
-                            }
-                        }
+                        // アバターのときは対応アバター削除、共通素体グループから削除用の処理を実行する
+                        if (item.Type == ItemType.Avatar) DeleteAvatarFromSupported(item);
 
                         Items.RemoveAll(i => i.ItemPath == item.ItemPath);
 
@@ -1613,6 +1496,101 @@ internal sealed partial class MainForm : Form
     }
     #endregion
 
+    #region ボタンの処理
+    private bool ChangeThumbnail(Item item)
+    {
+        var previousPath = item.ImagePath;
+        OpenFileDialog ofd = new()
+        {
+            Filter = LanguageUtils.Translate("画像ファイル|*.png;*.jpg", CurrentLanguage),
+            Title = LanguageUtils.Translate("サムネイル変更", CurrentLanguage),
+            Multiselect = false
+        };
+        if (ofd.ShowDialog() != DialogResult.OK) return false;
+
+        item.ImagePath = ofd.FileName;
+
+        FormUtils.ShowMessageBox(
+            LanguageUtils.Translate("サムネイルを変更しました！", CurrentLanguage) + "\n\n" +
+            LanguageUtils.Translate("変更前: ", CurrentLanguage) + previousPath + "\n\n" +
+            LanguageUtils.Translate("変更後: ", CurrentLanguage) + ofd.FileName,
+            LanguageUtils.Translate("完了", CurrentLanguage)
+        );
+
+        return true;
+    }
+    private bool ChangeThumbnail(Author author)
+    {
+        var previousPath = author.AuthorImagePath;
+        OpenFileDialog ofd = new()
+        {
+            Filter = LanguageUtils.Translate("画像ファイル|*.png;*.jpg", CurrentLanguage),
+            Title = LanguageUtils.Translate("サムネイル変更", CurrentLanguage),
+            Multiselect = false
+        };
+        if (ofd.ShowDialog() != DialogResult.OK) return false;
+
+        foreach (var item in Items.Where(item => item.AuthorImageFilePath == previousPath))
+        {
+            item.AuthorImageFilePath = ofd.FileName;
+        }
+
+        FormUtils.ShowMessageBox(
+            LanguageUtils.Translate("サムネイルを変更しました！", CurrentLanguage) + "\n\n" +
+            LanguageUtils.Translate("変更前: ", CurrentLanguage) + previousPath + "\n\n" +
+            LanguageUtils.Translate("変更後: ", CurrentLanguage) + ofd.FileName,
+            "完了"
+        );
+
+        return true;
+    }
+
+    private bool AddMemoToItem(Item item)
+    {
+        var previousMemo = item.ItemMemo;
+        AddMemoForm addMemo = new(this, item);
+        addMemo.ShowDialog();
+
+        var memo = addMemo.Memo;
+        if (memo == previousMemo) return false;
+
+        item.ItemMemo = memo;
+        item.UpdatedDate = DateUtils.GetUnixTime();
+
+        return true;
+    }
+
+    private void SearchByAuthorName(Item item)
+    {
+        SearchBox.Text = $"Author=\"{item.AuthorName}\"";
+        SearchItems();
+    }
+
+    private void DeleteAvatarFromSupported(Item item)
+    {
+        var result = FormUtils.ShowConfirmDialog(
+            LanguageUtils.Translate("このアバターを対応アバターとしているアイテムの対応アバターからこのアバターを削除しますか？", CurrentLanguage),
+            LanguageUtils.Translate("確認", CurrentLanguage)
+        );
+
+        DatabaseUtils.DeleteAvatarFromItems(Items, item.ItemPath, result);
+
+        if (CommonAvatars.Any(commonAvatar => commonAvatar.Avatars.Contains(item.ItemPath)))
+        {
+            var result1 = FormUtils.ShowConfirmDialog(
+                LanguageUtils.Translate("このアバターを共通素体グループから削除しますか？", CurrentLanguage),
+                LanguageUtils.Translate("確認", CurrentLanguage)
+            );
+
+            if (result1)
+            {
+                DatabaseUtils.DeleteAvatarFromCommonAvatars(CommonAvatars, item.ItemPath);
+                DatabaseUtils.SaveCommonAvatarData(CommonAvatars);
+            }
+        }
+    }
+    #endregion
+
     #region 検索関連の処理
     /// <summary>
     /// 検索ボックスに入力された文字列を元にアイテムを検索します。
@@ -1715,7 +1693,7 @@ internal sealed partial class MainForm : Form
                         }
 
                         // 対応アバターのパスを変えてあげる
-                        DatabaseUtils.ChangeAllItemPaths(ref Items, prePath);
+                        DatabaseUtils.ChangeAllItemPaths(Items, prePath);
 
                         GenerateFilteredItem(searchFilter, false);
                         GenerateAvatarList(false);
@@ -1775,11 +1753,7 @@ internal sealed partial class MainForm : Form
                 createContextMenu.AddItem(
                     LanguageUtils.Translate("この作者の他のアイテムを表示", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.OpenIcon),
-                    (_, _) =>
-                    {
-                        SearchBox.Text = $"Author=\"{item.AuthorName}\"";
-                        SearchItems();
-                    },
+                    (_, _) => SearchByAuthorName(item),
                     Keys.A
                 );
 
@@ -1788,23 +1762,7 @@ internal sealed partial class MainForm : Form
                     SharedImages.GetImage(SharedImages.Images.EditIcon),
                     (_, _) =>
                     {
-                        var previousPath = item.ImagePath;
-                        OpenFileDialog ofd = new()
-                        {
-                            Filter = LanguageUtils.Translate("画像ファイル|*.png;*.jpg", CurrentLanguage),
-                            Title = LanguageUtils.Translate("サムネイル変更", CurrentLanguage),
-                            Multiselect = false
-                        };
-                        if (ofd.ShowDialog() != DialogResult.OK) return;
-
-                        item.ImagePath = ofd.FileName;
-
-                        FormUtils.ShowMessageBox(
-                            LanguageUtils.Translate("サムネイルを変更しました！", CurrentLanguage) + "\n\n" +
-                            LanguageUtils.Translate("変更前: ", CurrentLanguage) + previousPath + "\n\n" +
-                            LanguageUtils.Translate("変更後: ", CurrentLanguage) + ofd.FileName,
-                            LanguageUtils.Translate("完了", CurrentLanguage)
-                        );
+                        if (!ChangeThumbnail(item)) return;
 
                         GenerateFilteredItem(searchFilter, false);
                         GenerateAvatarList(false);
@@ -1819,11 +1777,12 @@ internal sealed partial class MainForm : Form
                     (_, _) =>
                     {
                         var prePath = item.ItemPath;
+
                         AddItemForm addItem = new(this, item.Type, item.CustomCategory, true, item, null);
                         addItem.ShowDialog();
 
                         // 対応アバターのパスを変えてあげる
-                        DatabaseUtils.ChangeAllItemPaths(ref Items, prePath);
+                        DatabaseUtils.ChangeAllItemPaths(Items, prePath);
 
                         if (CurrentPath.CurrentSelectedAvatarPath == prePath)
                         {
@@ -1845,14 +1804,7 @@ internal sealed partial class MainForm : Form
                     SharedImages.GetImage(SharedImages.Images.EditIcon),
                     (_, _) =>
                     {
-                        var previousMemo = item.ItemMemo;
-                        AddMemoForm addMemo = new(this, item);
-                        addMemo.ShowDialog();
-
-                        var memo = addMemo.Memo;
-                        if (memo == previousMemo) return;
-
-                        item.ItemMemo = memo;
+                        if (!AddMemoToItem(item)) return;
 
                         GenerateFilteredItem(searchFilter, false);
                         GenerateAvatarList(false);
@@ -1916,29 +1868,8 @@ internal sealed partial class MainForm : Form
                         );
                         if (!result) return;
 
-                        if (item.Type == ItemType.Avatar)
-                        {
-                            var result2 = FormUtils.ShowConfirmDialog(
-                                LanguageUtils.Translate("このアバターを対応アバターとしているアイテムの対応アバターからこのアバターを削除しますか？", CurrentLanguage),
-                                LanguageUtils.Translate("確認", CurrentLanguage)
-                            );
-
-                            DatabaseUtils.DeleteAvatarFromItems(ref Items, item.ItemPath, result2);
-
-                            if (CommonAvatars.Any(commonAvatar => commonAvatar.Avatars.Contains(item.ItemPath)))
-                            {
-                                var result3 = FormUtils.ShowConfirmDialog(
-                                    LanguageUtils.Translate("このアバターを共通素体グループから削除しますか？", CurrentLanguage),
-                                    LanguageUtils.Translate("確認", CurrentLanguage)
-                                );
-
-                                if (result3)
-                                {
-                                    DatabaseUtils.DeleteAvatarFromCommonAvatars(ref CommonAvatars, item.ItemPath);
-                                    DatabaseUtils.SaveCommonAvatarData(CommonAvatars);
-                                }
-                            }
-                        }
+                        // アバターのときは対応アバター削除、共通素体グループから削除用の処理を実行する
+                        if (item.Type == ItemType.Avatar) DeleteAvatarFromSupported(item);
 
                         Items.RemoveAll(i => i.ItemPath == item.ItemPath);
 
@@ -2856,11 +2787,11 @@ internal sealed partial class MainForm : Form
                 else
                 {
                     Items = DatabaseUtils.LoadItemsData(filePath);
-                    DatabaseUtils.FixItemRelativePaths(ref Items);
-                    DatabaseUtils.FixSupportedAvatarPaths(ref Items);
-                    DatabaseUtils.UpdateEmptyDates(ref Items);
-                    DatabaseUtils.FixItemDates(ref Items);
-                    DatabaseUtils.FixRelativePathEscapes(ref Items);
+                    DatabaseUtils.FixItemRelativePaths(Items);
+                    DatabaseUtils.FixSupportedAvatarPaths(Items);
+                    DatabaseUtils.UpdateEmptyDates(Items);
+                    DatabaseUtils.FixItemDates(Items);
+                    DatabaseUtils.FixRelativePathEscapes(Items);
                     DatabaseUtils.SaveItemsData(Items);
                 }
 
@@ -2938,11 +2869,11 @@ internal sealed partial class MainForm : Form
                 else
                 {
                     Items = DatabaseUtils.LoadItemsData(filePath);
-                    DatabaseUtils.FixItemRelativePaths(ref Items);
-                    DatabaseUtils.FixSupportedAvatarPaths(ref Items);
-                    DatabaseUtils.UpdateEmptyDates(ref Items);
-                    DatabaseUtils.FixItemDates(ref Items);
-                    DatabaseUtils.FixRelativePathEscapes(ref Items);
+                    DatabaseUtils.FixItemRelativePaths(Items);
+                    DatabaseUtils.FixSupportedAvatarPaths(Items);
+                    DatabaseUtils.UpdateEmptyDates(Items);
+                    DatabaseUtils.FixItemDates(Items);
+                    DatabaseUtils.FixRelativePathEscapes(Items);
                     DatabaseUtils.SaveItemsData(Items);
                 }
 
@@ -3006,37 +2937,32 @@ internal sealed partial class MainForm : Form
                 var thumbnailResult = true;
                 var authorImageResult = true;
                 var itemsResult = true;
+
+                Enabled = false;
+                Visible = false;
                 if (Directory.Exists(thumbnailPath))
                 {
-                    Directory.CreateDirectory("./Datas/Thumbnail");
-                    foreach (var file in Directory.GetFiles(thumbnailPath))
+                    try
                     {
-                        try
-                        {
-                            File.Copy(file, "./Datas/Thumbnail/" + Path.GetFileName(file), true);
-                        }
-                        catch (Exception ex)
-                        {
-                            LogUtils.ErrorLogger("サムネイルのコピーに失敗しました。", ex);
-                            thumbnailResult = false;
-                        }
+                        await FileSystemUtils.CopyDirectoryWithProgress(thumbnailPath, "./Datas/Thumbnail", CurrentLanguage, LanguageUtils.Translate("データの移行中", CurrentLanguage) + " (Thumbnail)", true);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogUtils.ErrorLogger("サムネイルのコピーに失敗しました。", ex);
+                        thumbnailResult = false;
                     }
                 }
 
                 if (Directory.Exists(authorImagePath))
                 {
-                    Directory.CreateDirectory("./Datas/AuthorImage");
-                    foreach (var file in Directory.GetFiles(authorImagePath))
+                    try
                     {
-                        try
-                        {
-                            File.Copy(file, "./Datas/AuthorImage/" + Path.GetFileName(file), true);
-                        }
-                        catch (Exception ex)
-                        {
-                            LogUtils.ErrorLogger("作者画像のコピーに失敗しました。", ex);
-                            authorImageResult = false;
-                        }
+                        await FileSystemUtils.CopyDirectoryWithProgress(authorImagePath, "./Datas/AuthorImage", CurrentLanguage, LanguageUtils.Translate("データの移行中", CurrentLanguage) + " (Author Image)", true);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogUtils.ErrorLogger("作者画像のコピーに失敗しました。", ex);
+                        authorImageResult = false;
                     }
                 }
 
@@ -3045,16 +2971,12 @@ internal sealed partial class MainForm : Form
                     try
                     {
                         Enabled = false;
-                        await FileSystemUtils.CopyDirectoryWithProgress(itemsPath, "./Datas/Items", CurrentLanguage, LanguageUtils.Translate("データの移行中", CurrentLanguage), true);
+                        await FileSystemUtils.CopyDirectoryWithProgress(itemsPath, "./Datas/Items", CurrentLanguage, LanguageUtils.Translate("データの移行中", CurrentLanguage) + " (Items)", true);
                     }
                     catch (Exception ex)
                     {
                         LogUtils.ErrorLogger("Itemsのコピーに失敗しました。", ex);
                         itemsResult = false;
-                    }
-                    finally
-                    {
-                        Enabled = true;
                     }
                 }
 
@@ -3082,9 +3004,14 @@ internal sealed partial class MainForm : Form
                 );
                 LogUtils.ErrorLogger("データの読み込みに失敗しました。", ex);
             }
+            finally
+            {
+                Enabled = true;
+                Visible = true;
+            }
         }
 
-        DatabaseUtils.CheckMissingCustomCategories(Items, ref CustomCategories, CurrentLanguage);
+        DatabaseUtils.CheckMissingCustomCategories(Items, CustomCategories);
 
         SearchBox.Text = "";
         SearchResultLabel.Text = "";
@@ -3094,6 +3021,8 @@ internal sealed partial class MainForm : Form
         GenerateCategoryListLeft();
         ResetAvatarExplorer(true);
         PathTextBox.Text = GeneratePath();
+
+        BringToFront();
     }
 
     /// <summary>
