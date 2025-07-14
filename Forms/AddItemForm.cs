@@ -701,7 +701,7 @@ internal sealed partial class AddItemForm : Form
     /// <param name="e"></param>
     private void BoothURLTextBox_KeyDown(object sender, KeyEventArgs e)
     {
-        if (e.KeyCode == Keys.Enter)
+        if (!e.Control && e.KeyCode == Keys.Enter)
         {
             GetButton_Click(this, EventArgs.Empty);
         }
