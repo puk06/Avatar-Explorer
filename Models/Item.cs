@@ -5,7 +5,7 @@ namespace Avatar_Explorer.Models;
 /// <summary>
 /// アイテム情報を表します。
 /// </summary>
-public class Item
+public class Item()
 {
     /// <summary>
     /// アイテムのタイトルを取得または設定します。
@@ -97,4 +97,25 @@ public class Item
     /// </summary>
     public string GetTitle(bool removeBrackets)
         => removeBrackets ? AEUtils.RemoveBrackets(Title) : Title;
+
+    internal Item(Item item) : this()
+    {
+        Title = item.Title;
+        AuthorName = item.AuthorName;
+        ItemMemo = item.ItemMemo;
+        AuthorId = item.AuthorId;
+        BoothId = item.BoothId;
+        ItemPath = item.ItemPath;
+        MaterialPath = item.MaterialPath;
+        ThumbnailUrl = item.ThumbnailUrl;
+        ImagePath = item.ImagePath;
+        AuthorImageUrl = item.AuthorImageUrl;
+        AuthorImageFilePath = item.AuthorImageFilePath;
+        Type = item.Type;
+        CustomCategory = item.CustomCategory;
+        SupportedAvatar = new List<string>(item.SupportedAvatar);
+        CreatedDate = item.CreatedDate;
+        UpdatedDate = item.UpdatedDate;
+        ImplementedAvatars = new List<string>(item.ImplementedAvatars);
+    }
 }

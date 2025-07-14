@@ -65,7 +65,7 @@ internal sealed partial class SelectSupportedAvatarForm : Form
         var index = 0;
         foreach (Item item in items)
         {
-            if (item.ItemPath == _addItem.Item.ItemPath) continue;
+            if (item.ItemPath == _addItem.GetEditItem.ItemPath) continue;
             Button button = CreateAvatarButton(item, _mainForm.CurrentLanguage);
             button.Location = new Point(0, (70 * index) + 2);
             button.BackColor = _addItem.SupportedAvatar.Contains(item.ItemPath) ? Color.LightGreen : Color.FromKnownColor(KnownColor.Control);

@@ -503,7 +503,7 @@ internal sealed partial class MainForm : Form
                 (_, _) =>
                 {
                     var result = FormUtils.ShowConfirmDialog(
-                        LanguageUtils.Translate("本当に削除しますか？", CurrentLanguage),
+                        LanguageUtils.Translate("本当に削除しますか？", CurrentLanguage) + "\n\n" + item.Title,
                         LanguageUtils.Translate("確認", CurrentLanguage)
                     );
                     if (!result) return;
@@ -533,12 +533,12 @@ internal sealed partial class MainForm : Form
                         LanguageUtils.Translate("完了", CurrentLanguage)
                     );
 
+                    GenerateAvatarList(false);
+                    GenerateAuthorList(false);
+                    GenerateCategoryListLeft();
+
                     if (_isSearching)
                     {
-                        GenerateAvatarList();
-                        GenerateAuthorList();
-                        GenerateCategoryListLeft();
-
                         // フォルダー内検索の時
                         if (_openingWindow is Window.ItemFolderCategoryList or Window.ItemFolderItemsList)
                         {
@@ -575,10 +575,6 @@ internal sealed partial class MainForm : Form
                     }
                     else
                     {
-                        GenerateAvatarList();
-                        GenerateAuthorList();
-                        GenerateCategoryListLeft();
-
                         // アバターが選択された状態(CurrentSelectedAvatarPathとして設定されている時)
                         if (undo2)
                         {
@@ -1251,7 +1247,7 @@ internal sealed partial class MainForm : Form
                     (_, _) =>
                     {
                         var result = FormUtils.ShowConfirmDialog(
-                            LanguageUtils.Translate("本当に削除しますか？", CurrentLanguage),
+                            LanguageUtils.Translate("本当に削除しますか？", CurrentLanguage) + "\n\n" + item.Title,
                             LanguageUtils.Translate("確認", CurrentLanguage)
                         );
                         if (!result) return;
@@ -1863,7 +1859,7 @@ internal sealed partial class MainForm : Form
                     (_, _) =>
                     {
                         bool result = FormUtils.ShowConfirmDialog(
-                            LanguageUtils.Translate("本当に削除しますか？", CurrentLanguage),
+                            LanguageUtils.Translate("本当に削除しますか？", CurrentLanguage) + "\n\n" + item.Title,
                             LanguageUtils.Translate("確認", CurrentLanguage)
                         );
                         if (!result) return;

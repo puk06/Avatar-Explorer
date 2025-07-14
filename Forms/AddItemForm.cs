@@ -11,9 +11,14 @@ internal sealed partial class AddItemForm : Form
     private readonly MainForm _mainForm;
 
     /// <summary>
-    /// 編集モードで開かれているかどうかを取得または設定します。
+    /// 編集モードで開かれているかどうかを取得します。
     /// </summary>
     private readonly bool _edit;
+
+    /// <summary>
+    /// 編集モード時にパスが存在状態で画面が開かれたかどうかを取得します。
+    /// </summary>
+    private readonly bool _folderNotFound = false;
 
     /// <summary>
     /// 最後にBoothの情報を取得した時間を取得または設定します。
@@ -26,11 +31,6 @@ internal sealed partial class AddItemForm : Form
     private static readonly HttpClient _httpClient = new();
 
     /// <summary>
-    /// 追加ボタンが有効になれるかどうかを取得または設定します。
-    /// </summary>
-    private bool _addButtonEnabled;
-
-    /// <summary>
     /// アイテムが追加されたときに発生するイベントです。
     /// </summary>
     internal event EventHandler? ItemAdded;
@@ -38,21 +38,27 @@ internal sealed partial class AddItemForm : Form
     /// <summary>
     /// メインフォームに反映される予定のアイテムファイルです。
     /// </summary>
-    internal Item Item = new();
+    private Item _item = new();
+
+    /// <summary>
+    /// アイテム編集時に使用される、渡されたアイテムのコピーです。
+    /// </summary>
+    private readonly Item _editItem = new();
+
+    /// <summary>
+    /// 外部から編集時のアイテムのコピーを取得するプロパティです。
+    /// </summary>
+    internal Item GetEditItem => _editItem;
 
     /// <summary>
     /// 対応しているアバターのリストを取得または設定します。
     /// </summary>
-    internal List<string> SupportedAvatar = new List<string>();
+    internal List<string> SupportedAvatar = new();
 
     /// <summary>
     /// アイテムのその他のフォルダのパスを取得または設定します。
     /// </summary>
     private string[] _itemFolderPaths = Array.Empty<string>();
-
-    /// <summary>
-    /// アイテムフォルダのパスを取得または設定します。
-    /// </summary>
     private string[] ItemFolderPaths
     {
         get => _itemFolderPaths;
@@ -119,9 +125,9 @@ internal sealed partial class AddItemForm : Form
     {
         _edit = edit;
         _mainForm = mainForm;
+
         InitializeComponent();
 
-        ValidCheck();
         TranslateControls();
 
         for (var i = 0; i < mainForm.CustomCategories.Count; i++)
@@ -132,62 +138,45 @@ internal sealed partial class AddItemForm : Form
         ItemFolderPaths = itemFolderPaths ?? Array.Empty<string>();
         if (boothId != "") BoothURLTextBox.Text = "https://booth.pm/ja/items/" + boothId;
 
-        if (type == ItemType.Custom)
-        {
-            if (!string.IsNullOrEmpty(customCategory))
-            {
-                var typeIndex = TypeComboBox.Items.IndexOf(customCategory);
-                TypeComboBox.SelectedIndex = typeIndex == -1 ? 0 : typeIndex;
-            }
-            else
-            {
-                TypeComboBox.SelectedIndex = 0;
-            }
-        }
-        else
-        {
-            TypeComboBox.SelectedIndex = (int)type == 10 ? 0 : (int)type;
-        }
+        SetTypeCombobox(type, customCategory);
 
         Text = LanguageUtils.Translate("アイテムの追加", _mainForm.CurrentLanguage);
 
-        if (!(edit && item != null)) return;
-        Item = item;
-        Text = LanguageUtils.Translate("アイテムの編集", _mainForm.CurrentLanguage);
-        label3.Text = LanguageUtils.Translate("アイテムの編集", _mainForm.CurrentLanguage);
-        AddButton.Text = LanguageUtils.Translate("編集", _mainForm.CurrentLanguage);
-
-        AddButton.Enabled = true;
-        TitleTextBox.Enabled = true;
-        AuthorTextBox.Enabled = true;
-        CustomButton.Enabled = false;
-        _addButtonEnabled = true;
-
-        BoothURLTextBox.Text = item.BoothId != -1 ? $"https://booth.pm/ja/items/{item.BoothId}" : "";
-        FolderTextBox.Text = item.ItemPath;
-        MaterialTextBox.Text = item.MaterialPath;
-        FolderTextBox.ReadOnly = true;
-        openFolderButton.Enabled = false;
-
-        if (item.Type == ItemType.Custom)
+        if (edit && item != null)
         {
-            var typeIndex = TypeComboBox.Items.IndexOf(item.CustomCategory);
-            TypeComboBox.SelectedIndex = typeIndex == -1 ? 0 : typeIndex;
-        }
-        else
-        {
-            TypeComboBox.SelectedIndex = (int)item.Type;
+            _editItem = new Item(item);
+
+            Text = LanguageUtils.Translate("アイテムの編集", _mainForm.CurrentLanguage);
+            label3.Text = LanguageUtils.Translate("アイテムの編集", _mainForm.CurrentLanguage);
+            AddButton.Text = LanguageUtils.Translate("編集", _mainForm.CurrentLanguage);
+
+            TitleTextBox.Enabled = true;
+            AuthorTextBox.Enabled = true;
+            CustomButton.Enabled = false;
+
+            BoothURLTextBox.Text = item.BoothId != -1 ? $"https://booth.pm/ja/items/{item.BoothId}" : "";
+            FolderTextBox.Text = item.ItemPath;
+            MaterialTextBox.Text = item.MaterialPath;
+            FolderTextBox.ReadOnly = true;
+            openFolderButton.Enabled = false;
+
+            SetTypeCombobox(item.Type, item.CustomCategory);
+
+            SupportedAvatar = item.SupportedAvatar;
+            TitleTextBox.Text = item.Title;
+            AuthorTextBox.Text = item.AuthorName;
+            SelectAvatar.Text = LanguageUtils.Translate("選択中: ", _mainForm.CurrentLanguage) + SupportedAvatar.Count +
+                                LanguageUtils.Translate("個", _mainForm.CurrentLanguage);
+
+            if (Directory.Exists(FolderTextBox.Text))
+            {
+                FolderTextBox.ReadOnly = false;
+                openFolderButton.Enabled = true;
+                _folderNotFound = true;
+            }
         }
 
-        SupportedAvatar = item.SupportedAvatar;
-        TitleTextBox.Text = item.Title;
-        AuthorTextBox.Text = item.AuthorName;
-        SelectAvatar.Text = LanguageUtils.Translate("選択中: ", _mainForm.CurrentLanguage) + SupportedAvatar.Count +
-                            LanguageUtils.Translate("個", _mainForm.CurrentLanguage);
-
-        if (Directory.Exists(FolderTextBox.Text)) return;
-        FolderTextBox.Enabled = true;
-        openFolderButton.Enabled = true;
+        ValidCheck();
     }
 
     /// <summary>
@@ -202,7 +191,6 @@ internal sealed partial class AddItemForm : Form
         AuthorTextBox.Text = "";
         TitleTextBox.Enabled = true;
         AuthorTextBox.Enabled = true;
-        _addButtonEnabled = true;
     }
 
     private void TranslateControls()
@@ -261,7 +249,7 @@ internal sealed partial class AddItemForm : Form
         {
             GetButton.Enabled = false;
             GetButton.Text = LanguageUtils.Translate("取得中...", _mainForm.CurrentLanguage);
-            Item = await BoothUtils.GetBoothItemInfoAsync(boothId);
+            _item = await BoothUtils.GetBoothItemInfoAsync(boothId);
             GetButton.Text = LanguageUtils.Translate("情報を取得", _mainForm.CurrentLanguage);
             GetButton.Enabled = true;
         }
@@ -276,19 +264,18 @@ internal sealed partial class AddItemForm : Form
             AuthorTextBox.Enabled = true;
             GetButton.Enabled = true;
             GetButton.Text = LanguageUtils.Translate("情報を取得", _mainForm.CurrentLanguage);
-            Item = new Item();
+            _item = new Item();
         }
 
-        Item.BoothId = int.Parse(boothId);
+        _item.BoothId = int.Parse(boothId);
 
-        AddButton.Enabled = true;
-        TitleTextBox.Text = Item.Title;
-        AuthorTextBox.Text = Item.AuthorName;
-        if (Item.Type != ItemType.Unknown) TypeComboBox.SelectedIndex = (int)Item.Type;
+        TitleTextBox.Text = _item.Title;
+        AuthorTextBox.Text = _item.AuthorName;
+        if (_item.Type != ItemType.Unknown) TypeComboBox.SelectedIndex = (int)_item.Type;
         TitleTextBox.Enabled = true;
         AuthorTextBox.Enabled = true;
 
-        _addButtonEnabled = true;
+        ValidCheck();
     }
 
     /// <summary>
@@ -343,10 +330,10 @@ internal sealed partial class AddItemForm : Form
         ItemType type = TypeComboBox.SelectedIndex >= 9 ? ItemType.Custom : (ItemType)TypeComboBox.SelectedIndex;
 
         AddButton.Enabled = false;
-        Item.Title = TitleTextBox.Text;
-        Item.AuthorName = AuthorTextBox.Text;
-        Item.Type = type;
-        if (type == ItemType.Custom) Item.CustomCategory = TypeComboBox.Text;
+        _item.Title = TitleTextBox.Text;
+        _item.AuthorName = AuthorTextBox.Text;
+        _item.Type = type;
+        if (type == ItemType.Custom) _item.CustomCategory = TypeComboBox.Text;
 
         var itemFolderArray = Array.Empty<string>();
         foreach (var itemFolderPath in ItemFolderPaths)
@@ -368,16 +355,16 @@ internal sealed partial class AddItemForm : Form
             }
         }
 
-        Item.ItemPath = parentFolder;
+        _item.ItemPath = parentFolder;
 
-        var materialPath = ExtractZipWithHandling(MaterialTextBox.Text, Path.Combine(Item.ItemPath, "Materials"));
+        var materialPath = ExtractZipWithHandling(MaterialTextBox.Text, Path.Combine(_item.ItemPath, "Materials"));
         if (materialPath == null) return;
 
-        Item.MaterialPath = materialPath;
+        _item.MaterialPath = materialPath;
 
-        if (Item.Type != ItemType.Avatar) Item.SupportedAvatar = SupportedAvatar;
+        if (_item.Type != ItemType.Avatar) _item.SupportedAvatar = SupportedAvatar;
 
-        if (Item.BoothId != -1)
+        if (_item.BoothId != -1)
         {
             var thumbnailFolderPath = Path.Combine("Datas", "Thumbnail");
             if (!Directory.Exists(thumbnailFolderPath))
@@ -385,16 +372,16 @@ internal sealed partial class AddItemForm : Form
                 Directory.CreateDirectory(thumbnailFolderPath);
             }
 
-            var thumbnailPath = Path.Combine(thumbnailFolderPath, $"{Item.BoothId}.png");
+            var thumbnailPath = Path.Combine(thumbnailFolderPath, $"{_item.BoothId}.png");
             if (!File.Exists(thumbnailPath))
             {
-                if (!string.IsNullOrEmpty(Item.ThumbnailUrl))
+                if (!string.IsNullOrEmpty(_item.ThumbnailUrl))
                 {
                     try
                     {
-                        var thumbnailData = await _httpClient.GetByteArrayAsync(Item.ThumbnailUrl);
+                        var thumbnailData = await _httpClient.GetByteArrayAsync(_item.ThumbnailUrl);
                         await File.WriteAllBytesAsync(thumbnailPath, thumbnailData);
-                        Item.ImagePath = thumbnailPath;
+                        _item.ImagePath = thumbnailPath;
                     }
                     catch (Exception ex)
                     {
@@ -409,11 +396,11 @@ internal sealed partial class AddItemForm : Form
             }
             else
             {
-                Item.ImagePath = thumbnailPath;
+                _item.ImagePath = thumbnailPath;
             }
         }
 
-        if (!string.IsNullOrEmpty(Item.AuthorId))
+        if (!string.IsNullOrEmpty(_item.AuthorId))
         {
             var authorImageFolderPath = Path.Combine("Datas", "AuthorImage");
             if (!Directory.Exists(authorImageFolderPath))
@@ -421,16 +408,16 @@ internal sealed partial class AddItemForm : Form
                 Directory.CreateDirectory(authorImageFolderPath);
             }
 
-            var authorImagePath = Path.Combine(authorImageFolderPath, $"{Item.AuthorId}.png");
+            var authorImagePath = Path.Combine(authorImageFolderPath, $"{_item.AuthorId}.png");
             if (!File.Exists(authorImagePath))
             {
-                if (!string.IsNullOrEmpty(Item.AuthorImageUrl))
+                if (!string.IsNullOrEmpty(_item.AuthorImageUrl))
                 {
                     try
                     {
-                        var authorImageData = await _httpClient.GetByteArrayAsync(Item.AuthorImageUrl);
+                        var authorImageData = await _httpClient.GetByteArrayAsync(_item.AuthorImageUrl);
                         await File.WriteAllBytesAsync(authorImagePath, authorImageData);
-                        Item.AuthorImageFilePath = authorImagePath;
+                        _item.AuthorImageFilePath = authorImagePath;
                     }
                     catch (Exception ex)
                     {
@@ -445,7 +432,7 @@ internal sealed partial class AddItemForm : Form
             }
             else
             {
-                Item.AuthorImageFilePath = authorImagePath;
+                _item.AuthorImageFilePath = authorImagePath;
             }
         }
 
@@ -454,12 +441,12 @@ internal sealed partial class AddItemForm : Form
 
         if (_edit)
         {
-            Item.UpdatedDate = now;
+            _item.UpdatedDate = now;
         }
         else
         {
-            Item.CreatedDate = now;
-            Item.UpdatedDate = now;
+            _item.CreatedDate = now;
+            _item.UpdatedDate = now;
         }
 
         if (_edit)
@@ -467,23 +454,24 @@ internal sealed partial class AddItemForm : Form
             // 同じパスのものを削除してから追加
             FormUtils.ShowMessageBox(
                 LanguageUtils.Translate("Boothのアイテムを編集しました!", _mainForm.CurrentLanguage) + "\n" +
-                LanguageUtils.Translate("アイテム名: ", _mainForm.CurrentLanguage) + Item.Title + "\n" +
-                LanguageUtils.Translate("作者: ", _mainForm.CurrentLanguage) + Item.AuthorName,
+                LanguageUtils.Translate("アイテム名: ", _mainForm.CurrentLanguage) + _item.Title + "\n" +
+                LanguageUtils.Translate("作者: ", _mainForm.CurrentLanguage) + _item.AuthorName,
                 LanguageUtils.Translate("編集完了", _mainForm.CurrentLanguage)
             );
 
-            _mainForm.Items.RemoveAll(i => i.ItemPath == Item.ItemPath);
-            _mainForm.Items.Add(Item);
+            _mainForm.Items.RemoveAll(i => i.ItemPath == _editItem.ItemPath);
+            _mainForm.Items.Add(_item);
         }
         else
         {
             FormUtils.ShowMessageBox(
                 LanguageUtils.Translate("Boothのアイテムを追加しました!", _mainForm.CurrentLanguage) + "\n" +
-                LanguageUtils.Translate("アイテム名: ", _mainForm.CurrentLanguage) + Item.Title + "\n" +
-                LanguageUtils.Translate("作者: ", _mainForm.CurrentLanguage) + Item.AuthorName,
+                LanguageUtils.Translate("アイテム名: ", _mainForm.CurrentLanguage) + _item.Title + "\n" +
+                LanguageUtils.Translate("作者: ", _mainForm.CurrentLanguage) + _item.AuthorName,
                 LanguageUtils.Translate("追加完了", _mainForm.CurrentLanguage)
             );
-            _mainForm.Items.Add(Item);
+
+            _mainForm.Items.Add(_item);
         }
 
         Close();
@@ -603,8 +591,8 @@ internal sealed partial class AddItemForm : Form
     /// <param name="errorMessage"></param>
     private void SetErrorState(string errorMessage)
     {
-        AddButton.Enabled = false;
         ErrorLabel.Text = errorMessage;
+        AddButton.Enabled = false;
     }
 
     /// <summary>
@@ -612,8 +600,28 @@ internal sealed partial class AddItemForm : Form
     /// </summary>
     private void ClearErrorState()
     {
-        if (_addButtonEnabled) AddButton.Enabled = true;
         ErrorLabel.Text = "";
+        AddButton.Enabled = true;
+    }
+
+    private void SetTypeCombobox(ItemType itemType, string? customCategory)
+    {
+        if (itemType == ItemType.Custom)
+        {
+            if (!string.IsNullOrEmpty(customCategory))
+            {
+                var typeIndex = TypeComboBox.Items.IndexOf(customCategory);
+                TypeComboBox.SelectedIndex = typeIndex == -1 ? 0 : typeIndex;
+            }
+            else
+            {
+                TypeComboBox.SelectedIndex = 0;
+            }
+        }
+        else
+        {
+            TypeComboBox.SelectedIndex = (int)itemType == 10 ? 0 : (int)itemType;
+        }
     }
 
     /// <summary>
@@ -647,7 +655,7 @@ internal sealed partial class AddItemForm : Form
             return;
         }
 
-        if (_mainForm.Items.Any(i => i.ItemPath == FolderTextBox.Text) && !_edit)
+        if (_mainForm.Items.Any(i => i.ItemPath == FolderTextBox.Text) && (!_edit || _folderNotFound))
         {
             SetErrorState(LanguageUtils.Translate("エラー: 同じパスのアイテムが既に存在します", _mainForm.CurrentLanguage));
             return;
