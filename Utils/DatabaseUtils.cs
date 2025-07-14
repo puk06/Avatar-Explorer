@@ -42,6 +42,21 @@ internal static class DatabaseUtils
     {
         try
         {
+            // Fix Item Relative Path
+            FixItemRelativePaths(items);
+
+            // Fix Supported Avatar Path (Title => Path)
+            FixSupportedAvatarPaths(items);
+
+            // Update Empty Dates
+            UpdateEmptyDates(items);
+
+            // Fix Item Dates
+            FixItemDates(items);
+
+            // Fix Relative Path Escape
+            FixRelativePathEscapes(items);
+
             string json = JsonSerializer.Serialize(items, jsonSerializerOptions);
             File.WriteAllText("./Datas/ItemsData.json", json);
         }

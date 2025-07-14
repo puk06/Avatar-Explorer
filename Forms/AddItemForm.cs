@@ -166,7 +166,7 @@ internal sealed partial class AddItemForm : Form
         BoothURLTextBox.Text = item.BoothId != -1 ? $"https://booth.pm/ja/items/{item.BoothId}" : "";
         FolderTextBox.Text = item.ItemPath;
         MaterialTextBox.Text = item.MaterialPath;
-        FolderTextBox.Enabled = false;
+        FolderTextBox.ReadOnly = true;
         openFolderButton.Enabled = false;
 
         if (item.Type == ItemType.Custom)
