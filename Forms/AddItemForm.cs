@@ -137,7 +137,7 @@ internal sealed partial class AddItemForm : Form
         SetTypeCombobox(type, customCategory);
 
         ItemFolderPaths = itemFolderPaths ?? Array.Empty<string>();
-        if (boothId != "") BoothURLTextBox.Text = "https://booth.pm/ja/items/" + boothId;
+        if (boothId != string.Empty) BoothURLTextBox.Text = $"https://booth.pm/ja/items/{boothId}";
 
         Text = LanguageUtils.Translate("アイテムの追加", _mainForm.CurrentLanguage);
 
@@ -185,9 +185,9 @@ internal sealed partial class AddItemForm : Form
     /// <param name="e"></param>
     private void CustomButton_Click(object sender, EventArgs e)
     {
-        BoothURLTextBox.Text = "";
-        TitleTextBox.Text = "";
-        AuthorTextBox.Text = "";
+        BoothURLTextBox.Text = string.Empty;
+        TitleTextBox.Text = string.Empty;
+        AuthorTextBox.Text = string.Empty;
         TitleTextBox.Enabled = true;
         AuthorTextBox.Enabled = true;
     }
@@ -599,7 +599,7 @@ internal sealed partial class AddItemForm : Form
     /// </summary>
     private void ClearErrorState()
     {
-        ErrorLabel.Text = "";
+        ErrorLabel.Text = string.Empty;
         AddButton.Enabled = true;
     }
 

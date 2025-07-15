@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace Avatar_Explorer.Utils;
 
-internal static class BoothUtils
+internal static partial class BoothUtils
 {
     private static readonly HttpClient _httpClient = new();
     private static readonly JsonSerializerOptions jsonSerializerOptions = new()
@@ -26,6 +26,9 @@ internal static class BoothUtils
         { new[] { "ツール", "システム", "Tool", "System" }, ItemType.Tool },
         { new[] { "シェーダー", "Shader" }, ItemType.Shader }
     };
+
+    [GeneratedRegex(@"https://(.*)\.booth\.pm/")]
+    private static partial Regex BoothAuthorURLRegex();
 
     /// <summary>
     ///　Boothのアイテム情報を取得します。
@@ -61,7 +64,7 @@ internal static class BoothUtils
 
     private static string GetAuthorId(string url)
     {
-        var match = Regex.Match(url, @"https://(.*)\.booth\.pm/");
+        var match = BoothAuthorURLRegex().Match(url);
         return match.Success ? match.Groups[1].Value : "";
     }
 
