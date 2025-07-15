@@ -109,13 +109,11 @@ internal sealed partial class SelectSupportedAvatarForm : Form
     /// <param name="e"></param>
     private void ConfirmButton_Click(object sender, EventArgs e)
     {
-#pragma warning disable CS8619 // 値における参照型の Null 許容性が、対象の型と一致しません。
         _addItem.SupportedAvatar = AvatarList.Controls.OfType<Button>()
             .Where(button => button.BackColor == Color.LightGreen)
-            .Select(button => button.Tag as string)
+            .Select(button => button.Tag?.ToString() ?? string.Empty)
             .Where(tag => !string.IsNullOrWhiteSpace(tag))
             .ToList();
-#pragma warning restore CS8619 // 値における参照型の Null 許容性が、対象の型と一致しません。
         Close();
     }
 }
