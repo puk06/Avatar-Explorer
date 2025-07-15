@@ -87,12 +87,14 @@ internal sealed partial class SelectSupportedAvatarForm : Form
     /// <returns></returns>
     private static CustomItemButton CreateAvatarButton(Item item, string language)
     {
-        CustomItemButton button = new CustomItemButton(992);
-        button.ImagePath = item.ImagePath;
-        button.TitleText = item.Title;
-        button.AuthorName = LanguageUtils.Translate("作者: ", language) + item.AuthorName;
-        button.ToolTipText = item.Title;
-        button.Tag = item.ItemPath;
+        CustomItemButton button = new(992)
+        {
+            ImagePath = item.ImagePath,
+            TitleText = item.Title,
+            AuthorName = LanguageUtils.Translate("作者: ", language) + item.AuthorName,
+            ToolTipText = item.Title,
+            Tag = item.ItemPath
+        };
 
         button.Click += (_, _) =>
         {

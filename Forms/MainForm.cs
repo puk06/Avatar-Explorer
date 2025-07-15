@@ -379,7 +379,7 @@ internal sealed partial class MainForm : Form
             button.Location = new Point(0, (70 * index) + 2);
             button.MouseClick += OnMouseClick;
 
-            EventHandler clickEvent = (_, _) =>
+            void ButtonClick(object? sender, EventArgs? e)
             {
                 CurrentPath = new CurrentPath
                 {
@@ -395,12 +395,12 @@ internal sealed partial class MainForm : Form
 
                 GenerateCategoryList();
                 PathTextBox.Text = GeneratePath();
-            };
+            }
 
-            button.Click += clickEvent;
+            button.Click += ButtonClick;
             button.Disposed += (_, _) =>
             {
-                button.Click -= clickEvent;
+                button.Click -= ButtonClick;
                 button.ContextMenuStrip?.Dispose();
             };
 
@@ -2537,8 +2537,8 @@ internal sealed partial class MainForm : Form
 
             foreach (var item in Items)
             {
-                List<string> SupportedAvatarNames = new List<string>();
-                List<string> SupportedAvatarPaths = new List<string>();
+                List<string> SupportedAvatarNames = new();
+                List<string> SupportedAvatarPaths = new();
 
                 foreach (var avatar in item.SupportedAvatar)
                 {
@@ -2566,7 +2566,7 @@ internal sealed partial class MainForm : Form
                     }
                 }
 
-                List<string> ImplementedAvatarNames = new List<string>();
+                List<string> ImplementedAvatarNames = new();
                 foreach (var avatar in item.ImplementedAvatars)
                 {
                     var avatarName = DatabaseUtils.GetAvatarName(Items, avatar);
