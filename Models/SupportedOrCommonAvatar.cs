@@ -28,5 +28,5 @@ internal class SupportedOrCommonAvatar
     /// <summary>
     /// もし共通素体グループに入っていれば、そのグループの名前を取得または設定します。
     /// </summary>
-    internal string CommonAvatarName { get; set; } = "";
+    internal string CommonAvatarName { get; set; } = string.Empty;
 }

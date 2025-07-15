@@ -8,10 +8,10 @@ internal class Author
     /// <summary>
     /// アイテムの作者の名前を取得または設定します。
     /// </summary>
-    internal string AuthorName { get; set; } = "";
+    internal string AuthorName { get; set; } = string.Empty;
 
     /// <summary>
     /// アイテムの作者の画像パスを取得または設定します。
     /// </summary>
-    internal string AuthorImagePath { get; set; } = "";
+    internal string AuthorImagePath { get; set; } = string.Empty;
 }

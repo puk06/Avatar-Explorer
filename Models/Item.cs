@@ -10,22 +10,22 @@ public class Item()
     /// <summary>
     /// アイテムのタイトルを取得または設定します。
     /// </summary>
-    public string Title { get; set; } = "";
+    public string Title { get; set; } = string.Empty;
 
     /// <summary>
     /// アイテムの作者の名前を取得また設定します。
     /// </summary>
-    public string AuthorName { get; set; } = "";
+    public string AuthorName { get; set; } = string.Empty;
 
     /// <summary>
     /// アイテムのメモを取得または設定します。
     /// </summary>
-    public string ItemMemo { get; set; } = "";
+    public string ItemMemo { get; set; } = string.Empty;
 
     /// <summary>
     /// アイテムの作者のIDを取得または設定します。
     /// </summary>
-    public string AuthorId { get; set; } = "";
+    public string AuthorId { get; set; } = string.Empty;
 
     /// <summary>
     /// アイテムのBooth IDを取得または設定します。
@@ -35,32 +35,32 @@ public class Item()
     /// <summary>
     /// アイテムフォルダがあるパスを取得または設定します。
     /// </summary>
-    public string ItemPath { get; set; } = "";
+    public string ItemPath { get; set; } = string.Empty;
 
     /// <summary>
     /// アイテムのマテリアル用のフォルダのパスを取得または設定します。
     /// </summary>
-    public string MaterialPath { get; set; } = "";
+    public string MaterialPath { get; set; } = string.Empty;
 
     /// <summary>
     /// アイテムのサムネイルのURLを取得または設定します。
     /// </summary>
-    public string ThumbnailUrl { get; set; } = "";
+    public string ThumbnailUrl { get; set; } = string.Empty;
 
     /// <summary>
     /// アイテムのサムネイルのファイルパスを取得または設定します。
     /// </summary>
-    public string ImagePath { get; set; } = "";
+    public string ImagePath { get; set; } = string.Empty;
 
     /// <summary>
     /// アイテムの作者のアイコンのURLを取得または設定します。
     /// </summary>
-    public string AuthorImageUrl { get; set; } = "";
+    public string AuthorImageUrl { get; set; } = string.Empty;
 
     /// <summary>
     /// アイテムの作者のアイコンのファイルパスを取得または設定します。
     /// </summary>
-    public string AuthorImageFilePath { get; set; } = "";
+    public string AuthorImageFilePath { get; set; } = string.Empty;
 
     /// <summary>
     /// アイテムのタイプを取得または設定します。
@@ -70,7 +70,7 @@ public class Item()
     /// <summary>
     /// もしタイプがカスタムカテゴリだった場合の、そのカスタムカテゴリ名を取得または設定します。
     /// </summary>
-    public string CustomCategory { get; set; } = "";
+    public string CustomCategory { get; set; } = string.Empty;
 
     /// <summary>
     /// アイテムの対応アバターを取得また設定します。
@@ -80,12 +80,12 @@ public class Item()
     /// <summary>
     /// アイテムの作成日時を取得または設定します。
     /// </summary>
-    public string CreatedDate { get; set; } = "";
+    public string CreatedDate { get; set; } = string.Empty;
 
     /// <summary>
     /// アイテムの更新日時を取得または設定します。
     /// </summary>
-    public string UpdatedDate { get; set; } = "";
+    public string UpdatedDate { get; set; } = string.Empty;
 
     /// <summary>
     /// アイテムが実装済みかどうかを管理する配列を取得または設定します。

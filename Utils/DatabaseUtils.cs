@@ -120,7 +120,7 @@ internal static class DatabaseUtils
             {
                 if (createNewFile)
                 {
-                    File.WriteAllText(path, "", Encoding.UTF8);
+                    File.WriteAllText(path, string.Empty, Encoding.UTF8);
                 }
 
                 return [];
@@ -222,9 +222,9 @@ internal static class DatabaseUtils
     /// <returns></returns>
     internal static string GetAvatarNameFromPaths(List<Item> items, string? path)
     {
-        if (string.IsNullOrEmpty(path)) return "";
+        if (string.IsNullOrEmpty(path)) return string.Empty;
         var item = items.FirstOrDefault(x => x.ItemPath == path);
-        return item?.Title ?? "";
+        return item?.Title ?? string.Empty;
     }
 
     /// <summary>
@@ -370,7 +370,7 @@ internal static class DatabaseUtils
 
     private static string FixPath(string path)
     {
-        if (string.IsNullOrEmpty(path)) return "";
+        if (string.IsNullOrEmpty(path)) return string.Empty;
 
         if (path.StartsWith("./"))
         {
@@ -404,7 +404,7 @@ internal static class DatabaseUtils
             return item.SupportedAvatar.Any(supportedAvatar =>
             {
                 var supportedAvatarName = GetAvatarNameFromPaths(items, supportedAvatar);
-                if (supportedAvatarName == "") return false;
+                if (supportedAvatarName == string.Empty) return false;
                 return supportedAvatarName.Contains(avatar, StringComparison.CurrentCultureIgnoreCase);
             });
         }))
@@ -454,7 +454,7 @@ internal static class DatabaseUtils
             return item.ImplementedAvatars.Any(implementedAvatar =>
             {
                 var implementedAvatarName = GetAvatarNameFromPaths(items, implementedAvatar);
-                if (implementedAvatarName == "") return false;
+                if (implementedAvatarName == string.Empty) return false;
                 return implementedAvatarName.Contains(avatar, StringComparison.CurrentCultureIgnoreCase);
             });
         }))

@@ -28,7 +28,7 @@ internal class CurrentPath
     /// <summary>
     /// 現在選択されているカスタムカテゴリを取得または設定します。
     /// </summary>
-    internal string CurrentSelectedCustomCategory = "";
+    internal string CurrentSelectedCustomCategory = string.Empty;
 
     /// <summary>
     /// 現在選択されているアイテムを取得または設定します。

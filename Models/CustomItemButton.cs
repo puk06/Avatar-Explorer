@@ -79,7 +79,7 @@ internal class CustomItemButton : Button
         };
         Controls.Add(_authorName);
 
-        _toolTipText = "";
+        _toolTipText = string.Empty;
         _toolTip = new ToolTip();
 
         // 画像とラベルのイベントが発生した際にボタンのイベントを呼び出す

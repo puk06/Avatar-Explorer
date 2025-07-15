@@ -389,8 +389,8 @@ internal sealed partial class MainForm : Form
 
                 _leftWindow = LeftWindow.Default;
 
-                SearchBox.Text = "";
-                SearchResultLabel.Text = "";
+                SearchBox.Text = string.Empty;
+                SearchResultLabel.Text = string.Empty;
                 _isSearching = false;
 
                 GenerateCategoryList();
@@ -545,8 +545,8 @@ internal sealed partial class MainForm : Form
                             // 選択されたアバターから現在の所まで来てる場合
                             if (undo2)
                             {
-                                SearchBox.Text = "";
-                                SearchResultLabel.Text = "";
+                                SearchBox.Text = string.Empty;
+                                SearchResultLabel.Text = string.Empty;
                                 _isSearching = false;
 
                                 ResetAvatarExplorer(true);
@@ -558,8 +558,8 @@ internal sealed partial class MainForm : Form
                             // アイテムとして選択されている場合
                             if (undo)
                             {
-                                SearchBox.Text = "";
-                                SearchResultLabel.Text = "";
+                                SearchBox.Text = string.Empty;
+                                SearchResultLabel.Text = string.Empty;
                                 _isSearching = false;
 
                                 GenerateItems();
@@ -673,8 +673,8 @@ internal sealed partial class MainForm : Form
 
                     _leftWindow = LeftWindow.Author;
 
-                    SearchBox.Text = "";
-                    SearchResultLabel.Text = "";
+                    SearchBox.Text = string.Empty;
+                    SearchResultLabel.Text = string.Empty;
                     _isSearching = false;
 
                     GenerateCategoryList();
@@ -755,7 +755,7 @@ internal sealed partial class MainForm : Form
                 var items = Items.Where(item => item.Type == itemType);
                 var itemCount = items.Count();
 
-                CustomItemButton button = AEUtils.CreateButton(_previewScale, null, ItemUtils.GetCategoryName(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), true, "", GetAvatarListWidth);
+                CustomItemButton button = AEUtils.CreateButton(_previewScale, null, ItemUtils.GetCategoryName(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), true, string.Empty, GetAvatarListWidth);
                 button.Location = new Point(0, (70 * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -767,8 +767,8 @@ internal sealed partial class MainForm : Form
                     };
 
                     _leftWindow = LeftWindow.Category;
-                    SearchBox.Text = "";
-                    SearchResultLabel.Text = "";
+                    SearchBox.Text = string.Empty;
+                    SearchResultLabel.Text = string.Empty;
                     _isSearching = false;
 
                     GenerateItems();
@@ -800,7 +800,7 @@ internal sealed partial class MainForm : Form
                     var items = Items.Where(item => item.CustomCategory == customCategory);
                     var itemCount = items.Count();
 
-                    Button button = AEUtils.CreateButton(_previewScale, null, customCategory, itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), true, "", GetAvatarListWidth);
+                    Button button = AEUtils.CreateButton(_previewScale, null, customCategory, itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), true, string.Empty, GetAvatarListWidth);
                     button.Location = new Point(0, (70 * index) + 2);
                     button.MouseClick += OnMouseClick;
 
@@ -814,8 +814,8 @@ internal sealed partial class MainForm : Form
 
                         _leftWindow = LeftWindow.Category;
 
-                        SearchBox.Text = "";
-                        SearchResultLabel.Text = "";
+                        SearchBox.Text = string.Empty;
+                        SearchResultLabel.Text = string.Empty;
                         _isSearching = false;
 
                         GenerateItems();
@@ -880,7 +880,7 @@ internal sealed partial class MainForm : Form
 
                 if (itemCount == 0) continue;
 
-                Button button = AEUtils.CreateButton(_previewScale, null, ItemUtils.GetCategoryName(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, "", GetItemExplorerListWidth);
+                Button button = AEUtils.CreateButton(_previewScale, null, ItemUtils.GetCategoryName(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, string.Empty, GetItemExplorerListWidth);
                 button.Location = new Point(0, (70 * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -931,7 +931,7 @@ internal sealed partial class MainForm : Form
 
                     if (itemCount == 0) continue;
 
-                    Button button = AEUtils.CreateButton(_previewScale, null, customCategory, itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, "", GetItemExplorerListWidth);
+                    Button button = AEUtils.CreateButton(_previewScale, null, customCategory, itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, string.Empty, GetItemExplorerListWidth);
                     button.Location = new Point(0, (70 * index) + 2);
                     button.MouseClick += OnMouseClick;
 
@@ -1272,8 +1272,8 @@ internal sealed partial class MainForm : Form
 
                         if (undo)
                         {
-                            SearchBox.Text = "";
-                            SearchResultLabel.Text = "";
+                            SearchBox.Text = string.Empty;
+                            SearchResultLabel.Text = string.Empty;
                             _isSearching = false;
 
                             GenerateAvatarList(false);
@@ -1356,7 +1356,7 @@ internal sealed partial class MainForm : Form
                 var itemCount = itemFolderInfo.GetItemCount(itemType);
                 if (itemCount == 0) continue;
 
-                Button button = AEUtils.CreateButton(_previewScale, null, LanguageUtils.Translate(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, "", GetItemExplorerListWidth);
+                Button button = AEUtils.CreateButton(_previewScale, null, LanguageUtils.Translate(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, string.Empty, GetItemExplorerListWidth);
                 button.Location = new Point(0, (70 * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -1412,8 +1412,8 @@ internal sealed partial class MainForm : Form
         {
             try
             {
-                var imagePath = file.FileExtension is ".png" or ".jpg" ? file.FilePath : "";
-                Button button = AEUtils.CreateButton(_previewScale, imagePath, file.FileName, file.FileExtension.Replace(".", "") + LanguageUtils.Translate("ファイル", CurrentLanguage), false, LanguageUtils.Translate("開くファイルのパス: ", CurrentLanguage) + file.FilePath, GetItemExplorerListWidth);
+                var imagePath = file.FileExtension is ".png" or ".jpg" ? file.FilePath : string.Empty;
+                Button button = AEUtils.CreateButton(_previewScale, imagePath, file.FileName, file.FileExtension.Replace(".", string.Empty) + LanguageUtils.Translate("ファイル", CurrentLanguage), false, LanguageUtils.Translate("開くファイルのパス: ", CurrentLanguage) + file.FilePath, GetItemExplorerListWidth);
                 button.Location = new Point(0, (70 * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -1606,7 +1606,7 @@ internal sealed partial class MainForm : Form
                     item.SupportedAvatar.Any(avatar =>
                     {
                         var supportedAvatarName = DatabaseUtils.GetAvatarNameFromPaths(Items, avatar);
-                        if (supportedAvatarName == "") return false;
+                        if (supportedAvatarName == string.Empty) return false;
                         return supportedAvatarName.Contains(word, StringComparison.CurrentCultureIgnoreCase);
                     }) ||
                     item.BoothId.ToString().Contains(word, StringComparison.CurrentCultureIgnoreCase) ||
@@ -1702,8 +1702,8 @@ internal sealed partial class MainForm : Form
 
                     GeneratePathFromItem(item);
 
-                    SearchBox.Text = "";
-                    SearchResultLabel.Text = "";
+                    SearchBox.Text = string.Empty;
+                    SearchResultLabel.Text = string.Empty;
                     _isSearching = false;
 
                     GenerateItemCategoryList();
@@ -1953,8 +1953,8 @@ internal sealed partial class MainForm : Form
         {
             try
             {
-                var imagePath = file.FileExtension is ".png" or ".jpg" ? file.FilePath : "";
-                Button button = AEUtils.CreateButton(_previewScale, imagePath, file.FileName, file.FileExtension.Replace(".", "") + LanguageUtils.Translate("ファイル", CurrentLanguage), false, LanguageUtils.Translate("開くファイルのパス: ", CurrentLanguage) + file.FilePath, GetItemExplorerListWidth);
+                var imagePath = file.FileExtension is ".png" or ".jpg" ? file.FilePath : string.Empty;
+                Button button = AEUtils.CreateButton(_previewScale, imagePath, file.FileName, file.FileExtension.Replace(".", string.Empty) + LanguageUtils.Translate("ファイル", CurrentLanguage), false, LanguageUtils.Translate("開くファイルのパス: ", CurrentLanguage) + file.FilePath, GetItemExplorerListWidth);
                 button.Location = new Point(0, (70 * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -2132,8 +2132,8 @@ internal sealed partial class MainForm : Form
         // 検索中だった場合は前の画面までとりあえず戻してあげる
         if (_isSearching)
         {
-            SearchBox.Text = "";
-            SearchResultLabel.Text = "";
+            SearchBox.Text = string.Empty;
+            SearchResultLabel.Text = string.Empty;
             _isSearching = false;
 
             if (CurrentPath.CurrentSelectedItemCategory != null)
@@ -2169,8 +2169,8 @@ internal sealed partial class MainForm : Form
             return;
         }
 
-        SearchBox.Text = "";
-        SearchResultLabel.Text = "";
+        SearchBox.Text = string.Empty;
+        SearchResultLabel.Text = string.Empty;
         _isSearching = false;
 
         if (CurrentPath.IsEmpty())
@@ -2265,7 +2265,7 @@ internal sealed partial class MainForm : Form
     {
         if (string.IsNullOrEmpty(SearchBox.Text))
         {
-            SearchResultLabel.Text = "";
+            SearchResultLabel.Text = string.Empty;
             PathTextBox.Text = GeneratePath();
             if (CurrentPath.CurrentSelectedItemCategory != null)
             {
@@ -2889,8 +2889,8 @@ internal sealed partial class MainForm : Form
 
                 if (!result2)
                 {
-                    SearchBox.Text = "";
-                    SearchResultLabel.Text = "";
+                    SearchBox.Text = string.Empty;
+                    SearchResultLabel.Text = string.Empty;
                     _isSearching = false;
                     GenerateAvatarList();
                     GenerateAuthorList();
@@ -2955,9 +2955,9 @@ internal sealed partial class MainForm : Form
                     }
                 }
 
-                var thumbilResultText = thumbnailResult ? "" : "\n" + LanguageUtils.Translate("サムネイルのコピーに一部失敗しています。", CurrentLanguage);
-                var authorImageResultText = authorImageResult ? "" : "\n" + LanguageUtils.Translate("作者画像のコピーに一部失敗しています。", CurrentLanguage);
-                var itemsResultText = itemsResult ? "" : "\n" + LanguageUtils.Translate("Itemsのコピーに一部失敗しています。", CurrentLanguage);
+                var thumbilResultText = thumbnailResult ? string.Empty : "\n" + LanguageUtils.Translate("サムネイルのコピーに一部失敗しています。", CurrentLanguage);
+                var authorImageResultText = authorImageResult ? string.Empty : "\n" + LanguageUtils.Translate("作者画像のコピーに一部失敗しています。", CurrentLanguage);
+                var itemsResultText = itemsResult ? string.Empty : "\n" + LanguageUtils.Translate("Itemsのコピーに一部失敗しています。", CurrentLanguage);
 
                 var resultMessage = LanguageUtils.Translate("コピーが完了しました。", CurrentLanguage);
                 if (!thumbnailResult || !authorImageResult || !itemsResult)
@@ -2988,8 +2988,8 @@ internal sealed partial class MainForm : Form
 
         DatabaseUtils.CheckMissingCustomCategories(Items, CustomCategories);
 
-        SearchBox.Text = "";
-        SearchResultLabel.Text = "";
+        SearchBox.Text = string.Empty;
+        SearchResultLabel.Text = string.Empty;
         _isSearching = false;
         GenerateAvatarList();
         GenerateAuthorList();

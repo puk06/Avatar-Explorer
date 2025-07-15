@@ -38,7 +38,7 @@ internal sealed partial class SelectSupportedAvatarForm : Form
         {
             foreach (Control control in Controls)
             {
-                if (control.Text != "")
+                if (control.Text != string.Empty)
                 {
                     control.Text = LanguageUtils.Translate(control.Text, _mainForm.CurrentLanguage);
                 }

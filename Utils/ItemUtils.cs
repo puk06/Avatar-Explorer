@@ -29,7 +29,7 @@ internal static class ItemUtils
             return new SupportedOrCommonAvatar
             {
                 IsCommon = true,
-                CommonAvatarName = commonAvatar?.Name ?? ""
+                CommonAvatarName = commonAvatar?.Name ?? string.Empty
             };
         }
     }

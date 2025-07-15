@@ -131,14 +131,14 @@ internal static class SchemeUtils
     {
         using (RegistryKey key = Registry.ClassesRoot.CreateSubKey(protocol))
         {
-            key.SetValue("", "URL:" + protocol + " Protocol");
-            key.SetValue("URL Protocol", "");
+            key.SetValue(string.Empty, "URL:" + protocol + " Protocol");
+            key.SetValue("URL Protocol", string.Empty);
         }
 
         string commandKey = $@"{protocol}\shell\open\command";
         using (RegistryKey key = Registry.ClassesRoot.CreateSubKey(commandKey))
         {
-            key.SetValue("", $"\"{exePath}\" \"%1\"");
+            key.SetValue(string.Empty, $"\"{exePath}\" \"%1\"");
         }
     }
 

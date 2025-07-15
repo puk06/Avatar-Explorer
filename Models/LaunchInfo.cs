@@ -18,5 +18,5 @@ internal class LaunchInfo
     /// <summary>
     /// URLで起動された場合の、アセットのIDを取得または設定します。
     /// </summary>
-    internal string assetId = "";
+    internal string assetId = string.Empty;
 }

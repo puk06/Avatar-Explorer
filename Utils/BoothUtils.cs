@@ -42,13 +42,13 @@ internal static partial class BoothUtils
 
         var itemJson = JsonSerializer.Deserialize<BoothItemResponse>(response, jsonSerializerOptions);
 
-        var title = itemJson?.Name ?? "";
-        var author = itemJson?.Shop?.Name ?? "";
-        var authorUrl = itemJson?.Shop?.Url ?? "";
-        var imageUrl = itemJson?.Images?.FirstOrDefault()?.Original ?? "";
-        var authorIcon = itemJson?.Shop?.ThumbnailUrl ?? "";
+        var title = itemJson?.Name ?? string.Empty;
+        var author = itemJson?.Shop?.Name ?? string.Empty;
+        var authorUrl = itemJson?.Shop?.Url ?? string.Empty;
+        var imageUrl = itemJson?.Images?.FirstOrDefault()?.Original ?? string.Empty;
+        var authorIcon = itemJson?.Shop?.ThumbnailUrl ?? string.Empty;
         var authorId = GetAuthorId(authorUrl);
-        var category = itemJson?.Category?.Name ?? "";
+        var category = itemJson?.Category?.Name ?? string.Empty;
         var estimatedCategory = GetItemType(title, category);
 
         return new Item
@@ -65,7 +65,7 @@ internal static partial class BoothUtils
     private static string GetAuthorId(string url)
     {
         var match = BoothAuthorURLRegex().Match(url);
-        return match.Success ? match.Groups[1].Value : "";
+        return match.Success ? match.Groups[1].Value : string.Empty;
     }
 
 

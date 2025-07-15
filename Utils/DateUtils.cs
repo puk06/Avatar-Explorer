@@ -35,7 +35,7 @@ internal class DateUtils
         {
             if (date.All(char.IsDigit)) return DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(date)).UtcDateTime;
 
-            var allDigits = "";
+            var allDigits = string.Empty;
             foreach (var c in date)
             {
                 if (char.IsDigit(c)) allDigits += c;
