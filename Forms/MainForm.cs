@@ -200,7 +200,7 @@ internal sealed partial class MainForm : Form
     /// <summary>
     /// 商品名の括弧を削除するか決めることが出来ます。
     /// </summary>
-    private bool _removeBrackets = true;
+    private bool _removeBrackets = false;
     #endregion
 
     #region フォームの初期化
