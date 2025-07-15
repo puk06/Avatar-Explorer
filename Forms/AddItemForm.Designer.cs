@@ -344,7 +344,6 @@ namespace Avatar_Explorer.Forms
             StartPosition = FormStartPosition.CenterScreen;
             Text = "AddItem";
             KeyDown += AddItem_KeyDown;
-            FormClosing += AddItem_FormClosing;
             ResumeLayout(false);
             PerformLayout();
         }

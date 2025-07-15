@@ -341,4 +341,17 @@ internal static partial class AEUtils
     /// <returns></returns>
     internal static string RemoveBrackets(string itemTitle)
         => BracketsRegex().Replace(itemTitle, "");
+
+    /// <summary>
+    /// DragEventで取得したパスの配列を返します。
+    /// </summary>
+    /// <param name="dragEventArgs"></param>
+    /// <returns></returns>
+    internal static string[] GetFileDropPaths(DragEventArgs dragEventArgs)
+    {
+        if (dragEventArgs.Data == null) return [];
+        if (!dragEventArgs.Data.GetDataPresent(DataFormats.FileDrop)) return [];
+
+        return (string[]?)dragEventArgs.Data.GetData(DataFormats.FileDrop, false) ?? [];
+    }
 }

@@ -32,20 +32,23 @@ internal sealed partial class SelectSupportedAvatarForm : Form
         GenerateAvatarList();
     }
 
+    #region フォーム関連の処理
+    /// <summary>
+    /// コントロールを翻訳します。
+    /// </summary>
     private void TranslateControls()
     {
-        if (_mainForm.CurrentLanguage != "ja-JP")
-        {
-            foreach (Control control in Controls)
-            {
-                if (!string.IsNullOrEmpty(control.Text))
-                {
-                    control.Text = LanguageUtils.Translate(control.Text, _mainForm.CurrentLanguage);
-                }
-            }
+        if (_mainForm.CurrentLanguage == "ja-JP") return;
 
-            AvatarList.Text = LanguageUtils.Translate(AvatarList.Text, _mainForm.CurrentLanguage);
+        foreach (Control control in Controls)
+        {
+            if (!string.IsNullOrEmpty(control.Text))
+            {
+                control.Text = LanguageUtils.Translate(control.Text, _mainForm.CurrentLanguage);
+            }
         }
+
+        AvatarList.Text = LanguageUtils.Translate(AvatarList.Text, _mainForm.CurrentLanguage);
     }
 
     /// <summary>
@@ -65,7 +68,7 @@ internal sealed partial class SelectSupportedAvatarForm : Form
         var index = 0;
         foreach (Item item in items)
         {
-            if (item.ItemPath == _addItem.GetEditItem.ItemPath) continue;
+            if (item.ItemPath == _addItem.ItemPath) continue;
             Button button = CreateAvatarButton(item, _mainForm.CurrentLanguage);
             button.Location = new Point(0, (70 * index) + 2);
             button.BackColor = _addItem.SupportedAvatar.Contains(item.ItemPath) ? Color.LightGreen : Color.FromKnownColor(KnownColor.Control);
@@ -103,12 +106,9 @@ internal sealed partial class SelectSupportedAvatarForm : Form
 
         return button;
     }
+    #endregion
 
-    /// <summary>
-    /// 選択を確定し、フォームを閉じます。
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
+    #region イベントハンドラ
     private void ConfirmButton_Click(object sender, EventArgs e)
     {
         _addItem.SupportedAvatar = AvatarList.Controls.OfType<Button>()
@@ -118,4 +118,5 @@ internal sealed partial class SelectSupportedAvatarForm : Form
             .ToList();
         Close();
     }
+    #endregion
 }

@@ -42,20 +42,23 @@ internal sealed partial class ManageCommonAvatarsForm : Form
         RefleshCommonAvatarButtonColor();
     }
 
+    #region フォーム関連の処理
+    /// <summary>
+    /// コントロールを翻訳します。
+    /// </summary>
     private void TranslateControls()
     {
-        if (_mainForm.CurrentLanguage != "ja-JP")
-        {
-            foreach (Control control in Controls)
-            {
-                if (!string.IsNullOrEmpty(control.Text))
-                {
-                    control.Text = LanguageUtils.Translate(control.Text, _mainForm.CurrentLanguage);
-                }
-            }
+        if (_mainForm.CurrentLanguage == "ja-JP") return;
 
-            AvatarList.Text = LanguageUtils.Translate(AvatarList.Text, _mainForm.CurrentLanguage);
+        foreach (Control control in Controls)
+        {
+            if (!string.IsNullOrEmpty(control.Text))
+            {
+                control.Text = LanguageUtils.Translate(control.Text, _mainForm.CurrentLanguage);
+            }
         }
+
+        AvatarList.Text = LanguageUtils.Translate(AvatarList.Text, _mainForm.CurrentLanguage);
     }
 
     /// <summary>
@@ -121,48 +124,9 @@ internal sealed partial class ManageCommonAvatarsForm : Form
 
         return button;
     }
+    #endregion
 
-    /// <summary>
-    /// 共通素体グループ名から共通素体のリストを取得します。
-    /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    private CommonAvatar? GetCommonAvatar(string? name) 
-        => string.IsNullOrWhiteSpace(name) ? null : _commonAvatars.FirstOrDefault(commonAvatar => commonAvatar.Name == name);
-
-    /// <summary>
-    /// 共通素体コンボボックスのテキストが変更されたときに呼び出されます。
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void CommonAvatarsCombobox_TextChanged(object sender, EventArgs e) =>
-        RefleshCommonAvatarButtonColor();
-
-    /// <summary>
-    /// 共通素体のボタンの色を現在の共通素体グループから更新します。
-    /// </summary>
-    private void RefleshCommonAvatarButtonColor()
-    {
-        foreach (Button button in AvatarList.Controls)
-        {
-            var commonAvatar = GetCommonAvatar(CommonAvatarsCombobox.Text);
-            NewLabel.Visible = commonAvatar is null && !string.IsNullOrWhiteSpace(CommonAvatarsCombobox.Text);
-            AddButton.Text = commonAvatar is null ? LanguageUtils.Translate("追加", _mainForm.CurrentLanguage) : LanguageUtils.Translate("更新", _mainForm.CurrentLanguage);
-            AddButton.Enabled = !string.IsNullOrWhiteSpace(CommonAvatarsCombobox.Text);
-            DeleteSelectedGroupButton.Enabled = !string.IsNullOrWhiteSpace(CommonAvatarsCombobox.Text) && commonAvatar != null;
-            button.BackColor = commonAvatar != null
-                ? commonAvatar.Avatars.Contains(button.Tag?.ToString() ?? string.Empty)
-                    ? Color.LightGreen
-                    : Color.FromKnownColor(KnownColor.Control)
-                : Color.FromKnownColor(KnownColor.Control);
-        }
-    }
-
-    /// <summary>
-    /// 共通素体グループを削除します。
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
+    #region イベントハンドラ
     private void DeleteSelectedGroupButton_Click(object sender, EventArgs e)
     {
         if (string.IsNullOrWhiteSpace(CommonAvatarsCombobox.Text))
@@ -202,11 +166,9 @@ internal sealed partial class ManageCommonAvatarsForm : Form
         RefleshCommonAvatarButtonColor();
     }
 
-    /// <summary>
-    /// 共通素体グループを追加するボタンが押されたときに呼び出されます。
-    /// </summary>
-    /// <param name="o"></param>
-    /// <param name="e"></param>
+    private void CommonAvatarsCombobox_TextChanged(object sender, EventArgs e) =>
+        RefleshCommonAvatarButtonColor();
+
     private void AddButton_Click(object o, EventArgs e)
     {
         var name = CommonAvatarsCombobox.Text;
@@ -257,4 +219,35 @@ internal sealed partial class ManageCommonAvatarsForm : Form
         _mainForm.CommonAvatars = _commonAvatars;
         RefleshCommonAvatarButtonColor();
     }
+    #endregion
+
+    #region 処理関数
+    /// <summary>
+    /// 共通素体グループ名から共通素体のリストを取得します。
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    private CommonAvatar? GetCommonAvatar(string? name) 
+        => string.IsNullOrWhiteSpace(name) ? null : _commonAvatars.FirstOrDefault(commonAvatar => commonAvatar.Name == name);
+
+    /// <summary>
+    /// 共通素体のボタンの色を現在の共通素体グループから更新します。
+    /// </summary>
+    private void RefleshCommonAvatarButtonColor()
+    {
+        foreach (Button button in AvatarList.Controls)
+        {
+            var commonAvatar = GetCommonAvatar(CommonAvatarsCombobox.Text);
+            NewLabel.Visible = commonAvatar is null && !string.IsNullOrWhiteSpace(CommonAvatarsCombobox.Text);
+            AddButton.Text = commonAvatar is null ? LanguageUtils.Translate("追加", _mainForm.CurrentLanguage) : LanguageUtils.Translate("更新", _mainForm.CurrentLanguage);
+            AddButton.Enabled = !string.IsNullOrWhiteSpace(CommonAvatarsCombobox.Text);
+            DeleteSelectedGroupButton.Enabled = !string.IsNullOrWhiteSpace(CommonAvatarsCombobox.Text) && commonAvatar != null;
+            button.BackColor = commonAvatar != null
+                ? commonAvatar.Avatars.Contains(button.Tag?.ToString() ?? string.Empty)
+                    ? Color.LightGreen
+                    : Color.FromKnownColor(KnownColor.Control)
+                : Color.FromKnownColor(KnownColor.Control);
+        }
+    }
+    #endregion
 }

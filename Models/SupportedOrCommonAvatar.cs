@@ -18,12 +18,14 @@ internal class SupportedOrCommonAvatar
     /// <summary>
     /// 対応アバターか共通素体に含まれているかどうかを取得します。
     /// </summary>
-    internal bool IsSupportedOrCommon => IsSupported || IsCommon;
+    internal bool IsSupportedOrCommon
+        => IsSupported || IsCommon;
 
     /// <summary>
     /// 共通素体に含まれているが対応アバターではないかどうかを取得します。
     /// </summary>
-    internal bool OnlyCommon => IsCommon && !IsSupported;
+    internal bool OnlyCommon
+        => IsCommon && !IsSupported;
 
     /// <summary>
     /// もし共通素体グループに入っていれば、そのグループの名前を取得または設定します。

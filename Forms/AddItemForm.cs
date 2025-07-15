@@ -6,6 +6,11 @@ namespace Avatar_Explorer.Forms;
 internal sealed partial class AddItemForm : Form
 {
     /// <summary>
+    /// アイテムが追加されたときに発生するイベントです。
+    /// </summary>
+    internal event EventHandler? ItemAdded;
+
+    /// <summary>
     /// メインフォームを取得または設定します。
     /// </summary>
     private readonly MainForm _mainForm;
@@ -16,9 +21,9 @@ internal sealed partial class AddItemForm : Form
     private readonly bool _edit;
 
     /// <summary>
-    /// 編集モード時にパスが存在状態で画面が開かれたかどうかを取得します。
+    /// 編集モード時にパスが存在しない状態で画面が開かれたかどうかを取得します。
     /// </summary>
-    private readonly bool _folderNotFound = false;
+    private readonly bool _directoryNotFound = false;
 
     /// <summary>
     /// 最後にBoothの情報を取得した時間を取得または設定します。
@@ -31,50 +36,43 @@ internal sealed partial class AddItemForm : Form
     private static readonly HttpClient _httpClient = new();
 
     /// <summary>
-    /// アイテムが追加されたときに発生するイベントです。
-    /// </summary>
-    internal event EventHandler? ItemAdded;
-
-    /// <summary>
     /// メインフォームに反映される予定のアイテムファイルです。
     /// </summary>
-    private Item _item = new();
+    private readonly Item _item = new();
 
     /// <summary>
-    /// アイテム編集時に使用される、渡されたアイテムのコピーです。
+    /// 渡されてるアイテムのパスです。
     /// </summary>
-    private readonly Item _editItem = new();
-
-    /// <summary>
-    /// 外部から編集時のアイテムのコピーを取得するプロパティです。
-    /// </summary>
-    internal Item GetEditItem => _editItem;
+    internal string ItemPath => _item.ItemPath;
 
     /// <summary>
     /// 対応しているアバターのリストを取得または設定します。
     /// </summary>
     internal List<string> SupportedAvatar = new();
+    
+    private string[] _itemFolderPaths = Array.Empty<string>();
 
     /// <summary>
     /// アイテムのその他のフォルダのパスを取得または設定します。
     /// </summary>
-    private string[] _itemFolderPaths = Array.Empty<string>();
     private string[] ItemFolderPaths
     {
         get => _itemFolderPaths;
         set
         {
-            var validPaths = value.Where(file => (File.Exists(file) && file.EndsWith(".zip")) || Directory.Exists(file)).ToArray();
+            var validPaths = value
+                .Where(path => (File.Exists(path) && path.EndsWith(".zip")) || Directory.Exists(path))
+                .ToArray();
+
             var invalidPaths = value.Except(validPaths).ToArray();
+
             _itemFolderPaths = validPaths;
 
-            // 不正なパスがある場合は通知
             if (invalidPaths.Length > 0)
             {
                 ShowInvalidPathsMessage(invalidPaths, value.Length);
             }
 
-            // UI 更新
             UpdateFolderUI();
         }
     }
@@ -143,85 +141,269 @@ internal sealed partial class AddItemForm : Form
 
         if (edit && item != null)
         {
-            _editItem = new Item(item);
+            _item = item;
 
             Text = LanguageUtils.Translate("アイテムの編集", _mainForm.CurrentLanguage);
             label3.Text = LanguageUtils.Translate("アイテムの編集", _mainForm.CurrentLanguage);
             AddButton.Text = LanguageUtils.Translate("編集", _mainForm.CurrentLanguage);
 
-            TitleTextBox.Enabled = true;
-            AuthorTextBox.Enabled = true;
-            CustomButton.Enabled = false;
-
-            BoothURLTextBox.Text = item.BoothId != -1 ? $"https://booth.pm/ja/items/{item.BoothId}" : string.Empty;
             FolderTextBox.Text = item.ItemPath;
-            MaterialTextBox.Text = item.MaterialPath;
-            FolderTextBox.ReadOnly = true;
-            openFolderButton.Enabled = false;
-
-            SetTypeCombobox(item.Type, item.CustomCategory);
-
-            SupportedAvatar = item.SupportedAvatar;
-            TitleTextBox.Text = item.Title;
-            AuthorTextBox.Text = item.AuthorName;
-            SelectAvatar.Text = LanguageUtils.Translate("選択中: ", _mainForm.CurrentLanguage) + SupportedAvatar.Count +
-                                LanguageUtils.Translate("個", _mainForm.CurrentLanguage);
-
             if (!Directory.Exists(FolderTextBox.Text))
             {
                 FolderTextBox.ReadOnly = false;
                 openFolderButton.Enabled = true;
-                _folderNotFound = true;
+                _directoryNotFound = true;
             }
+            else
+            {
+                FolderTextBox.ReadOnly = true;
+                openFolderButton.Enabled = false;
+            }
+
+            MaterialTextBox.Text = item.MaterialPath;
+
+            BoothURLTextBox.Text = item.BoothId != -1 ? $"https://booth.pm/ja/items/{item.BoothId}" : string.Empty;
+
+            TitleTextBox.Text = item.Title;
+            TitleTextBox.Enabled = true;
+
+            AuthorTextBox.Text = item.AuthorName;
+            AuthorTextBox.Enabled = true;
+
+            SetTypeCombobox(item.Type, item.CustomCategory);
+
+            SupportedAvatar = item.SupportedAvatar;
+            SelectAvatar.Text = LanguageUtils.Translate("選択中: ", _mainForm.CurrentLanguage) + SupportedAvatar.Count + LanguageUtils.Translate("個", _mainForm.CurrentLanguage);
+
+            CustomButton.Enabled = false;
         }
 
         ValidCheck();
     }
 
+    #region フォーム関連の処理
     /// <summary>
-    /// カスタムで追加するボタンがクリックされたときの処理です。
+    /// コントロールを翻訳します。
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void CustomButton_Click(object sender, EventArgs e)
-    {
-        BoothURLTextBox.Text = string.Empty;
-        TitleTextBox.Text = string.Empty;
-        AuthorTextBox.Text = string.Empty;
-        TitleTextBox.Enabled = true;
-        AuthorTextBox.Enabled = true;
-    }
-
     private void TranslateControls()
     {
-        if (_mainForm.CurrentLanguage != "ja-JP")
-        {
-            foreach (Control control in Controls)
-            {
-                if (!string.IsNullOrEmpty(control.Text))
-                {
-                    control.Text = LanguageUtils.Translate(control.Text, _mainForm.CurrentLanguage);
-                }
-            }
+        if (_mainForm.CurrentLanguage == "ja-JP") return;
 
-            for (var i = 0; i < TypeComboBox.Items.Count; i++)
+        foreach (Control control in Controls)
+        {
+            if (!string.IsNullOrEmpty(control.Text))
             {
-                var text = TypeComboBox.Items[i]?.ToString();
-                if (text == null) continue;
-                TypeComboBox.Items[i] = LanguageUtils.Translate(text, _mainForm.CurrentLanguage);
+                control.Text = LanguageUtils.Translate(control.Text, _mainForm.CurrentLanguage);
             }
+        }
+
+        for (var i = 0; i < TypeComboBox.Items.Count; i++)
+        {
+            var text = TypeComboBox.Items[i]?.ToString();
+            if (text == null) continue;
+            TypeComboBox.Items[i] = LanguageUtils.Translate(text, _mainForm.CurrentLanguage);
         }
     }
 
     /// <summary>
-    /// Boothのアイテム情報を取得するボタンがクリックされたときの処理です。
+    /// アイテムタイプ、カスタムカテゴリから、TypeComboBoxのIndexを設定します。
+    /// </summary>
+    /// <param name="itemType"></param>
+    /// <param name="customCategory"></param>
+    private void SetTypeCombobox(ItemType itemType, string? customCategory)
+    {
+        if (itemType == ItemType.Custom)
+        {
+            if (!string.IsNullOrEmpty(customCategory))
+            {
+                var typeIndex = TypeComboBox.Items.IndexOf(customCategory);
+                TypeComboBox.SelectedIndex = typeIndex == -1 ? 0 : typeIndex;
+            }
+            else
+            {
+                TypeComboBox.SelectedIndex = 0;
+            }
+        }
+        else
+        {
+            TypeComboBox.SelectedIndex = (int)itemType == 10 ? 0 : (int)itemType;
+        }
+    }
+
+    /// <summary>
+    /// フォルダパスのテキストボックスが変更されたときの処理です。
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
+    private void CheckText(object sender, EventArgs e)
+        => ValidCheck();
+
+    /// <summary>
+    /// パスなどのテキストボックス内のテキストが有効かどうかをチェックします。
+    /// </summary>
+    private void ValidCheck()
+    {
+        if (!(File.Exists(FolderTextBox.Text) && FolderTextBox.Text.EndsWith(".zip")) && !Directory.Exists(FolderTextBox.Text))
+        {
+            SetErrorState(LanguageUtils.Translate("エラー: フォルダパスが存在しません", _mainForm.CurrentLanguage));
+            return;
+        }
+
+        if (File.Exists(FolderTextBox.Text) && !FolderTextBox.Text.EndsWith(".zip"))
+        {
+            SetErrorState(LanguageUtils.Translate("エラー: フォルダパスがファイルです", _mainForm.CurrentLanguage));
+            return;
+        }
+
+        if (string.IsNullOrEmpty(FolderTextBox.Text))
+        {
+            SetErrorState(LanguageUtils.Translate("エラー: フォルダパスが入力されていません", _mainForm.CurrentLanguage));
+            return;
+        }
+
+        if (_mainForm.Items.Any(i => i.ItemPath == FolderTextBox.Text) && (!_edit || _directoryNotFound))
+        {
+            SetErrorState(LanguageUtils.Translate("エラー: 同じパスのアイテムが既に存在します", _mainForm.CurrentLanguage));
+            return;
+        }
+
+        if (!string.IsNullOrEmpty(MaterialTextBox.Text) && (!(File.Exists(MaterialTextBox.Text) && MaterialTextBox.Text.EndsWith(".zip")) && !Directory.Exists(MaterialTextBox.Text)))
+        {
+            SetErrorState(LanguageUtils.Translate("エラー: マテリアルフォルダパスが存在しません", _mainForm.CurrentLanguage));
+            return;
+        }
+
+        if (!string.IsNullOrEmpty(MaterialTextBox.Text) && File.Exists(MaterialTextBox.Text) && !MaterialTextBox.Text.EndsWith(".zip"))
+        {
+            SetErrorState(LanguageUtils.Translate("エラー: マテリアルフォルダパスがファイルです", _mainForm.CurrentLanguage));
+            return;
+        }
+
+        if (string.IsNullOrEmpty(TitleTextBox.Text))
+        {
+            SetErrorState(LanguageUtils.Translate("エラー: タイトルが入力されていません", _mainForm.CurrentLanguage));
+            return;
+        }
+
+        if (TitleTextBox.Text == "*")
+        {
+            SetErrorState(LanguageUtils.Translate("エラー: タイトルを*にすることはできません", _mainForm.CurrentLanguage));
+            return;
+        }
+
+        if (string.IsNullOrEmpty(AuthorTextBox.Text))
+        {
+            SetErrorState(LanguageUtils.Translate("エラー: 作者が入力されていません", _mainForm.CurrentLanguage));
+            return;
+        }
+
+        ClearErrorState();
+    }
+
+    /// <summary>
+    /// エラー状態を設定します。
+    /// </summary>
+    /// <param name="errorMessage"></param>
+    private void SetErrorState(string errorMessage)
+    {
+        ErrorLabel.Text = errorMessage;
+        AddButton.Enabled = false;
+    }
+
+    /// <summary>
+    /// エラー状態を解除します。
+    /// </summary>
+    private void ClearErrorState()
+    {
+        ErrorLabel.Text = string.Empty;
+        AddButton.Enabled = true;
+    }
+    #endregion
+
+    #region イベントハンドラ
+    private void openFolderButton_Click(object sender, EventArgs e)
+    {
+        var fbd = new FolderBrowserDialog
+        {
+            Description = LanguageUtils.Translate("アイテムフォルダを選択してください", _mainForm.CurrentLanguage),
+            UseDescriptionForTitle = true,
+            ShowNewFolderButton = true,
+            Multiselect = true
+        };
+
+        if (fbd.ShowDialog() != DialogResult.OK) return;
+        ItemFolderPaths = fbd.SelectedPaths;
+    }
+
+    private void openMaterialFolderButton_Click(object sender, EventArgs e)
+    {
+        var fbd = new FolderBrowserDialog
+        {
+            Description = LanguageUtils.Translate("マテリアルフォルダを選択してください", _mainForm.CurrentLanguage),
+            UseDescriptionForTitle = true,
+            ShowNewFolderButton = true
+        };
+
+        if (fbd.ShowDialog() != DialogResult.OK) return;
+        MaterialTextBox.Text = fbd.SelectedPath;
+    }
+
+    private void FolderTextBox_DragDrop(object sender, DragEventArgs e)
+        => ItemFolderPaths = AEUtils.GetFileDropPaths(e);
+
+    private void MaterialTextBox_DragDrop(object sender, DragEventArgs e)
+    {
+        var files = AEUtils.GetFileDropPaths(e);
+        if (files.Length == 0) return;
+
+        var folderPath = files[0];
+
+        if (!(File.Exists(folderPath) && folderPath.EndsWith(".zip")) && !Directory.Exists(folderPath))
+        {
+            FormUtils.ShowMessageBox(
+                LanguageUtils.Translate("有効なフォルダ、またはzipファイルを選択してください", _mainForm.CurrentLanguage),
+                LanguageUtils.Translate("エラー", _mainForm.CurrentLanguage),
+                true
+            );
+            return;
+        }
+        MaterialTextBox.Text = folderPath;
+    }
+
+    private void BoothURLTextBox_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (!e.Control && e.KeyCode == Keys.Enter)
+        {
+            GetButton_Click(this, EventArgs.Empty);
+        }
+    }
+
+    private void TypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        => SelectAvatar.Enabled = TypeComboBox.SelectedIndex != (int)ItemType.Avatar;
+
+    private void SelectAvatar_Click(object sender, EventArgs e)
+    {
+        SelectSupportedAvatarForm selectSupportedAvatar = new(_mainForm, this);
+        selectSupportedAvatar.ShowDialog();
+
+        SelectAvatar.Text = LanguageUtils.Translate("選択中: ", _mainForm.CurrentLanguage) + SupportedAvatar.Count + LanguageUtils.Translate("個", _mainForm.CurrentLanguage);
+    }
+
+    private void CustomButton_Click(object sender, EventArgs e)
+    {
+        BoothURLTextBox.Text = string.Empty;
+
+        TitleTextBox.Text = string.Empty;
+        TitleTextBox.Enabled = true;
+
+        AuthorTextBox.Text = string.Empty;
+        AuthorTextBox.Enabled = true;
+    }
+
     private async void GetButton_Click(object sender, EventArgs e)
     {
-        var boothId = BoothURLTextBox.Text.Split('/')[^1];
-        if (!int.TryParse(boothId, out _))
+        var rawBoothId = BoothURLTextBox.Text.Split('/')[^1];
+        if (!int.TryParse(rawBoothId, out int boothId))
         {
             FormUtils.ShowMessageBox(
                 LanguageUtils.Translate("Booth URLが正しくありません", _mainForm.CurrentLanguage),
@@ -241,16 +423,23 @@ internal sealed partial class AddItemForm : Form
             );
             return;
         }
-
         _lastGetTime = currentTime;
+
+        _item.BoothId = boothId;
 
         try
         {
             GetButton.Enabled = false;
             GetButton.Text = LanguageUtils.Translate("取得中...", _mainForm.CurrentLanguage);
-            _item = await BoothUtils.GetBoothItemInfoAsync(boothId);
-            GetButton.Text = LanguageUtils.Translate("情報を取得", _mainForm.CurrentLanguage);
-            GetButton.Enabled = true;
+
+            var newItem = await BoothUtils.GetBoothItemInfoAsync(rawBoothId);
+
+            _item.Title = newItem.Title;
+            _item.AuthorName = newItem.AuthorName;
+            _item.ThumbnailUrl = newItem.ThumbnailUrl;
+            _item.AuthorImageUrl = newItem.AuthorImageUrl;
+            _item.AuthorId = newItem.AuthorId;
+            _item.Type = newItem.Type;
         }
         catch (Exception ex)
         {
@@ -259,51 +448,24 @@ internal sealed partial class AddItemForm : Form
                 LanguageUtils.Translate("エラー", _mainForm.CurrentLanguage),
                 true
             );
-            TitleTextBox.Enabled = true;
-            AuthorTextBox.Enabled = true;
-            GetButton.Enabled = true;
+        }
+        finally
+        {
             GetButton.Text = LanguageUtils.Translate("情報を取得", _mainForm.CurrentLanguage);
-            _item = new Item();
+            GetButton.Enabled = true;
         }
 
-        _item.BoothId = int.Parse(boothId);
-
         TitleTextBox.Text = _item.Title;
-        AuthorTextBox.Text = _item.AuthorName;
-        if (_item.Type != ItemType.Unknown) TypeComboBox.SelectedIndex = (int)_item.Type;
         TitleTextBox.Enabled = true;
+
+        AuthorTextBox.Text = _item.AuthorName;
         AuthorTextBox.Enabled = true;
+
+        if (_item.Type != ItemType.Unknown) TypeComboBox.SelectedIndex = (int)_item.Type;
 
         ValidCheck();
     }
 
-    /// <summary>
-    /// 対応アバターを選択するボタンがクリックされたときの処理です。
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void SelectAvatar_Click(object sender, EventArgs e)
-    {
-        SelectSupportedAvatarForm selectSupportedAvatar = new(_mainForm, this);
-        selectSupportedAvatar.ShowDialog();
-        SelectAvatar.Text = LanguageUtils.Translate("選択中: ", _mainForm.CurrentLanguage) + SupportedAvatar.Count + LanguageUtils.Translate("個", _mainForm.CurrentLanguage);
-    }
-
-    /// <summary>
-    /// アイテムのタイプのコンボボックスが変更されたときの処理です。
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void TypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
-    {
-        SelectAvatar.Enabled = TypeComboBox.SelectedIndex != (int)ItemType.Avatar;
-    }
-
-    /// <summary>
-    /// アイテムを追加または編集します。
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
     private async void AddButton_Click(object sender, EventArgs e)
     {
         if (ItemFolderPaths.Length == 0)
@@ -322,17 +484,18 @@ internal sealed partial class AddItemForm : Form
                 LanguageUtils.Translate("エラー", _mainForm.CurrentLanguage),
                 true
             );
+
             ValidCheck();
             return;
         }
 
-        ItemType type = TypeComboBox.SelectedIndex >= 9 ? ItemType.Custom : (ItemType)TypeComboBox.SelectedIndex;
-
         AddButton.Enabled = false;
+
         _item.Title = TitleTextBox.Text;
         _item.AuthorName = AuthorTextBox.Text;
-        _item.Type = type;
-        if (type == ItemType.Custom) _item.CustomCategory = TypeComboBox.Text;
+
+        _item.Type = TypeComboBox.SelectedIndex >= 9 ? ItemType.Custom : (ItemType)TypeComboBox.SelectedIndex;
+        if (_item.Type == ItemType.Custom) _item.CustomCategory = TypeComboBox.Text;
 
         var itemFolderArray = Array.Empty<string>();
         foreach (var itemFolderPath in ItemFolderPaths)
@@ -438,46 +601,46 @@ internal sealed partial class AddItemForm : Form
         // アイテムの更新日付の更新
         var now = DateUtils.GetUnixTime();
 
-        if (_edit)
-        {
-            _item.UpdatedDate = now;
-        }
-        else
-        {
-            _item.CreatedDate = now;
-            _item.UpdatedDate = now;
-        }
+        if (!_edit) _item.CreatedDate = now;
+        _item.UpdatedDate = now;
 
         if (_edit)
         {
-            // 同じパスのものを削除してから追加
             FormUtils.ShowMessageBox(
                 LanguageUtils.Translate("Boothのアイテムを編集しました!", _mainForm.CurrentLanguage) + "\n" +
                 LanguageUtils.Translate("アイテム名: ", _mainForm.CurrentLanguage) + _item.Title + "\n" +
                 LanguageUtils.Translate("作者: ", _mainForm.CurrentLanguage) + _item.AuthorName,
                 LanguageUtils.Translate("編集完了", _mainForm.CurrentLanguage)
             );
-
-            _mainForm.Items.RemoveAll(i => i.ItemPath == _editItem.ItemPath);
-            _mainForm.Items.Add(_item);
         }
         else
         {
+            _mainForm.Items.Add(_item);
+
             FormUtils.ShowMessageBox(
                 LanguageUtils.Translate("Boothのアイテムを追加しました!", _mainForm.CurrentLanguage) + "\n" +
                 LanguageUtils.Translate("アイテム名: ", _mainForm.CurrentLanguage) + _item.Title + "\n" +
                 LanguageUtils.Translate("作者: ", _mainForm.CurrentLanguage) + _item.AuthorName,
                 LanguageUtils.Translate("追加完了", _mainForm.CurrentLanguage)
             );
-
-            _mainForm.Items.Add(_item);
         }
 
+        ItemAdded?.Invoke(this, EventArgs.Empty);
         Close();
     }
 
+    private void AddItem_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Control && e.KeyCode == Keys.Enter && AddButton.Enabled)
+        {
+            AddButton_Click(this, EventArgs.Empty);
+        }
+    }
+    #endregion
+
+    #region 処理関数
     /// <summary>
-    /// zipファイルを指定されたフォルダに展開します。
+    /// zipファイルを指定したフォルダに展開します。
     /// </summary>
     /// <param name="path"></param>
     /// <param name="destination"></param>
@@ -505,225 +668,5 @@ internal sealed partial class AddItemForm : Form
 
         return path;
     }
-
-    /// <summary>
-    /// アイテムフォルダを開くボタンがクリックされたときの処理です。
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void openFolderButton_Click(object sender, EventArgs e)
-    {
-        var fbd = new FolderBrowserDialog
-        {
-            Description = LanguageUtils.Translate("アイテムフォルダを選択してください", _mainForm.CurrentLanguage),
-            UseDescriptionForTitle = true,
-            ShowNewFolderButton = true,
-            Multiselect = true
-        };
-
-        if (fbd.ShowDialog() != DialogResult.OK) return;
-        ItemFolderPaths = fbd.SelectedPaths;
-    }
-
-    /// <summary>
-    /// マテリアルフォルダを開くボタンがクリックされたときの処理です。
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void openMaterialFolderButton_Click(object sender, EventArgs e)
-    {
-        var fbd = new FolderBrowserDialog
-        {
-            Description = LanguageUtils.Translate("マテリアルフォルダを選択してください", _mainForm.CurrentLanguage),
-            UseDescriptionForTitle = true,
-            ShowNewFolderButton = true
-        };
-
-        if (fbd.ShowDialog() != DialogResult.OK) return;
-        MaterialTextBox.Text = fbd.SelectedPath;
-    }
-
-    /// <summary>
-    /// アイテムフォルダ欄にドラッグされたときの処理です。
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void FolderTextBox_DragDrop(object sender, DragEventArgs e)
-    {
-        if (e.Data == null) return;
-        if (!e.Data.GetDataPresent(DataFormats.FileDrop)) return;
-        string[]? dragFilePathArr = (string[]?)e.Data.GetData(DataFormats.FileDrop, false);
-        if (dragFilePathArr == null) return;
-
-        ItemFolderPaths = dragFilePathArr;
-    }
-
-    /// <summary>
-    /// マテリアルフォルダ欄にドラッグされたときの処理です。
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void MaterialTextBox_DragDrop(object sender, DragEventArgs e)
-    {
-        if (e.Data == null) return;
-        if (!e.Data.GetDataPresent(DataFormats.FileDrop)) return;
-        string[]? dragFilePathArr = (string[]?)e.Data.GetData(DataFormats.FileDrop, false);
-        if (dragFilePathArr == null) return;
-        var folderPath = dragFilePathArr[0];
-
-        if (!(File.Exists(folderPath) && folderPath.EndsWith(".zip")) && !Directory.Exists(folderPath))
-        {
-            FormUtils.ShowMessageBox(
-                LanguageUtils.Translate("有効なフォルダ、またはzipファイルを選択してください", _mainForm.CurrentLanguage),
-                LanguageUtils.Translate("エラー", _mainForm.CurrentLanguage),
-                true
-            );
-            return;
-        }
-
-        MaterialTextBox.Text = folderPath;
-    }
-
-    /// <summary>
-    /// エラー状態を設定します。
-    /// </summary>
-    /// <param name="errorMessage"></param>
-    private void SetErrorState(string errorMessage)
-    {
-        ErrorLabel.Text = errorMessage;
-        AddButton.Enabled = false;
-    }
-
-    /// <summary>
-    /// エラー状態を解除します。
-    /// </summary>
-    private void ClearErrorState()
-    {
-        ErrorLabel.Text = string.Empty;
-        AddButton.Enabled = true;
-    }
-
-    /// <summary>
-    /// アイテムタイプ、カスタムカテゴリから、TypeComboBoxのIndexを設定します。
-    /// </summary>
-    /// <param name="itemType"></param>
-    /// <param name="customCategory"></param>
-    private void SetTypeCombobox(ItemType itemType, string? customCategory)
-    {
-        if (itemType == ItemType.Custom)
-        {
-            if (!string.IsNullOrEmpty(customCategory))
-            {
-                var typeIndex = TypeComboBox.Items.IndexOf(customCategory);
-                TypeComboBox.SelectedIndex = typeIndex == -1 ? 0 : typeIndex;
-            }
-            else
-            {
-                TypeComboBox.SelectedIndex = 0;
-            }
-        }
-        else
-        {
-            TypeComboBox.SelectedIndex = (int)itemType == 10 ? 0 : (int)itemType;
-        }
-    }
-
-    /// <summary>
-    /// フォルダパスのテキストボックスが変更されたときの処理です。
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void CheckText(object sender, EventArgs e)
-        => ValidCheck();
-
-    /// <summary>
-    /// パスなどのテキストボックス内のテキストが有効かどうかをチェックします。
-    /// </summary>
-    private void ValidCheck()
-    {
-        if (!(File.Exists(FolderTextBox.Text) && FolderTextBox.Text.EndsWith(".zip")) && !Directory.Exists(FolderTextBox.Text))
-        {
-            SetErrorState(LanguageUtils.Translate("エラー: フォルダパスが存在しません", _mainForm.CurrentLanguage));
-            return;
-        }
-
-        if (File.Exists(FolderTextBox.Text) && !FolderTextBox.Text.EndsWith(".zip"))
-        {
-            SetErrorState(LanguageUtils.Translate("エラー: フォルダパスがファイルです", _mainForm.CurrentLanguage));
-            return;
-        }
-
-        if (string.IsNullOrEmpty(FolderTextBox.Text))
-        {
-            SetErrorState(LanguageUtils.Translate("エラー: フォルダパスが入力されていません", _mainForm.CurrentLanguage));
-            return;
-        }
-
-        if (_mainForm.Items.Any(i => i.ItemPath == FolderTextBox.Text) && (!_edit || _folderNotFound))
-        {
-            SetErrorState(LanguageUtils.Translate("エラー: 同じパスのアイテムが既に存在します", _mainForm.CurrentLanguage));
-            return;
-        }
-
-        if (!string.IsNullOrEmpty(MaterialTextBox.Text) && (!(File.Exists(MaterialTextBox.Text) && MaterialTextBox.Text.EndsWith(".zip")) && !Directory.Exists(MaterialTextBox.Text)))
-        {
-            SetErrorState(LanguageUtils.Translate("エラー: マテリアルフォルダパスが存在しません", _mainForm.CurrentLanguage));
-            return;
-        }
-
-        if (!string.IsNullOrEmpty(MaterialTextBox.Text) && File.Exists(MaterialTextBox.Text) && !MaterialTextBox.Text.EndsWith(".zip"))
-        {
-            SetErrorState(LanguageUtils.Translate("エラー: マテリアルフォルダパスがファイルです", _mainForm.CurrentLanguage));
-            return;
-        }
-
-        if (string.IsNullOrEmpty(TitleTextBox.Text))
-        {
-            SetErrorState(LanguageUtils.Translate("エラー: タイトルが入力されていません", _mainForm.CurrentLanguage));
-            return;
-        }
-
-        if (TitleTextBox.Text == "*")
-        {
-            SetErrorState(LanguageUtils.Translate("エラー: タイトルを*にすることはできません", _mainForm.CurrentLanguage));
-            return;
-        }
-
-        if (string.IsNullOrEmpty(AuthorTextBox.Text))
-        {
-            SetErrorState(LanguageUtils.Translate("エラー: 作者が入力されていません", _mainForm.CurrentLanguage));
-            return;
-        }
-
-        ClearErrorState();
-    }
-
-    /// <summary>
-    /// BoothのURL欄でEnterキーが押されたときの処理です。
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void BoothURLTextBox_KeyDown(object sender, KeyEventArgs e)
-    {
-        if (!e.Control && e.KeyCode == Keys.Enter)
-        {
-            GetButton_Click(this, EventArgs.Empty);
-        }
-    }
-
-    /// <summary>
-    /// フォームが閉じられるときの処理です。イベントを発火します。
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void AddItem_FormClosing(object sender, FormClosingEventArgs e) 
-        => ItemAdded?.Invoke(this, EventArgs.Empty);
-
-    private void AddItem_KeyDown(object sender, KeyEventArgs e)
-    {
-        if (e.Control && e.KeyCode == Keys.Enter && AddButton.Enabled)
-        {
-            AddButton_Click(this, EventArgs.Empty);
-        }
-    }
+    #endregion
 }

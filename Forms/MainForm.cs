@@ -2029,6 +2029,7 @@ internal sealed partial class MainForm : Form
     {
         AddItemForm addItem = new(this, CurrentPath.CurrentSelectedCategory, CurrentPath.CurrentSelectedCustomCategory, false, null, null);
         addItem.ShowDialog();
+
         RefleshWindow();
         DatabaseUtils.SaveItemsData(Items);
     }
@@ -2447,21 +2448,23 @@ internal sealed partial class MainForm : Form
     /// <param name="e"></param>
     private void AvatarItemExplorer_DragDrop(object sender, DragEventArgs e)
     {
-        if (e.Data == null) return;
-        if (!e.Data.GetDataPresent(DataFormats.FileDrop)) return;
-        string[]? dragFilePathArr = (string[]?)e.Data.GetData(DataFormats.FileDrop, false);
-        if (dragFilePathArr == null) return;
+        var files = AEUtils.GetFileDropPaths(e);
 
-        AddItemForm addItem = new(this, CurrentPath.CurrentSelectedCategory, CurrentPath.CurrentSelectedCustomCategory, false, null, dragFilePathArr);
-        EventHandler itemAdded = (_, _) =>
+        AddItemForm addItem = new(this, CurrentPath.CurrentSelectedCategory, CurrentPath.CurrentSelectedCustomCategory, false, null, AEUtils.GetFileDropPaths(e));
+
+        void ItemAdded(object? sender, EventArgs? e)
         {
             RefleshWindow();
             DatabaseUtils.SaveItemsData(Items);
+        }
+
+        addItem.ItemAdded += ItemAdded;
+        addItem.FormClosed += (_, _) =>
+        {
+            addItem.ItemAdded -= ItemAdded;
             Enabled = true;
         };
 
-        addItem.ItemAdded += itemAdded;
-        addItem.FormClosed += (_, _) => addItem.ItemAdded -= itemAdded;
         addItem.Show();
         Enabled = false;
     }
@@ -2473,18 +2476,23 @@ internal sealed partial class MainForm : Form
     /// <param name="e"></param>
     private void AvatarPage_DragDrop(object sender, DragEventArgs e)
     {
-        if (e.Data == null) return;
-        if (!e.Data.GetDataPresent(DataFormats.FileDrop)) return;
-        string[]? dragFilePathArr = (string[]?)e.Data.GetData(DataFormats.FileDrop, false);
-        if (dragFilePathArr == null) return;
+        var files = AEUtils.GetFileDropPaths(e);
 
-        AddItemForm addItem = new(this, ItemType.Avatar, null, false, null, dragFilePathArr);
-        addItem.ItemAdded += (_, _) =>
+        AddItemForm addItem = new(this, ItemType.Avatar, null, false, null, files);
+
+        void ItemAdded(object? sender, EventArgs? e)
         {
             RefleshWindow();
             DatabaseUtils.SaveItemsData(Items);
+        }
+
+        addItem.ItemAdded += ItemAdded;
+        addItem.FormClosed += (_, _) =>
+        {
+            addItem.ItemAdded -= ItemAdded;
             Enabled = true;
         };
+
         addItem.Show();
         Enabled = false;
     }

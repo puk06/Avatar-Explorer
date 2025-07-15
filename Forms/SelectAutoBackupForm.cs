@@ -41,22 +41,27 @@ internal partial class SelectAutoBackupForm : Form
         if (SelectBackup.Items.Count > 0) SelectBackup.SelectedIndex = 0;
     }
 
+    #region フォーム関連の処理
+    /// <summary>
+    /// コントロールを翻訳します。
+    /// </summary>
     private void TranslateControls()
     {
-        if (_mainForm.CurrentLanguage != "ja-JP")
+        if (_mainForm.CurrentLanguage == "ja-JP") return;
+
+        foreach (Control control in Controls)
         {
-            foreach (Control control in Controls)
+            if (!string.IsNullOrEmpty(control.Text))
             {
-                if (!string.IsNullOrEmpty(control.Text))
-                {
-                    control.Text = LanguageUtils.Translate(control.Text, _mainForm.CurrentLanguage);
-                }
+                control.Text = LanguageUtils.Translate(control.Text, _mainForm.CurrentLanguage);
             }
-
-            Text = LanguageUtils.Translate("自動バックアップから復元", _mainForm.CurrentLanguage);
         }
-    }
 
+        Text = LanguageUtils.Translate("自動バックアップから復元", _mainForm.CurrentLanguage);
+    }
+    #endregion
+
+    #region イベントハンドラ
     private void SelectBackup_SelectedIndexChanged(object sender, EventArgs e)
     {
         var backupPath = GetBackupPath();
@@ -81,6 +86,19 @@ internal partial class SelectAutoBackupForm : Form
         BackupInfo.Text = $"{itemDatabase}\n{commonAvatarDatabase}\n{customCategory}";
     }
 
+    private void SelectButton_Click(object sender, EventArgs e)
+    {
+        SelectedBackupPath = GetBackupPath();
+        Close();
+    }
+    #endregion
+
+    #region 処理関数
+    /// <summary>
+    /// バックアップパスのリストを取得します。
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
     private Dictionary<string, string> GetBackupPaths(string path)
     {
         try
@@ -109,12 +127,10 @@ internal partial class SelectAutoBackupForm : Form
         }
     }
 
-    private void SelectButton_Click(object sender, EventArgs e)
-    {
-        SelectedBackupPath = GetBackupPath();
-        Close();
-    }
-
+    /// <summary>
+    /// 現在選択されているバックアップパスを取得します。
+    /// </summary>
+    /// <returns></returns>
     private string GetBackupPath()
     {
         if (SelectBackup.SelectedItem == null) return string.Empty;
@@ -124,4 +140,5 @@ internal partial class SelectAutoBackupForm : Form
 
         return _backupPaths.TryGetValue(selectedBackup, out string? backupPath) ? backupPath : string.Empty;
     }
+    #endregion
 }

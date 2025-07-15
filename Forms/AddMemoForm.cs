@@ -8,7 +8,7 @@ internal partial class AddMemoForm : Form
     /// <summary>
     /// アイテムのメモを取得または設定します。
     /// </summary>
-    internal string Memo { get; set; } = "";
+    internal string Memo { get; private set; } = string.Empty;
 
     /// <summary>
     /// メインフォームを取得または設定します。
@@ -23,6 +23,7 @@ internal partial class AddMemoForm : Form
     internal AddMemoForm(MainForm MainForm, Item item)
     {
         _mainForm = MainForm;
+
         InitializeComponent();
 
         Text = LanguageUtils.Translate(Text, _mainForm.CurrentLanguage);
@@ -33,28 +34,29 @@ internal partial class AddMemoForm : Form
         MemoTextBox.Text = item.ItemMemo;
     }
 
+    #region フォーム関連の処理
+    /// <summary>
+    /// コントロールを翻訳します。
+    /// </summary>
     private void TranslateControls()
     {
-        if (_mainForm.CurrentLanguage != "ja-JP")
+        if (_mainForm.CurrentLanguage == "ja-JP") return;
+
+        foreach (Control control in Controls)
         {
-            foreach (Control control in Controls)
+            if (!string.IsNullOrEmpty(control.Text))
             {
-                if (!string.IsNullOrEmpty(control.Text))
-                {
-                    control.Text = LanguageUtils.Translate(control.Text, _mainForm.CurrentLanguage);
-                }
+                control.Text = LanguageUtils.Translate(control.Text, _mainForm.CurrentLanguage);
             }
         }
     }
+    #endregion
 
-    /// <summary>
-    /// メモを追加し、フォームを閉じます。
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
+    #region イベントハンドラ
     private void EditButton_Click(object sender, EventArgs e)
     {
         Memo = MemoTextBox.Text;
         Close();
     }
+    #endregion
 }
