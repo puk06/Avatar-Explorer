@@ -279,8 +279,9 @@ internal sealed partial class MainForm : Form
                 AddItemForm addItem = new(this, ItemType.Avatar, null, false, null, launchInfo.assetDirs, launchInfo.assetId);
                 addItem.ShowDialog();
 
-                RefleshWindow();
                 DatabaseUtils.SaveItemsData(Items);
+
+                RefleshWindow();
             }
 
             AdjustLabelPosition();
@@ -437,6 +438,8 @@ internal sealed partial class MainForm : Form
                 {
                     if (!ChangeThumbnail(item)) return;
 
+                    DatabaseUtils.SaveItemsData(Items);
+
                     // もしアバターの欄を右で開いていたら、そのサムネイルも更新しないといけないため。
                     if (_openingWindow == Window.ItemList && !_isSearching) GenerateItems();
 
@@ -444,7 +447,6 @@ internal sealed partial class MainForm : Form
                     if (_isSearching) SearchItems();
 
                     GenerateAvatarList();
-                    DatabaseUtils.SaveItemsData(Items);
                 },
                 Keys.T
             );
@@ -461,6 +463,8 @@ internal sealed partial class MainForm : Form
 
                     // 対応アバターのパスを変えてあげる
                     DatabaseUtils.ChangeAllItemPaths(Items, prePath);
+
+                    DatabaseUtils.SaveItemsData(Items);
 
                     // もしアイテムで編集されたアイテムを開いていたら、パスなどに使用される文字列も更新しないといけないため
                     if (CurrentPath.CurrentSelectedAvatarPath == prePath)
@@ -479,7 +483,6 @@ internal sealed partial class MainForm : Form
                     if (!_isSearching) PathTextBox.Text = GeneratePath();
 
                     RefleshWindow();
-                    DatabaseUtils.SaveItemsData(Items);
                 },
                 Keys.E
             );
@@ -491,8 +494,9 @@ internal sealed partial class MainForm : Form
                 {
                     if (!AddMemoToItem(item)) return;
 
-                    RefleshWindow();
                     DatabaseUtils.SaveItemsData(Items);
+
+                    RefleshWindow();
                 },
                 Keys.M
             );
@@ -2034,8 +2038,9 @@ internal sealed partial class MainForm : Form
         AddItemForm addItem = new(this, CurrentPath.CurrentSelectedCategory, CurrentPath.CurrentSelectedCustomCategory, false, null, null);
         addItem.ShowDialog();
 
-        RefleshWindow();
         DatabaseUtils.SaveItemsData(Items);
+
+        RefleshWindow();
     }
     #endregion
 
@@ -2458,8 +2463,8 @@ internal sealed partial class MainForm : Form
 
         void ItemAdded(object? sender, EventArgs? e)
         {
-            RefleshWindow();
             DatabaseUtils.SaveItemsData(Items);
+            RefleshWindow();
         }
 
         addItem.ItemAdded += ItemAdded;
@@ -2486,8 +2491,8 @@ internal sealed partial class MainForm : Form
 
         void ItemAdded(object? sender, EventArgs? e)
         {
-            RefleshWindow();
             DatabaseUtils.SaveItemsData(Items);
+            RefleshWindow();
         }
 
         addItem.ItemAdded += ItemAdded;
