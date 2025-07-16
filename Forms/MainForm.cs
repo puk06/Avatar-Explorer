@@ -2327,7 +2327,7 @@ internal sealed partial class MainForm : Form
         {
             if (values.Length > 0)
             {
-                string translatedLabel = label == "BoothID" ? label : LanguageUtils.Translate(label, CurrentLanguage);
+                string translatedLabel = LanguageUtils.Translate(label, CurrentLanguage);
                 pathTextList.Add($"{translatedLabel}: {string.Join(", ", values)}");
             }
         }
@@ -3031,11 +3031,14 @@ internal sealed partial class MainForm : Form
     private void ChangeControlFont(Control control)
     {
         if (GuiFont == null) return;
+
         var previousFont = control.Font;
         var familyName = previousFont.FontFamily.Name;
         if (familyName == "Yu Gothic UI") return;
+
         var previousSize = previousFont.Size;
         if (previousSize is <= 0 or >= float.MaxValue) return;
+
         control.Font = new Font(GuiFont, previousSize, previousFont.Style);
     }
 
@@ -3095,6 +3098,7 @@ internal sealed partial class MainForm : Form
             {
                 var newFontSize = defaultSize.ScreenFontSize * ClientSize.Height;
                 if (newFontSize <= 0 || newFontSize >= float.MaxValue) continue;
+
                 control.Font = new Font(control.Font.FontFamily, newFontSize, control.Font.Style);
             }
         }
