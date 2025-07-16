@@ -528,6 +528,8 @@ internal sealed partial class MainForm : Form
 
                     Items.RemoveAll(i => i.ItemPath == item.ItemPath);
 
+                    DatabaseUtils.SaveItemsData(Items);
+
                     FormUtils.ShowMessageBox(
                         LanguageUtils.Translate("削除が完了しました。", CurrentLanguage),
                         LanguageUtils.Translate("完了", CurrentLanguage)
@@ -551,7 +553,6 @@ internal sealed partial class MainForm : Form
 
                                 ResetAvatarExplorer(true);
                                 PathTextBox.Text = GeneratePath();
-                                DatabaseUtils.SaveItemsData(Items);
                                 return;
                             }
 
@@ -564,13 +565,11 @@ internal sealed partial class MainForm : Form
 
                                 GenerateItems();
                                 PathTextBox.Text = GeneratePath();
-                                DatabaseUtils.SaveItemsData(Items);
                             }
                         }
                         else
                         {
                             SearchItems();
-                            DatabaseUtils.SaveItemsData(Items);
                         }
                     }
                     else
@@ -580,7 +579,6 @@ internal sealed partial class MainForm : Form
                         {
                             ResetAvatarExplorer(true);
                             PathTextBox.Text = GeneratePath();
-                            DatabaseUtils.SaveItemsData(Items);
                             return;
                         }
 
@@ -589,7 +587,6 @@ internal sealed partial class MainForm : Form
                         {
                             GenerateItems();
                             PathTextBox.Text = GeneratePath();
-                            DatabaseUtils.SaveItemsData(Items);
                             return;
                         }
 
@@ -597,14 +594,11 @@ internal sealed partial class MainForm : Form
                         if (_openingWindow == Window.ItemList)
                         {
                             GenerateItems();
-                            DatabaseUtils.SaveItemsData(Items);
                             return;
                         }
 
                         // アイテム画面の前にいる
                         RefleshWindow();
-
-                        DatabaseUtils.SaveItemsData(Items);
                     }
                 },
                 Keys.D
@@ -697,8 +691,9 @@ internal sealed partial class MainForm : Form
                     {
                         if (!ChangeThumbnail(author)) return;
 
-                        GenerateAuthorList(false);
                         DatabaseUtils.SaveItemsData(Items);
+
+                        GenerateAuthorList(false);
                     },
                     Keys.T
                 );
@@ -1077,6 +1072,8 @@ internal sealed partial class MainForm : Form
                         // 対応アバターのパスを変えてあげる
                         DatabaseUtils.ChangeAllItemPaths(Items, prePath);
 
+                        DatabaseUtils.SaveItemsData(Items);
+
                         if (CurrentPath.CurrentSelectedAvatarPath == prePath)
                         {
                             CurrentPath.CurrentSelectedAvatar = item.Title;
@@ -1084,7 +1081,6 @@ internal sealed partial class MainForm : Form
                         }
 
                         RefleshWindow();
-                        DatabaseUtils.SaveItemsData(Items);
                     }
 
                     CurrentPath.CurrentSelectedItem = item;
@@ -1142,6 +1138,8 @@ internal sealed partial class MainForm : Form
                     {
                         if (!ChangeThumbnail(item)) return;
 
+                        DatabaseUtils.SaveItemsData(Items);
+
                         if (_isSearching)
                         {
                             SearchItems();
@@ -1152,7 +1150,6 @@ internal sealed partial class MainForm : Form
                         }
 
                         GenerateAvatarList(false);
-                        DatabaseUtils.SaveItemsData(Items);
                     },
                     Keys.T
                 );
@@ -1170,6 +1167,8 @@ internal sealed partial class MainForm : Form
                         // 対応アバターのパスを変えてあげる
                         DatabaseUtils.ChangeAllItemPaths(Items, prePath);
 
+                        DatabaseUtils.SaveItemsData(Items);
+
                         if (CurrentPath.CurrentSelectedAvatarPath == prePath)
                         {
                             CurrentPath.CurrentSelectedAvatar = item.Title;
@@ -1178,7 +1177,6 @@ internal sealed partial class MainForm : Form
 
                         if (!_isSearching) PathTextBox.Text = GeneratePath();
                         RefleshWindow();
-                        DatabaseUtils.SaveItemsData(Items);
                     },
                     Keys.E
                 );
@@ -1190,9 +1188,10 @@ internal sealed partial class MainForm : Form
                     {
                         if (!AddMemoToItem(item)) return;
 
+                        DatabaseUtils.SaveItemsData(Items);
+
                         GenerateAuthorList(false);
                         GenerateItems(false);
-                        DatabaseUtils.SaveItemsData(Items);
                     },
                     Keys.E
                 );
@@ -1265,6 +1264,8 @@ internal sealed partial class MainForm : Form
 
                         Items.RemoveAll(i => i.ItemPath == item.ItemPath);
 
+                        DatabaseUtils.SaveItemsData(Items);
+
                         FormUtils.ShowMessageBox(
                             LanguageUtils.Translate("削除が完了しました。", CurrentLanguage),
                             LanguageUtils.Translate("完了", CurrentLanguage)
@@ -1285,8 +1286,6 @@ internal sealed partial class MainForm : Form
                         {
                             RefleshWindow();
                         }
-
-                        DatabaseUtils.SaveItemsData(Items);
                     },
                     Keys.D
                 );
@@ -1691,11 +1690,12 @@ internal sealed partial class MainForm : Form
                         // 対応アバターのパスを変えてあげる
                         DatabaseUtils.ChangeAllItemPaths(Items, prePath);
 
+                        DatabaseUtils.SaveItemsData(Items);
+
                         GenerateFilteredItem(searchFilter, false);
                         GenerateAvatarList(false);
                         GenerateAuthorList(false);
                         GenerateCategoryListLeft();
-                        DatabaseUtils.SaveItemsData(Items);
                     }
 
                     _leftWindow = LeftWindow.Default;
@@ -1760,9 +1760,10 @@ internal sealed partial class MainForm : Form
                     {
                         if (!ChangeThumbnail(item)) return;
 
+                        DatabaseUtils.SaveItemsData(Items);
+
                         GenerateFilteredItem(searchFilter, false);
                         GenerateAvatarList(false);
-                        DatabaseUtils.SaveItemsData(Items);
                     },
                     Keys.T
                 );
@@ -1780,6 +1781,8 @@ internal sealed partial class MainForm : Form
                         // 対応アバターのパスを変えてあげる
                         DatabaseUtils.ChangeAllItemPaths(Items, prePath);
 
+                        DatabaseUtils.SaveItemsData(Items);
+
                         if (CurrentPath.CurrentSelectedAvatarPath == prePath)
                         {
                             CurrentPath.CurrentSelectedAvatar = item.Title;
@@ -1790,7 +1793,6 @@ internal sealed partial class MainForm : Form
                         GenerateAvatarList(false);
                         GenerateAuthorList(false);
                         GenerateCategoryListLeft();
-                        DatabaseUtils.SaveItemsData(Items);
                     },
                     Keys.E
                 );
@@ -1802,9 +1804,10 @@ internal sealed partial class MainForm : Form
                     {
                         if (!AddMemoToItem(item)) return;
 
+                        DatabaseUtils.SaveItemsData(Items);
+
                         GenerateFilteredItem(searchFilter, false);
                         GenerateAvatarList(false);
-                        DatabaseUtils.SaveItemsData(Items);
                     },
                     Keys.M
                 );
@@ -1869,6 +1872,8 @@ internal sealed partial class MainForm : Form
 
                         Items.RemoveAll(i => i.ItemPath == item.ItemPath);
 
+                        DatabaseUtils.SaveItemsData(Items);
+
                         FormUtils.ShowMessageBox(
                             LanguageUtils.Translate("削除が完了しました。", CurrentLanguage),
                             LanguageUtils.Translate("完了", CurrentLanguage)
@@ -1878,7 +1883,6 @@ internal sealed partial class MainForm : Form
                         GenerateAvatarList(false);
                         GenerateAuthorList(false);
                         GenerateCategoryListLeft();
-                        DatabaseUtils.SaveItemsData(Items);
                     },
                     Keys.D
                 );
