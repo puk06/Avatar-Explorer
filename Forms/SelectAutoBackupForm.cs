@@ -33,6 +33,7 @@ internal partial class SelectAutoBackupForm : Form
         TranslateControls();
 
         _backupPaths = GetBackupPaths(AUTO_BACKUP_PATH);
+
         SelectBackup.Items.Clear();
 
         foreach (var backup in _backupPaths)

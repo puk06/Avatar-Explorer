@@ -208,8 +208,7 @@ internal static partial class AEUtils
             {
                 if (control is not CustomItemButton button) continue;
 
-                var buttonAbsoluteLocation = button.Location;
-                buttonAbsoluteLocation.Y += tabPage.VerticalScroll.Value;
+                var buttonAbsoluteLocation = button.Location with { Y = button.Location.Y + tabPage.VerticalScroll.Value };
                 button.CheckThmbnail(buttonAbsoluteLocation, button.Size, visibleArea);
             }
         }
