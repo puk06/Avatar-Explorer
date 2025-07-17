@@ -223,21 +223,6 @@ internal sealed partial class MainForm : Form
             var added = DatabaseUtils.CheckMissingCustomCategories(Items, CustomCategories);
             if (added) DatabaseUtils.SaveCustomCategoriesData(CustomCategories);
 
-            // Fix Item Relative Path
-            DatabaseUtils.FixItemRelativePaths(Items);
-
-            // Fix Supported Avatar Path (Title => Path)
-            DatabaseUtils.FixSupportedAvatarPaths(Items);
-
-            // Update Empty Dates
-            DatabaseUtils.UpdateEmptyDates(Items);
-
-            // Fix Item Dates
-            DatabaseUtils.FixItemDates(Items);
-
-            // Fix Relative Path Escape
-            DatabaseUtils.FixRelativePathEscapes(Items);
-
             AddFontFile();
             InitializeComponent();
 
@@ -348,6 +333,7 @@ internal sealed partial class MainForm : Form
     /// <summary>
     /// メイン画面左のアバター欄を作成します。
     /// </summary>
+    /// <param name="pageReset"></param>
     private void GenerateAvatarList(bool pageReset = true)
     {
         if (pageReset) _currentPageAvatar = 0;
@@ -638,6 +624,7 @@ internal sealed partial class MainForm : Form
     /// <summary>
     /// メイン画面左の作者欄を作成します。
     /// </summary>
+    /// <param name="pageReset"></param>
     private void GenerateAuthorList(bool pageReset = true)
     {
         if (pageReset) _currentPageAuthor = 0;
@@ -968,6 +955,7 @@ internal sealed partial class MainForm : Form
     /// <summary>
     /// メイン画面右のアイテム欄を作成します。
     /// </summary>
+    /// <param name="pageReset"></param>
     private void GenerateItems(bool pageReset = true)
     {
         if (pageReset) _currentPage = 0;
@@ -1395,6 +1383,7 @@ internal sealed partial class MainForm : Form
     /// <summary>
     /// メイン画面右のアイテム内のファイル欄を作成します。
     /// </summary>
+    /// <param name="pageReset"></param>
     private void GenerateItemFiles(bool pageReset = true)
     {
         if (pageReset) _currentPage = 0;
@@ -1595,6 +1584,7 @@ internal sealed partial class MainForm : Form
     /// 検索ボックスに入力された文字列を元にアイテムを検索します。
     /// </summary>
     /// <param name="searchFilter"></param>
+    /// <param name="pageReset"></param>
     private void GenerateFilteredItem(SearchFilter searchFilter, bool pageReset = true)
     {
         if (pageReset) _currentPage = 0;
@@ -1927,6 +1917,7 @@ internal sealed partial class MainForm : Form
     /// 検索ボックスに入力された文字列を元にアイテムフォルダー内を検索します。
     /// </summary>
     /// <param name="searchWords"></param>
+    /// <param name="pageReset"></param>
     private void GenerateFilteredFolderItems(SearchFilter searchWords, bool pageReset = true)
     {
         if (pageReset) _currentPage = 0;
@@ -2909,6 +2900,7 @@ internal sealed partial class MainForm : Form
                     SearchBox.Text = string.Empty;
                     SearchResultLabel.Text = string.Empty;
                     _isSearching = false;
+
                     GenerateAvatarList();
                     GenerateAuthorList();
                     GenerateCategoryListLeft();

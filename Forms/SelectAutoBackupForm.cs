@@ -27,7 +27,9 @@ internal partial class SelectAutoBackupForm : Form
     internal SelectAutoBackupForm(MainForm mainForm)
     {
         _mainForm = mainForm;
+
         InitializeComponent();
+
         TranslateControls();
 
         _backupPaths = GetBackupPaths(AUTO_BACKUP_PATH);
@@ -104,8 +106,7 @@ internal partial class SelectAutoBackupForm : Form
         try
         {
             var backupPaths = new Dictionary<string, string>();
-            var autoBackupFiles = Directory.GetDirectories(path);
-            autoBackupFiles = autoBackupFiles.Reverse().ToArray();
+            var autoBackupFiles = Directory.GetDirectories(path).Reverse();
 
             foreach (var file in autoBackupFiles)
             {

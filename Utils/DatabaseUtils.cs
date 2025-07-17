@@ -24,7 +24,24 @@ internal static class DatabaseUtils
         try
         {
             string json = File.ReadAllText(path);
-            return JsonSerializer.Deserialize<List<Item>>(json) ?? [];
+            var items =  JsonSerializer.Deserialize<List<Item>>(json) ?? [];
+
+            // Fix Item Relative Path
+            FixItemRelativePaths(items);
+
+            // Fix Supported Avatar Path (Title => Path)
+            FixSupportedAvatarPaths(items);
+
+            // Update Empty Dates
+            UpdateEmptyDates(items);
+
+            // Fix Item Dates
+            FixItemDates(items);
+
+            // Fix Relative Path Escape
+            FixRelativePathEscapes(items);
+
+            return items;
         }
         catch (Exception ex)
         {
@@ -80,7 +97,15 @@ internal static class DatabaseUtils
         try
         {
             string json = File.ReadAllText(path);
-            return JsonSerializer.Deserialize<List<CommonAvatar>>(json) ?? [];
+            var commonAvatars = JsonSerializer.Deserialize<List<CommonAvatar>>(json) ?? [];
+
+            // Fix Item Relative Path
+            FixItemRelativePaths(commonAvatars);
+
+            // Fix Relative Path Escape
+            FixRelativePathEscapes(commonAvatars);
+
+            return commonAvatars;
         }
         catch (Exception ex)
         {
@@ -98,6 +123,12 @@ internal static class DatabaseUtils
     {
         try
         {
+            // Fix Item Relative Path
+            FixItemRelativePaths(commonAvatars);
+
+            // Fix Relative Path Escape
+            FixRelativePathEscapes(commonAvatars);
+
             string json = JsonSerializer.Serialize(commonAvatars, jsonSerializerOptions);
             File.WriteAllText("./Datas/CommonAvatar.json", json);
         }
@@ -287,7 +318,11 @@ internal static class DatabaseUtils
         }
     }
 
-    internal static void FixItemDates(List<Item> items)
+    /// <summary>
+    /// アイテムの日付を修正します。
+    /// </summary>
+    /// <param name="items"></param>
+    private static void FixItemDates(List<Item> items)
     {
         foreach (var item in items)
         {
@@ -310,7 +345,7 @@ internal static class DatabaseUtils
     /// </summary>
     /// <param name="items"></param>
     /// <returns></returns>
-    internal static void UpdateEmptyDates(List<Item> items)
+    private static void UpdateEmptyDates(List<Item> items)
     {
         string now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
 
@@ -332,32 +367,72 @@ internal static class DatabaseUtils
     /// アイテムパスの絶対パスが./Datasと同じだった場合、自動で相対パスに変換するものです。
     /// </summary>
     /// <param name="items"></param>
-    internal static void FixItemRelativePaths(List<Item> items)
+    private static void FixItemRelativePaths(List<Item> items)
     {
         string currentDirectory = Path.GetFullPath(".");
 
         foreach (var item in items)
         {
-            if (string.IsNullOrEmpty(item.ItemPath)) continue;
+            item.ItemPath = FixItemRelativePath(item.ItemPath, currentDirectory);
 
-            string fullItemPath = Path.GetFullPath(item.ItemPath);
-
-            string datasFolder = Path.Combine(currentDirectory, "Datas");
-            string datasFolderFull = Path.GetFullPath(datasFolder);
-
-            if (fullItemPath.StartsWith(datasFolderFull, StringComparison.OrdinalIgnoreCase))
+            for (int i = 0; i < item.SupportedAvatar.Count; i++)
             {
-                string relativePath = Path.GetRelativePath(currentDirectory, fullItemPath);
-                item.ItemPath = FixPath(relativePath);
+                item.SupportedAvatar[i] = FixItemRelativePath(item.SupportedAvatar[i], currentDirectory);
+            }
+
+            for (int i = 0; i < item.ImplementedAvatars.Count; i++)
+            {
+                item.ImplementedAvatars[i] = FixItemRelativePath(item.ImplementedAvatars[i], currentDirectory);
             }
         }
+    }
+
+    /// <summary>
+    /// アイテムパスの絶対パスが./Datasと同じだった場合、自動で相対パスに変換するものです。
+    /// </summary>
+    /// <param name="commonAvatars"></param>
+    private static void FixItemRelativePaths(List<CommonAvatar> commonAvatars)
+    {
+        string currentDirectory = Path.GetFullPath(".");
+
+        foreach (var commonAvatar in commonAvatars)
+        {
+            for (int i = 0; i < commonAvatar.Avatars.Count; i++)
+            {
+                commonAvatar.Avatars[i] = FixItemRelativePath(commonAvatar.Avatars[i], currentDirectory);
+            }
+        }
+    }
+
+    /// <summary>
+    /// アイテムパスの絶対パスが./Datasと同じだった場合、自動で相対パスに変換するものです。
+    /// </summary>
+    /// <param name="path"></param>
+    /// <param name="currentDirectory"></param>
+    /// <returns></returns>
+    private static string FixItemRelativePath(string path, string currentDirectory)
+    {
+        if (string.IsNullOrEmpty(path)) return path;
+
+        string fullItemPath = Path.GetFullPath(path);
+
+        string datasFolder = Path.Combine(currentDirectory, "Datas");
+        string datasFolderFull = Path.GetFullPath(datasFolder);
+
+        if (fullItemPath.StartsWith(datasFolderFull, StringComparison.OrdinalIgnoreCase))
+        {
+            string relativePath = Path.GetRelativePath(currentDirectory, fullItemPath);
+            return FixPath(relativePath);
+        }
+
+        return path;
     }
 
     /// <summary>
     /// 相対パスのエスケープを直してくれます。
     /// </summary>
     /// <param name="items"></param>
-    internal static void FixRelativePathEscapes(List<Item> items)
+    private static void FixRelativePathEscapes(List<Item> items)
     {
         foreach (var item in items)
         {
@@ -368,6 +443,26 @@ internal static class DatabaseUtils
         }
     }
 
+    /// <summary>
+    /// 相対パスのエスケープを直してくれます。
+    /// </summary>
+    /// <param name="commonAvatars"></param>
+    private static void FixRelativePathEscapes(List<CommonAvatar> commonAvatars)
+    {
+        foreach (var commonAvatar in commonAvatars)
+        {
+            for (int i = 0; i < commonAvatar.Avatars.Count; i++)
+            {
+                commonAvatar.Avatars[i] = FixPath(commonAvatar.Avatars[i]);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 相対パスの./の文字を削除し、/を\\へ変換します。
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
     private static string FixPath(string path)
     {
         if (string.IsNullOrEmpty(path)) return string.Empty;
@@ -470,9 +565,10 @@ internal static class DatabaseUtils
     /// </summary>
     /// <param name="items"></param>
     /// <returns></returns>
-    internal static void FixSupportedAvatarPaths(List<Item> items)
+    private static void FixSupportedAvatarPaths(List<Item> items)
     {
-        var avatars = items.Where(x => x.Type == ItemType.Avatar).ToArray();
+        var avatars = items.Where(x => x.Type == ItemType.Avatar);
+
         foreach (var item in items)
         {
             if (item.SupportedAvatar.Count == 0) continue;
@@ -480,6 +576,7 @@ internal static class DatabaseUtils
             {
                 var avatar = avatars.FirstOrDefault(x => x.Title == supportedAvatar);
                 if (avatar == null) continue;
+
                 item.SupportedAvatar = item.SupportedAvatar
                     .Where(x => x != supportedAvatar)
                     .Append(avatar.ItemPath)
