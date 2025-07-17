@@ -1500,8 +1500,8 @@ internal sealed partial class MainForm : Form
 
         FormUtils.ShowMessageBox(
             LanguageUtils.Translate("サムネイルを変更しました！", CurrentLanguage) + "\n\n" +
-            LanguageUtils.Translate("変更前: ", CurrentLanguage) + previousPath + "\n\n" +
-            LanguageUtils.Translate("変更後: ", CurrentLanguage) + ofd.FileName,
+            LanguageUtils.Translate("変更前: ", CurrentLanguage) + "\n" + previousPath + "\n\n" +
+            LanguageUtils.Translate("変更後: ", CurrentLanguage) + "\n" + ofd.FileName,
             LanguageUtils.Translate("完了", CurrentLanguage)
         );
 
@@ -1525,8 +1525,8 @@ internal sealed partial class MainForm : Form
 
         FormUtils.ShowMessageBox(
             LanguageUtils.Translate("サムネイルを変更しました！", CurrentLanguage) + "\n\n" +
-            LanguageUtils.Translate("変更前: ", CurrentLanguage) + previousPath + "\n\n" +
-            LanguageUtils.Translate("変更後: ", CurrentLanguage) + ofd.FileName,
+            LanguageUtils.Translate("変更前: ", CurrentLanguage) + "\n" + previousPath + "\n\n" +
+            LanguageUtils.Translate("変更後: ", CurrentLanguage) + "\n" + ofd.FileName,
             "完了"
         );
 
