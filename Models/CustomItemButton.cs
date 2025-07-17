@@ -2,6 +2,7 @@ namespace Avatar_Explorer.Models;
 
 internal class CustomItemButton : Button
 {
+    private readonly int _buttonHeight = 64;
     private readonly PictureBox _pictureBox;
     private readonly Label _title;
     private readonly Label _authorName;
@@ -41,32 +42,34 @@ internal class CustomItemButton : Button
         }
     }
 
-    internal CustomItemButton(int buttonWidth)
+    internal CustomItemButton(int buttonWidth, int buttonHeight)
     {
+        _buttonHeight = buttonHeight;
+
         UseVisualStyleBackColor = true;
-        Size = new Size(buttonWidth, 64);
+        Size = new Size(buttonWidth, buttonHeight);
         SizeChanged += (_, _) =>
         {
             if (_title == null || _authorName == null) return;
-            _title.Size = new Size(Size.Width - 60 - 5, 24);
+            _title.Size = new Size(Size.Width - buttonHeight - 4 - 5, 24);
             _authorName.Size = new Size(Size.Width - 60 - 5, 40);
         };
 
         _pictureBox = new PictureBox
         {
             Location = new Point(4, 4),
-            Size = new Size(56, 56),
+            Size = new Size(buttonHeight - 8, buttonHeight - 8),
             SizeMode = PictureBoxSizeMode.StretchImage
         };
         Controls.Add(_pictureBox);
 
         // タイトルが長すぎる場合にボタンの幅を超えないようにする
         // ボタンの幅 - ラベルのX位置 - 余裕を持たせて数px引く
-        var labelWidth = buttonWidth - 60 - 5;
+        var labelWidth = buttonWidth - buttonHeight - 4 - 5;
 
         _title = new Label
         {
-            Location = new Point(60, 3),
+            Location = new Point(buttonHeight - 4, 3),
             Size = new Size(labelWidth, 24),
             Font = new Font("Yu Gothic UI", 12F)
         };
@@ -74,7 +77,7 @@ internal class CustomItemButton : Button
 
         _authorName = new Label
         {
-            Location = new Point(60, 25),
+            Location = new Point(buttonHeight - 4, 25),
             Size = new Size(labelWidth, 40)
         };
         Controls.Add(_authorName);
@@ -113,7 +116,7 @@ internal class CustomItemButton : Button
                     try
                     {
                         var image = Image.FromFile(ImagePath);
-                        _loadedPicture = new Bitmap(image, new Size(56, 56));
+                        _loadedPicture = new Bitmap(image, new Size(_buttonHeight - 8, _buttonHeight - 8));
                         image.Dispose();
                         image = null;
                     }

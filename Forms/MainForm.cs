@@ -201,6 +201,11 @@ internal sealed partial class MainForm : Form
     /// 商品名の括弧を削除するか決めることが出来ます。
     /// </summary>
     private bool _removeBrackets = false;
+
+    /// <summary>
+    /// ボタンの高さです。
+    /// </summary>
+    internal int ButtonSize = 64;
     #endregion
 
     #region フォームの初期化
@@ -317,6 +322,7 @@ internal sealed partial class MainForm : Form
         int thumbnailUpdateTimeout = int.TryParse(Configuration["ThumbnailUpdateTimeout"], out var tut) ? Math.Clamp(tut, 0, 10000) : 200;
         int backupInterval = int.TryParse(Configuration["BackupInterval"], out var bi) ? Math.Clamp(bi, 1, 1000) : 5;
         bool removeBrackets = Configuration["RemoveBrackets"] == "true";
+        int buttonSize = int.TryParse(Configuration["ButtonSize"], out var bs) ? Math.Clamp(bs, 1, 500) : 64;
 
         _itemsPerPage = itemsPerPage;
         _previewScale = previewScale;
@@ -325,6 +331,7 @@ internal sealed partial class MainForm : Form
         AEUtils.ThumbnailUpdateTimer.Interval = thumbnailUpdateTimeout;
         _backupInterval = backupInterval * 60000; // ms -> min
         _removeBrackets = removeBrackets;
+        ButtonSize = buttonSize;
     }
 
     #endregion
@@ -362,8 +369,8 @@ internal sealed partial class MainForm : Form
         {
             var description = ItemUtils.GetItemDescription(item, CurrentLanguage);
 
-            Button button = AEUtils.CreateButton(_previewScale, item.ImagePath, item.GetTitle(_removeBrackets), LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName, true, description, GetAvatarListWidth);
-            button.Location = new Point(0, (70 * index) + 2);
+            Button button = AEUtils.CreateButton(ButtonSize, _previewScale, item.ImagePath, item.GetTitle(_removeBrackets), LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName, true, description, GetAvatarListWidth);
+            button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
             button.MouseClick += OnMouseClick;
 
             void ButtonClick(object? sender, EventArgs? e)
@@ -601,7 +608,7 @@ internal sealed partial class MainForm : Form
 
         TabPageUtils.AddNavigationButtons(
             AvatarPage,
-            (70 * index) + 2,
+            ((ButtonSize + 6) * index) + 2,
             _currentPageAvatar, _itemsPerPage, totalCount, true,
             CurrentLanguage,
             (_, _) => _currentPageAvatar--,
@@ -645,8 +652,8 @@ internal sealed partial class MainForm : Form
         {
             try
             {
-                Button button = AEUtils.CreateButton(_previewScale, author.AuthorImagePath, author.AuthorName, Items.Count(item => item.AuthorName == author.AuthorName) + LanguageUtils.Translate("個の項目", CurrentLanguage), true, author.AuthorName, GetAvatarListWidth);
-                button.Location = new Point(0, (70 * index) + 2);
+                Button button = AEUtils.CreateButton(ButtonSize, _previewScale, author.AuthorImagePath, author.AuthorName, Items.Count(item => item.AuthorName == author.AuthorName) + LanguageUtils.Translate("個の項目", CurrentLanguage), true, author.AuthorName, GetAvatarListWidth);
+                button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
                 void ButtonClick(object? sender, EventArgs? e)
@@ -701,7 +708,7 @@ internal sealed partial class MainForm : Form
 
         TabPageUtils.AddNavigationButtons(
             AvatarAuthorPage,
-            (70 * index) + 2,
+            ((ButtonSize + 6) * index) + 2,
             _currentPageAuthor, _itemsPerPage, totalCount, true,
             CurrentLanguage,
             (_, _) => _currentPageAuthor--,
@@ -741,8 +748,8 @@ internal sealed partial class MainForm : Form
                 var items = Items.Where(item => item.Type == itemType);
                 var itemCount = items.Count();
 
-                CustomItemButton button = AEUtils.CreateButton(_previewScale, null, ItemUtils.GetCategoryName(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), true, string.Empty, GetAvatarListWidth);
-                button.Location = new Point(0, (70 * index) + 2);
+                CustomItemButton button = AEUtils.CreateButton(ButtonSize, _previewScale, null, ItemUtils.GetCategoryName(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), true, string.Empty, GetAvatarListWidth);
+                button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
                 void ButtonClick(object? sender, EventArgs? e)
@@ -786,8 +793,8 @@ internal sealed partial class MainForm : Form
                     var items = Items.Where(item => item.CustomCategory == customCategory);
                     var itemCount = items.Count();
 
-                    Button button = AEUtils.CreateButton(_previewScale, null, customCategory, itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), true, string.Empty, GetAvatarListWidth);
-                    button.Location = new Point(0, (70 * index) + 2);
+                    Button button = AEUtils.CreateButton(ButtonSize, _previewScale, null, customCategory, itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), true, string.Empty, GetAvatarListWidth);
+                    button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                     button.MouseClick += OnMouseClick;
 
                     void ButtonClick(object? sender, EventArgs? e)
@@ -866,8 +873,8 @@ internal sealed partial class MainForm : Form
 
                 if (itemCount == 0) continue;
 
-                Button button = AEUtils.CreateButton(_previewScale, null, ItemUtils.GetCategoryName(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, string.Empty, GetItemExplorerListWidth);
-                button.Location = new Point(0, (70 * index) + 2);
+                Button button = AEUtils.CreateButton(ButtonSize, _previewScale, null, ItemUtils.GetCategoryName(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, string.Empty, GetItemExplorerListWidth);
+                button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
                 void ButtonClick(object? sender, EventArgs? e)
@@ -917,8 +924,8 @@ internal sealed partial class MainForm : Form
 
                     if (itemCount == 0) continue;
 
-                    Button button = AEUtils.CreateButton(_previewScale, null, customCategory, itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, string.Empty, GetItemExplorerListWidth);
-                    button.Location = new Point(0, (70 * index) + 2);
+                    Button button = AEUtils.CreateButton(ButtonSize, _previewScale, null, customCategory, itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, string.Empty, GetItemExplorerListWidth);
+                    button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                     button.MouseClick += OnMouseClick;
 
                     void ButtonClick(object? sender, EventArgs? e)
@@ -1023,8 +1030,8 @@ internal sealed partial class MainForm : Form
 
                 var description = ItemUtils.GetItemDescription(item, CurrentLanguage);
 
-                Button button = AEUtils.CreateButton(_previewScale, item.ImagePath, item.GetTitle(_removeBrackets), authorText, false, description, GetItemExplorerListWidth);
-                button.Location = new Point(0, (70 * index) + 2);
+                Button button = AEUtils.CreateButton(ButtonSize, _previewScale, item.ImagePath, item.GetTitle(_removeBrackets), authorText, false, description, GetItemExplorerListWidth);
+                button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
                 if (SortingBox.SelectedIndex == 4 || SortingBox.SelectedIndex == 5)
@@ -1294,7 +1301,7 @@ internal sealed partial class MainForm : Form
 
         TabPageUtils.AddNavigationButtons(
             AvatarItemExplorer,
-            (70 * index) + 2,
+            ((ButtonSize + 6) * index) + 2,
             _currentPage, _itemsPerPage, totalCount, false,
             CurrentLanguage,
             (_, _) => _currentPage--,
@@ -1347,8 +1354,8 @@ internal sealed partial class MainForm : Form
                 var itemCount = itemFolderInfo.GetItemCount(itemType);
                 if (itemCount == 0) continue;
 
-                Button button = AEUtils.CreateButton(_previewScale, null, LanguageUtils.Translate(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, string.Empty, GetItemExplorerListWidth);
-                button.Location = new Point(0, (70 * index) + 2);
+                Button button = AEUtils.CreateButton(ButtonSize, _previewScale, null, LanguageUtils.Translate(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, string.Empty, GetItemExplorerListWidth);
+                button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
                 void ButtonClick(object? sender, EventArgs? e)
@@ -1405,8 +1412,8 @@ internal sealed partial class MainForm : Form
             try
             {
                 var imagePath = file.FileExtension is ".png" or ".jpg" ? file.FilePath : string.Empty;
-                Button button = AEUtils.CreateButton(_previewScale, imagePath, file.FileName, file.FileExtension.Replace(".", string.Empty) + LanguageUtils.Translate("ファイル", CurrentLanguage), false, LanguageUtils.Translate("開くファイルのパス: ", CurrentLanguage) + file.FilePath, GetItemExplorerListWidth);
-                button.Location = new Point(0, (70 * index) + 2);
+                Button button = AEUtils.CreateButton(ButtonSize, _previewScale, imagePath, file.FileName, file.FileExtension.Replace(".", string.Empty) + LanguageUtils.Translate("ファイル", CurrentLanguage), false, LanguageUtils.Translate("開くファイルのパス: ", CurrentLanguage) + file.FilePath, GetItemExplorerListWidth);
+                button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
                 void ButtonClick(object? sender, EventArgs? e)
@@ -1463,7 +1470,7 @@ internal sealed partial class MainForm : Form
 
         TabPageUtils.AddNavigationButtons(
             AvatarItemExplorer,
-            (70 * index) + 2,
+            ((ButtonSize + 6) * index) + 2,
             _currentPage, _itemsPerPage, totalCount, false,
             CurrentLanguage,
             (_, _) => _currentPage--,
@@ -1652,8 +1659,8 @@ internal sealed partial class MainForm : Form
             {
                 var description = ItemUtils.GetItemDescription(item, CurrentLanguage);
 
-                Button button = AEUtils.CreateButton(_previewScale, item.ImagePath, item.GetTitle(_removeBrackets), LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName, false, description, GetItemExplorerListWidth);
-                button.Location = new Point(0, (70 * index) + 2);
+                Button button = AEUtils.CreateButton(ButtonSize, _previewScale, item.ImagePath, item.GetTitle(_removeBrackets), LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName, false, description, GetItemExplorerListWidth);
+                button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
                 void ButtonClick(object? sender, EventArgs? e)
@@ -1893,7 +1900,7 @@ internal sealed partial class MainForm : Form
 
         TabPageUtils.AddNavigationButtons(
             AvatarItemExplorer,
-            (70 * index) + 2,
+            ((ButtonSize + 6) * index) + 2,
             _currentPage, _itemsPerPage, totalCount, false,
             CurrentLanguage,
             (_, _) => _currentPage--,
@@ -1953,8 +1960,8 @@ internal sealed partial class MainForm : Form
             try
             {
                 var imagePath = file.FileExtension is ".png" or ".jpg" ? file.FilePath : string.Empty;
-                Button button = AEUtils.CreateButton(_previewScale, imagePath, file.FileName, file.FileExtension.Replace(".", string.Empty) + LanguageUtils.Translate("ファイル", CurrentLanguage), false, LanguageUtils.Translate("開くファイルのパス: ", CurrentLanguage) + file.FilePath, GetItemExplorerListWidth);
-                button.Location = new Point(0, (70 * index) + 2);
+                Button button = AEUtils.CreateButton(ButtonSize, _previewScale, imagePath, file.FileName, file.FileExtension.Replace(".", string.Empty) + LanguageUtils.Translate("ファイル", CurrentLanguage), false, LanguageUtils.Translate("開くファイルのパス: ", CurrentLanguage) + file.FilePath, GetItemExplorerListWidth);
+                button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
                 void ButtonClick(object? sender, EventArgs? e)
@@ -1997,7 +2004,7 @@ internal sealed partial class MainForm : Form
 
         TabPageUtils.AddNavigationButtons(
             AvatarItemExplorer,
-            (70 * index) + 2,
+            ((ButtonSize + 6) * index) + 2,
             _currentPage, _itemsPerPage, totalCount, false,
             CurrentLanguage,
             (_, _) => _currentPage--,

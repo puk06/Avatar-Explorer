@@ -219,10 +219,11 @@ internal static partial class AEUtils
         }
     }
 
-
     /// <summary>
     /// 渡された情報からアイテム用のボタンを生成します。
     /// </summary>
+    /// <param name="buttonHeight"></param>
+    /// <param name="previewScale"></param>
     /// <param name="imagePath"></param>
     /// <param name="labelTitle"></param>
     /// <param name="description"></param>
@@ -230,12 +231,12 @@ internal static partial class AEUtils
     /// <param name="tooltip"></param>
     /// <param name="listWidthDiff"></param>
     /// <returns></returns>
-    internal static CustomItemButton CreateButton(float previewScale, string? imagePath, string labelTitle, string? description, bool @short = false, string tooltip = "", int listWidthDiff = 0)
+    internal static CustomItemButton CreateButton(int buttonHeight, float previewScale, string? imagePath, string labelTitle, string? description, bool @short = false, string tooltip = "", int listWidthDiff = 0)
     {
         var buttonWidth = @short ? 303 : 874;
         if (listWidthDiff != 0) buttonWidth += listWidthDiff;
 
-        CustomItemButton button = new(buttonWidth)
+        CustomItemButton button = new(buttonWidth, buttonHeight)
         {
             PreviewScale = previewScale,
             ImagePath = imagePath,

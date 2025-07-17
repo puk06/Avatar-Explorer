@@ -77,9 +77,9 @@ internal sealed partial class ManageCommonAvatarsForm : Form
         var index = 0;
         foreach (Item item in _mainForm.Items.Where(item => item.Type == ItemType.Avatar))
         {
-            Button button = CreateAvatarButton(item, _mainForm.CurrentLanguage);
+            Button button = CreateAvatarButton(_mainForm.ButtonSize, item, _mainForm.CurrentLanguage);
             button.Text = item.Title;
-            button.Location = new Point(0, (70 * index) + 2);
+            button.Location = new Point(0, ((_mainForm.ButtonSize + 6) * index) + 2);
             button.Tag = item.ItemPath;
 
             var commonAvatar = GetCommonAvatar(CommonAvatarsCombobox.Text);
@@ -102,12 +102,13 @@ internal sealed partial class ManageCommonAvatarsForm : Form
     /// <summary>
     /// アバターのボタンを生成します。
     /// </summary>
+    /// <param name="buttonHeight"></param>
     /// <param name="item"></param>
     /// <param name="language"></param>
     /// <returns></returns>
-    private static CustomItemButton CreateAvatarButton(Item item, string language)
+    private static CustomItemButton CreateAvatarButton(int buttonHeight, Item item, string language)
     {
-        CustomItemButton button = new(875)
+        CustomItemButton button = new(875, buttonHeight)
         {
             ImagePath = item.ImagePath,
             TitleText = item.Title,

@@ -69,8 +69,8 @@ internal sealed partial class SelectSupportedAvatarForm : Form
         foreach (Item item in items)
         {
             if (item.ItemPath == _addItem.ItemPath) continue;
-            Button button = CreateAvatarButton(item, _mainForm.CurrentLanguage);
-            button.Location = new Point(0, (70 * index) + 2);
+            Button button = CreateAvatarButton(_mainForm.ButtonSize, item, _mainForm.CurrentLanguage);
+            button.Location = new Point(0, ((_mainForm.ButtonSize + 6) * index) + 2);
             button.BackColor = _addItem.SupportedAvatar.Contains(item.ItemPath) ? Color.LightGreen : Color.FromKnownColor(KnownColor.Control);
             AvatarList.Controls.Add(button);
             index++;
@@ -85,12 +85,13 @@ internal sealed partial class SelectSupportedAvatarForm : Form
     /// <summary>
     /// フォーム内のアバターのボタンを生成します。
     /// </summary>
+    /// <param name="buttonHeight"></param>
     /// <param name="item"></param>
     /// <param name="language"></param>
     /// <returns></returns>
-    private static CustomItemButton CreateAvatarButton(Item item, string language)
+    private static CustomItemButton CreateAvatarButton(int buttonHeight, Item item, string language)
     {
-        CustomItemButton button = new(992)
+        CustomItemButton button = new(992, buttonHeight)
         {
             ImagePath = item.ImagePath,
             TitleText = item.Title,
