@@ -2369,7 +2369,7 @@ internal sealed partial class MainForm : Form
 
         controls.ForEach(control =>
         {
-            if (control is Label label)
+            if (control is Label label && label.Name == "StartLabel")
             {
                 label.Visible = startLabelVisible;
                 return;
