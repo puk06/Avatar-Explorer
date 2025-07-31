@@ -445,6 +445,33 @@ internal static class DatabaseUtils
     }
 
     /// <summary>
+    /// データベース内の破損したアイテムの対応 / 実装アバターパスをチェックします。
+    /// </summary>
+    /// <param name="items"></param>
+    internal static void CheckBrokenItemPaths(List<Item> items, string currentLanguage)
+    {
+        int brokenItemsCount = 0;
+        foreach (var itemData in items)
+        {
+            if (itemData.SupportedAvatar.Contains(itemData.ItemPath) || itemData.ImplementedAvatars.Contains(itemData.ItemPath))
+            {
+                brokenItemsCount++;
+            }
+        }
+
+        if (brokenItemsCount == 0) return;
+        FormUtils.ShowMessageBox(
+            LanguageUtils.Translate("対応 / 実装アバターのパスが壊れているアイテムが見つかりました。", currentLanguage) + "\n\n" +
+            LanguageUtils.Translate("検索パネルで、\"BrokenItems=true\"と入力することで、壊れたアイテム一覧を表示することが出来ます。", currentLanguage) + "\n\n" +
+            LanguageUtils.Translate("検索結果の画面からアイテムの対応アバター、実装アバターの修正が可能です。", currentLanguage) + "\n\n" +
+            LanguageUtils.Translate("このバグは、アバターのパスが変更されたとき、そのアイテムを対応アバターとしていた時に、新しいパスではなく、そのアイテムのパスを割り当ててしまうというバグとなっています。", currentLanguage) + "\n" +
+            LanguageUtils.Translate("なので、壊れたアバターはほぼ固定(アバターパスを変更した物のみ)となっています。", currentLanguage) + "\n\n" +
+            LanguageUtils.Translate("この度はご迷惑をおかけし、誠に申し訳ございませんでした。", currentLanguage),
+            LanguageUtils.Translate("データベースエラー", currentLanguage)
+        );
+    }
+
+    /// <summary>
     /// 相対パスのエスケープを直してくれます。
     /// </summary>
     /// <param name="commonAvatars"></param>
@@ -554,6 +581,11 @@ internal static class DatabaseUtils
                 return implementedAvatarName.Contains(avatar, StringComparison.CurrentCultureIgnoreCase);
             });
         }))
+        {
+            return false;
+        }
+
+        if (searchFilter.BrokenItems && !(item.SupportedAvatar.Contains(item.ItemPath) || item.ImplementedAvatars.Contains(item.ItemPath)))
         {
             return false;
         }

@@ -51,6 +51,11 @@ internal class SearchFilter
     internal string[] ImplementedAvatars { get; set; } = Array.Empty<string>();
 
     /// <summary>
+    /// アイテムの対応パスなどが破損しているかどうかを取得または設定します。
+    /// </summary>
+    internal bool BrokenItems { get; set; } = false;
+
+    /// <summary>
     /// 検索するアイテムの文字列を取得または設定します。
     /// </summary>
     internal string[] SearchWords { get; set; } = Array.Empty<string>();

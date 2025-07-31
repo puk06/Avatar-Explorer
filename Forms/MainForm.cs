@@ -275,6 +275,9 @@ internal sealed partial class MainForm : Form
             }
 
             AdjustLabelPosition();
+
+            // Check Broken Item Paths
+            DatabaseUtils.CheckBrokenItemPaths(Items, CurrentLanguage);
         }
         catch (Exception ex)
         {
@@ -2339,6 +2342,12 @@ internal sealed partial class MainForm : Form
             }
         }
 
+        if (searchFilter.BrokenItems)
+        {
+            string translatedLabel = LanguageUtils.Translate("パスが壊れているアイテム", CurrentLanguage);
+            pathTextList.Add(translatedLabel);
+        }
+
         if (searchFilter.SearchWords.Length > 0)
         {
             pathTextList.Add(string.Join(", ", searchFilter.SearchWords));
@@ -3002,7 +3011,12 @@ internal sealed partial class MainForm : Form
             }
         }
 
-        DatabaseUtils.CheckMissingCustomCategories(Items, CustomCategories);
+        // Add Missing Custom Categories
+        var added = DatabaseUtils.CheckMissingCustomCategories(Items, CustomCategories);
+        if (added) DatabaseUtils.SaveCustomCategoriesData(CustomCategories);
+
+        // Check Broken Item Paths
+        DatabaseUtils.CheckBrokenItemPaths(Items, CurrentLanguage);
 
         SearchBox.Text = string.Empty;
         SearchResultLabel.Text = string.Empty;
