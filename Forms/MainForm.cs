@@ -14,7 +14,7 @@ internal sealed partial class MainForm : Form
     /// <summary>
     /// ソフトの現在のバージョン
     /// </summary>
-    private const string CurrentVersion = "v1.1.2";
+    private const string CurrentVersion = "v1.1.3";
 
     /// <summary>
     /// デフォルトのフォームテキスト
@@ -455,7 +455,7 @@ internal sealed partial class MainForm : Form
                     addItem.ShowDialog();
 
                     // 対応アバターのパスを変えてあげる
-                    DatabaseUtils.ChangeAllItemPaths(Items, prePath);
+                    DatabaseUtils.ChangeAllItemPaths(Items, prePath, item.ItemPath);
 
                     DatabaseUtils.SaveItemsData(Items);
 
@@ -1069,7 +1069,7 @@ internal sealed partial class MainForm : Form
                         }
 
                         // 対応アバターのパスを変えてあげる
-                        DatabaseUtils.ChangeAllItemPaths(Items, prePath);
+                        DatabaseUtils.ChangeAllItemPaths(Items, prePath, item.ItemPath);
 
                         DatabaseUtils.SaveItemsData(Items);
 
@@ -1164,7 +1164,7 @@ internal sealed partial class MainForm : Form
                         addItem.ShowDialog();
 
                         // 対応アバターのパスを変えてあげる
-                        DatabaseUtils.ChangeAllItemPaths(Items, prePath);
+                        DatabaseUtils.ChangeAllItemPaths(Items, prePath, item.ItemPath);
 
                         DatabaseUtils.SaveItemsData(Items);
 
@@ -1689,7 +1689,7 @@ internal sealed partial class MainForm : Form
                         }
 
                         // 対応アバターのパスを変えてあげる
-                        DatabaseUtils.ChangeAllItemPaths(Items, prePath);
+                        DatabaseUtils.ChangeAllItemPaths(Items, prePath, item.ItemPath);
 
                         DatabaseUtils.SaveItemsData(Items);
 
@@ -1780,7 +1780,7 @@ internal sealed partial class MainForm : Form
                         addItem.ShowDialog();
 
                         // 対応アバターのパスを変えてあげる
-                        DatabaseUtils.ChangeAllItemPaths(Items, prePath);
+                        DatabaseUtils.ChangeAllItemPaths(Items, prePath, item.ItemPath);
 
                         DatabaseUtils.SaveItemsData(Items);
 

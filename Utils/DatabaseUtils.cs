@@ -263,21 +263,22 @@ internal static class DatabaseUtils
     /// </summary>
     /// <param name="items"></param>
     /// <param name="oldPath"></param>
-    internal static void ChangeAllItemPaths(List<Item> items, string oldPath)
+    /// <param name="newPath"></param>
+    internal static void ChangeAllItemPaths(List<Item> items, string oldPath, string newPath)
     {
         foreach (var item in items)
         {
             if (item.SupportedAvatar.Contains(oldPath))
             {
                 item.SupportedAvatar = item.SupportedAvatar
-                    .Select(avatar => avatar == oldPath ? item.ItemPath : avatar)
+                    .Select(avatar => avatar == oldPath ? newPath : avatar)
                     .ToList();
             }
 
             if (item.ImplementedAvatars.Contains(oldPath))
             {
                 item.ImplementedAvatars = item.ImplementedAvatars
-                    .Select(avatar => avatar == oldPath ? item.ItemPath : avatar)
+                    .Select(avatar => avatar == oldPath ? newPath : avatar)
                     .ToList();
             }
         }
