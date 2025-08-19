@@ -14,7 +14,7 @@ internal sealed partial class MainForm : Form
     /// <summary>
     /// ソフトの現在のバージョン
     /// </summary>
-    private const string CurrentVersion = "v1.1.3";
+    private const string CurrentVersion = "v1.1.4";
 
     /// <summary>
     /// デフォルトのフォームテキスト
@@ -169,6 +169,11 @@ internal sealed partial class MainForm : Form
     /// フォームが初期化されたかどうかを取得します。
     /// </summary>
     private readonly bool _initialized;
+
+    /// <summary>
+    /// 最後にBoothの情報を取得した時間を取得または設定します。
+    /// </summary>
+    private DateTime _lastGetTime;
     #endregion
 
     #region 設定ファイル関連の変数
@@ -445,6 +450,27 @@ internal sealed partial class MainForm : Form
                     GenerateAvatarList();
                 },
                 Keys.T
+            );
+
+            createContextMenu.AddItem(
+                LanguageUtils.Translate("サムネイル再取得", CurrentLanguage),
+                SharedImages.GetImage(SharedImages.Images.EditIcon),
+                async (_, _) =>
+                {
+                    bool result = await ReacquisitionThumbnailImage(item);
+                    if (!result) return;
+
+                    DatabaseUtils.SaveItemsData(Items);
+
+                    // もしアバターの欄を右で開いていたら、そのサムネイルも更新しないといけないため。
+                    if (_openingWindow == Window.ItemList && !_isSearching) GenerateItems();
+
+                    // 検索中だと、検索画面を再読込してあげる
+                    if (_isSearching) SearchItems();
+
+                    GenerateAvatarList();
+                },
+                Keys.R
             );
 
             createContextMenu.AddItem(
@@ -1157,6 +1183,27 @@ internal sealed partial class MainForm : Form
                 );
 
                 createContextMenu.AddItem(
+                    LanguageUtils.Translate("サムネイル再取得", CurrentLanguage),
+                    SharedImages.GetImage(SharedImages.Images.EditIcon),
+                    async (_, _) =>
+                    {
+                        bool result = await ReacquisitionThumbnailImage(item);
+                        if (!result) return;
+
+                        DatabaseUtils.SaveItemsData(Items);
+
+                        // もしアバターの欄を右で開いていたら、そのサムネイルも更新しないといけないため。
+                        if (_openingWindow == Window.ItemList && !_isSearching) GenerateItems();
+
+                        // 検索中だと、検索画面を再読込してあげる
+                        if (_isSearching) SearchItems();
+
+                        GenerateAvatarList();
+                    },
+                    Keys.R
+                );
+
+                createContextMenu.AddItem(
                     LanguageUtils.Translate("編集", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.EditIcon),
                     (_, _) =>
@@ -1543,6 +1590,81 @@ internal sealed partial class MainForm : Form
         return true;
     }
 
+    private async Task<bool> ReacquisitionThumbnailImage(Item item)
+    {
+        if (item.BoothId != -1)
+        {
+            var thumbnailFolderPath = Path.Combine("Datas", "Thumbnail");
+            if (!Directory.Exists(thumbnailFolderPath))
+            {
+                Directory.CreateDirectory(thumbnailFolderPath);
+            }
+
+            var currentTime = DateTime.Now;
+            if (_lastGetTime.AddSeconds(5) > currentTime)
+            {
+                FormUtils.ShowMessageBox(
+                    LanguageUtils.Translate("情報取得の間隔が短すぎます。前回の取得から5秒以上空けてください", CurrentLanguage),
+                    LanguageUtils.Translate("エラー", CurrentLanguage),
+                    true
+                );
+                return false;
+            }
+            _lastGetTime = currentTime;
+
+            string newThumbnailUrl = await BoothUtils.GetThumbnailURL(item.BoothId);
+
+            var thumbnailPath = Path.Combine(thumbnailFolderPath, $"{item.BoothId}.png");
+            if (!string.IsNullOrEmpty(newThumbnailUrl))
+            {
+                try
+                {
+                    var thumbnailData = await BoothUtils.GetImageBytes(newThumbnailUrl);
+                    await File.WriteAllBytesAsync(thumbnailPath, thumbnailData);
+
+                    item.ThumbnailUrl = newThumbnailUrl;
+                    item.UpdatedDate = DateUtils.GetUnixTime();
+
+                    FormUtils.ShowMessageBox(
+                        LanguageUtils.Translate("サムネイル画像の更新に成功しました。", CurrentLanguage),
+                        LanguageUtils.Translate("完了", CurrentLanguage)
+                    );
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    FormUtils.ShowMessageBox(
+                        LanguageUtils.Translate("サムネイルのダウンロードに失敗しました。詳細はErrorLog.txtをご覧ください。", CurrentLanguage),
+                        LanguageUtils.Translate("エラー", CurrentLanguage),
+                        true
+                    );
+                    LogUtils.ErrorLogger("サムネイルのダウンロードに失敗しました。", ex);
+                    return false;
+                }
+            }
+            else
+            {
+                FormUtils.ShowMessageBox(
+                    LanguageUtils.Translate("サムネイル画像URLが見つかりませんでした。", CurrentLanguage),
+                    LanguageUtils.Translate("エラー", CurrentLanguage),
+                    true
+                );
+
+                return false;
+            }
+        }
+        else
+        {
+            FormUtils.ShowMessageBox(
+                LanguageUtils.Translate("商品URLが見つかりませんでした。", CurrentLanguage),
+                LanguageUtils.Translate("エラー", CurrentLanguage),
+                true
+            );
+
+            return false;
+        }
+    }
+
     private bool AddMemoToItem(Item item)
     {
         var previousMemo = item.ItemMemo;
@@ -1770,6 +1892,27 @@ internal sealed partial class MainForm : Form
                         GenerateAvatarList(false);
                     },
                     Keys.T
+                );
+
+                createContextMenu.AddItem(
+                    LanguageUtils.Translate("サムネイル再取得", CurrentLanguage),
+                    SharedImages.GetImage(SharedImages.Images.EditIcon),
+                    async (_, _) =>
+                    {
+                        bool result = await ReacquisitionThumbnailImage(item);
+                        if (!result) return;
+
+                        DatabaseUtils.SaveItemsData(Items);
+
+                        // もしアバターの欄を右で開いていたら、そのサムネイルも更新しないといけないため。
+                        if (_openingWindow == Window.ItemList && !_isSearching) GenerateItems();
+
+                        // 検索中だと、検索画面を再読込してあげる
+                        if (_isSearching) SearchItems();
+
+                        GenerateAvatarList();
+                    },
+                    Keys.R
                 );
 
                 createContextMenu.AddItem(

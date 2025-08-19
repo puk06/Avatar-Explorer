@@ -179,5 +179,9 @@
   "このバグは、アバターのパスが変更されたとき、そのアイテムを対応アバターとしていた時に、新しいパスではなく、そのアイテムのパスを割り当ててしまうというバグとなっています。": "This bug occurs when an avatar's path is changed, and the item still assigns its own path instead of the new one for the supported avatar.",
   "なので、壊れたアバターはほぼ固定(アバターパスを変更した物のみ)となっています。": "Therefore, the broken avatars are mostly fixed (only those with changed avatar paths).",
   "この度はご迷惑をおかけし、誠に申し訳ございませんでした。": "We sincerely apologize for the inconvenience.",
-  "データベースエラー": "Database Error"
+  "データベースエラー": "Database Error",
+  "サムネイル再取得": "Retrieve Thumbnail",
+  "サムネイル画像の更新に成功しました。": "Thumbnail image updated successfully.",
+  "サムネイル画像URLが見つかりませんでした。": "Thumbnail image URL not found.",
+  "商品URLが見つかりませんでした。": "Product URL not found."
 }

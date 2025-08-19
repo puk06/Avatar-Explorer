@@ -62,12 +62,34 @@ internal static partial class BoothUtils
         };
     }
 
+    /// <summary>
+    /// 指定されたBooth IDのアイテムのサムネイルURLを取得します。
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    internal static async Task<string> GetThumbnailURL(int id)
+    {
+        var url = $"https://booth.pm/ja/items/{id}.json";
+        var response = await _httpClient.GetStringAsync(url);
+
+        var itemJson = JsonSerializer.Deserialize<BoothItemResponse>(response, jsonSerializerOptions);
+
+        return itemJson?.Images?.FirstOrDefault()?.Original ?? string.Empty;
+    }
+
+    /// <summary>
+    /// 指定された画像URL先のファイルのバイト配列を取得します。
+    /// </summary>
+    /// <param name="url"></param>
+    /// <returns></returns>
+    internal async static Task<byte[]> GetImageBytes(string url)
+        => await _httpClient.GetByteArrayAsync(url);
+
     private static string GetAuthorId(string url)
     {
         var match = BoothAuthorURLRegex().Match(url);
         return match.Success ? match.Groups[1].Value : string.Empty;
     }
-
 
     /// <summary>
     /// アイテムのデフォルトタイプを推測、取得します。

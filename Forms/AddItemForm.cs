@@ -31,11 +31,6 @@ internal sealed partial class AddItemForm : Form
     private DateTime _lastGetTime;
 
     /// <summary>
-    /// HTTPクライアントを取得または設定します。
-    /// </summary>
-    private static readonly HttpClient _httpClient = new();
-
-    /// <summary>
     /// メインフォームに反映される予定のアイテムファイルです。
     /// </summary>
     private readonly Item _item = new();
@@ -541,7 +536,7 @@ internal sealed partial class AddItemForm : Form
                 {
                     try
                     {
-                        var thumbnailData = await _httpClient.GetByteArrayAsync(_item.ThumbnailUrl);
+                        var thumbnailData = await BoothUtils.GetImageBytes(_item.ThumbnailUrl);
                         await File.WriteAllBytesAsync(thumbnailPath, thumbnailData);
                         _item.ImagePath = thumbnailPath;
                     }
@@ -577,7 +572,7 @@ internal sealed partial class AddItemForm : Form
                 {
                     try
                     {
-                        var authorImageData = await _httpClient.GetByteArrayAsync(_item.AuthorImageUrl);
+                        var authorImageData = await BoothUtils.GetImageBytes(_item.AuthorImageUrl);
                         await File.WriteAllBytesAsync(authorImagePath, authorImageData);
                         _item.AuthorImageFilePath = authorImagePath;
                     }
