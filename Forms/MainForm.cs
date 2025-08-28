@@ -14,7 +14,7 @@ internal sealed partial class MainForm : Form
     /// <summary>
     /// ソフトの現在のバージョン
     /// </summary>
-    private const string CurrentVersion = "v1.1.4";
+    private const string CurrentVersion = "v1.1.5";
 
     /// <summary>
     /// デフォルトのフォームテキスト
@@ -521,6 +521,13 @@ internal sealed partial class MainForm : Form
                     RefleshWindow();
                 },
                 Keys.M
+            );
+
+            createContextMenu.AddItem(
+                LanguageUtils.Translate("アイテムフォルダの追加", CurrentLanguage),
+                SharedImages.GetImage(SharedImages.Images.EditIcon),
+                (_, _) => AddFolderToItem(item),
+                Keys.A
             );
 
             createContextMenu.AddItem(
@@ -1242,7 +1249,14 @@ internal sealed partial class MainForm : Form
                         GenerateAuthorList(false);
                         GenerateItems(false);
                     },
-                    Keys.E
+                    Keys.M
+                );
+
+                createContextMenu.AddItem(
+                    LanguageUtils.Translate("アイテムフォルダの追加", CurrentLanguage),
+                    SharedImages.GetImage(SharedImages.Images.EditIcon),
+                    (_, _) => AddFolderToItem(item),
+                    Keys.A
                 );
 
                 var implementedMenu = createContextMenu.AddItem(LanguageUtils.Translate("実装/未実装", CurrentLanguage), SharedImages.GetImage(SharedImages.Images.EditIcon));
@@ -1590,6 +1604,35 @@ internal sealed partial class MainForm : Form
         return true;
     }
 
+    private async void AddFolderToItem(Item item)
+    {
+        var fbd = new FolderBrowserDialog
+        {
+            Description = LanguageUtils.Translate("アイテムフォルダを選択してください", CurrentLanguage),
+            UseDescriptionForTitle = true,
+            ShowNewFolderButton = true,
+            Multiselect = true
+        };
+
+        if (fbd.ShowDialog() != DialogResult.OK) return;
+        var itemFolderArray = fbd.SelectedPaths;
+
+        var result = FormUtils.ShowConfirmDialog(LanguageUtils.Translate("アイテム: {0}\n\n追加予定のフォルダ一覧:\n{1}\n\n選択したフォルダをアイテムに追加してもよろしいですか？", CurrentLanguage, item.Title, string.Join("\n", itemFolderArray.Select(log => $"・{Path.GetFileName(log)}"))), LanguageUtils.Translate("アイテムフォルダの追加", CurrentLanguage));
+        if (!result) return;
+
+        var parentFolder = item.ItemPath;
+
+        for (var i = 0; i < itemFolderArray.Length; i++)
+        {
+            var folderName = Path.GetFileName(itemFolderArray[i]);
+            var newPath = Path.Combine(parentFolder, "Others", folderName);
+
+            await FileSystemUtils.CopyDirectoryWithProgress(Path.GetFullPath(itemFolderArray[i]), newPath);
+        }
+
+        FormUtils.ShowMessageBox(LanguageUtils.Translate("フォルダの追加が完了しました。", CurrentLanguage), LanguageUtils.Translate("完了", CurrentLanguage));
+    } 
+
     private async Task<bool> ReacquisitionThumbnailImage(Item item)
     {
         if (item.BoothId != -1)
@@ -1765,9 +1808,7 @@ internal sealed partial class MainForm : Form
             })
             .AsEnumerable();
 
-        SearchResultLabel.Text =
-            LanguageUtils.Translate("検索結果: ", CurrentLanguage) + filteredItems.Count() + LanguageUtils.Translate("件", CurrentLanguage) +
-            LanguageUtils.Translate(" (全", CurrentLanguage) + Items.Count + LanguageUtils.Translate("件)", CurrentLanguage);
+        SearchResultLabel.Text = LanguageUtils.Translate("検索結果: {0}件 (全{1}件)", CurrentLanguage, filteredItems.Count().ToString(), Items.Count.ToString());
 
         if (!filteredItems.Any()) return;
 
@@ -1959,6 +2000,13 @@ internal sealed partial class MainForm : Form
                     Keys.M
                 );
 
+                createContextMenu.AddItem(
+                    LanguageUtils.Translate("アイテムフォルダの追加", CurrentLanguage),
+                    SharedImages.GetImage(SharedImages.Images.EditIcon),
+                    (_, _) => AddFolderToItem(item),
+                    Keys.A
+                );
+
                 var implementedMenu = createContextMenu.AddItem(LanguageUtils.Translate("実装/未実装", CurrentLanguage), SharedImages.GetImage(SharedImages.Images.EditIcon));
                 foreach (var avatar in Items.Where(i => i.Type == ItemType.Avatar))
                 {
@@ -2088,9 +2136,7 @@ internal sealed partial class MainForm : Form
             .OrderByDescending(file => searchWords.SearchWords.Count(word => file.FileName.Contains(word, StringComparison.CurrentCultureIgnoreCase)))
             .AsEnumerable();
 
-        SearchResultLabel.Text =
-            LanguageUtils.Translate("フォルダー内検索結果: ", CurrentLanguage) + filteredFileData.Count() + LanguageUtils.Translate("件", CurrentLanguage) +
-            LanguageUtils.Translate(" (全", CurrentLanguage) + fileDatas.Count() + LanguageUtils.Translate("件)", CurrentLanguage);
+        SearchResultLabel.Text = LanguageUtils.Translate("フォルダー内検索結果: {0}件 (全{1}件)", CurrentLanguage, filteredFileData.Count().ToString(), fileDatas.Count().ToString());
 
         if (!filteredFileData.Any()) return;
 

@@ -12,12 +12,28 @@ internal static class LanguageUtils
     /// <param name="str"></param>
     /// <param name="to"></param>
     /// <returns></returns>
-    internal static string Translate(string str, string to)
+    internal static string Translate(string str, string to, params string[] parameters)
     {
-        if (to == "ja-JP") return str;
+        if (to == "ja-JP") return ReplaceParameters(str, parameters);
         if (!File.Exists($"./Translate/{to}.json")) return str;
         var data = GetTranslateData(to);
-        return data.TryGetValue(str, out var translated) ? translated : str;
+        var translatedData = data.TryGetValue(str, out var translated) ? translated : str;
+
+        return ReplaceParameters(translatedData, parameters);
+    }
+
+    private static string ReplaceParameters(string rawValue, string[] parameters)
+    {
+        if (parameters.Length != 0)
+        {
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                var replaceString = $"{{{i}}}";
+                rawValue = rawValue.Replace(replaceString, parameters[i]);
+            }
+        }
+
+        return rawValue;
     }
 
     /// <summary>

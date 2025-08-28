@@ -168,7 +168,7 @@ internal sealed partial class AddItemForm : Form
             SetTypeCombobox(item.Type, item.CustomCategory);
 
             SupportedAvatar = item.SupportedAvatar;
-            SelectAvatar.Text = LanguageUtils.Translate("選択中: ", _mainForm.CurrentLanguage) + SupportedAvatar.Count + LanguageUtils.Translate("個", _mainForm.CurrentLanguage);
+            SelectAvatar.Text = LanguageUtils.Translate("選択中: {0}個", _mainForm.CurrentLanguage, SupportedAvatar.Count.ToString());
 
             CustomButton.Enabled = false;
         }
@@ -381,7 +381,7 @@ internal sealed partial class AddItemForm : Form
         SelectSupportedAvatarForm selectSupportedAvatar = new(_mainForm, this);
         selectSupportedAvatar.ShowDialog();
 
-        SelectAvatar.Text = LanguageUtils.Translate("選択中: ", _mainForm.CurrentLanguage) + SupportedAvatar.Count + LanguageUtils.Translate("個", _mainForm.CurrentLanguage);
+        SelectAvatar.Text = LanguageUtils.Translate("選択中: {0}個", _mainForm.CurrentLanguage, SupportedAvatar.Count.ToString());
     }
 
     private void CustomButton_Click(object sender, EventArgs e)

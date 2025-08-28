@@ -16,11 +16,8 @@
   "ファイル": " File",
   "開くファイルのパス: ": "Path to open: ",
   "ファイルのパスを開く": "Open file path",
-  "検索結果: ": "Search results: ",
-  "件": " item(s)",
-  " (全": " (Total ",
-  "件)": " item(s))",
-  "フォルダー内検索結果: ": "Folder search results: ",
+  "検索結果: {0}件 (全{1}件)": "Search results: {0} item(s) (Total {1} item(s))",
+  "フォルダー内検索結果: {0}件 (全{1}件)": "Folder search results: {0} item(s) (Total {1} item(s))",
   "有効なフォルダ、またはzipファイルを選択してください": "Please select a valid folder or zip file.",
   "Outputフォルダにエクスポートが完了しました！\nファイル名: ": "Export to Output folder completed!\nFile name: ",
   "バックアップに失敗しました": "Backup failed.",
@@ -37,7 +34,7 @@
   "CSVに出力": "Export to CSV",
   "バックアップの作成": "Create Backup",
   "アイテムの編集": "Edit Item",
-  "選択中: ": "Selected: ",
+  "選択中: {0}個": "Selected: {0} item(s)",
   "個": "item(s)",
   "タイトル、作者、フォルダパスのどれかが入力されていません": "Title, author, or folder path is missing.",
   "サムネイルのダウンロードに失敗しました。詳細はErrorLog.txtをご覧ください。": "Failed to download thumbnail. Please see ErrorLog.txt for details.",
@@ -183,5 +180,8 @@
   "サムネイル再取得": "Retrieve Thumbnail",
   "サムネイル画像の更新に成功しました。": "Thumbnail image updated successfully.",
   "サムネイル画像URLが見つかりませんでした。": "Thumbnail image URL not found.",
-  "商品URLが見つかりませんでした。": "Product URL not found."
+  "商品URLが見つかりませんでした。": "Product URL not found.",
+  "アイテム: {0}\n\n追加予定のフォルダ一覧:\n{1}\n\n選択したフォルダをアイテムに追加してもよろしいですか？": "- Item: {0}\n\n- List of folders to be added: {1}\n\nDo you want to add the selected folders to the item?",
+  "フォルダの追加が完了しました。": "Folder addition completed.",
+  "アイテムフォルダの追加": "Add Item Folder"
 }
