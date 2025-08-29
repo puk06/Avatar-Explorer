@@ -357,7 +357,7 @@ internal sealed partial class AddItemForm : Form
     /// <param name="message"></param>
     private void SetInfomationState(string message)
     {
-        ErrorLabel.ForeColor = Color.LightGreen;
+        ErrorLabel.ForeColor = _mainForm.DarkMode ? Color.LightGreen : Color.Green;
         ErrorLabel.Text = message;
         AddButton.Enabled = true;
     }
