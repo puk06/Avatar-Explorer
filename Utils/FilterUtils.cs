@@ -9,7 +9,7 @@ internal static class FilterUtils
     /// </summary>
     /// <param name="leftWindow"></param>
     /// <returns></returns>
-    internal static  string GetFilterName(LeftWindow leftWindow, string currentLanguage)
+    internal static string GetFilterName(LeftWindow leftWindow, string currentLanguage)
     {
         return leftWindow switch
         {

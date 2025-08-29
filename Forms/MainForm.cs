@@ -107,12 +107,12 @@ internal sealed partial class MainForm : Form
     /// <summary>
     /// メイン画面左のアバター欄の初期幅
     /// </summary>
-    private readonly int _baseAvatarSearchFilterListWidth;
+    private readonly int _baseFilterListWidth;
 
     /// <summary>
     /// メイン画面右のアイテム欄の初期幅
     /// </summary>
-    private readonly int _baseExplorerListListWidth;
+    private readonly int _baseExplorerListWidth;
 
     /// <summary>
     /// リサイズ用のタイマー
@@ -123,18 +123,18 @@ internal sealed partial class MainForm : Form
     };
 
     /// <summary>
-    /// Get AvatarList Width
+    /// FilterListの横の長さを元の長さから計算します。
     /// </summary>
-    /// <returns>AvatarList Width</returns>
-    private int GetAvatarListWidth
-        => FilterList.Width - _baseAvatarSearchFilterListWidth;
+    /// <returns></returns>
+    private int GetFilterListWidth
+        => FilterList.Width - _baseFilterListWidth;
 
     /// <summary>
-    /// Get ItemExplorerList Width
+    /// ExplorerListの横の長さを元の長さから計算します。
     /// </summary>
     /// <returns>ItemExplorerList Width</returns>
-    private int GetItemExplorerListWidth
-        => ExplorerList.Width - _baseExplorerListListWidth;
+    private int GetExplorerListWidth
+        => ExplorerList.Width - _baseExplorerListWidth;
     #endregion
 
     #region バックアップ関連の変数
@@ -245,8 +245,8 @@ internal sealed partial class MainForm : Form
 
             // Save the default Size
             _initialFormSize = ClientSize;
-            _baseAvatarSearchFilterListWidth = FilterList.Width;
-            _baseExplorerListListWidth = ExplorerList.Width;
+            _baseFilterListWidth = FilterList.Width;
+            _baseExplorerListWidth = ExplorerList.Width;
             _resizeTimer.Tick += (s, ev) =>
             {
                 _resizeTimer.Stop();
@@ -415,7 +415,7 @@ internal sealed partial class MainForm : Form
         {
             var description = ItemUtils.GetItemDescription(item, CurrentLanguage);
 
-            Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, item.ImagePath, item.GetTitle(_removeBrackets), LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName, true, description, GetAvatarListWidth);
+            Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, item.ImagePath, item.GetTitle(_removeBrackets), LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName, true, description, GetFilterListWidth);
             button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
             button.MouseClick += OnMouseClick;
 
@@ -725,7 +725,7 @@ internal sealed partial class MainForm : Form
         {
             try
             {
-                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, author.AuthorImagePath, author.AuthorName, Items.Count(item => item.AuthorName == author.AuthorName) + LanguageUtils.Translate("個の項目", CurrentLanguage), true, author.AuthorName, GetAvatarListWidth);
+                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, author.AuthorImagePath, author.AuthorName, Items.Count(item => item.AuthorName == author.AuthorName) + LanguageUtils.Translate("個の項目", CurrentLanguage), true, author.AuthorName, GetFilterListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -822,7 +822,7 @@ internal sealed partial class MainForm : Form
                 var items = Items.Where(item => item.Type == itemType);
                 var itemCount = items.Count();
 
-                CustomItemButton button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, ItemUtils.GetCategoryName(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), true, string.Empty, GetAvatarListWidth);
+                CustomItemButton button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, ItemUtils.GetCategoryName(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), true, string.Empty, GetFilterListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -867,7 +867,7 @@ internal sealed partial class MainForm : Form
                     var items = Items.Where(item => item.CustomCategory == customCategory);
                     var itemCount = items.Count();
 
-                    Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, customCategory, itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), true, string.Empty, GetAvatarListWidth);
+                    Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, customCategory, itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), true, string.Empty, GetFilterListWidth);
                     button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                     button.MouseClick += OnMouseClick;
 
@@ -943,27 +943,44 @@ internal sealed partial class MainForm : Form
     /// <param name="reset"></param>
     private void RenderFilter(bool reset = true)
     {
+        var visibleChanged = false;
         if (_leftWindowFilter == LeftWindow.Nothing)
         {
-            FilterList.Visible = false;
+            if (FilterList.Visible)
+            {
+                FilterList.Visible = false;
+                visibleChanged = true;
+            } 
         }
         else if (_leftWindowFilter == LeftWindow.Default)
         {
-            FilterList.Visible = true;
+            if (!FilterList.Visible)
+            {
+                FilterList.Visible = true;
+                visibleChanged = true;
+            }
             GenerateAvatarList(reset);
         }
         else if (_leftWindowFilter == LeftWindow.Author)
         {
-            FilterList.Visible = true;
+            if (!FilterList.Visible)
+            {
+                FilterList.Visible = true;
+                visibleChanged = true;
+            }
             GenerateAuthorList(reset);
         }
         else if (_leftWindowFilter == LeftWindow.Category)
         {
-            FilterList.Visible = true;
+            if (!FilterList.Visible)
+            {
+                FilterList.Visible = true;
+                visibleChanged = true;
+            }
             GenerateCategoryListLeft();
         }
 
-        ResizeControl();
+        if (visibleChanged) ResizeControl();
     }
 
     /// <summary>
@@ -1007,7 +1024,7 @@ internal sealed partial class MainForm : Form
 
                 if (itemCount == 0) continue;
 
-                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, ItemUtils.GetCategoryName(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, string.Empty, GetItemExplorerListWidth);
+                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, ItemUtils.GetCategoryName(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, string.Empty, GetExplorerListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -1058,7 +1075,7 @@ internal sealed partial class MainForm : Form
 
                     if (itemCount == 0) continue;
 
-                    Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, customCategory, itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, string.Empty, GetItemExplorerListWidth);
+                    Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, customCategory, itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, string.Empty, GetExplorerListWidth);
                     button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                     button.MouseClick += OnMouseClick;
 
@@ -1164,7 +1181,7 @@ internal sealed partial class MainForm : Form
 
                 var description = ItemUtils.GetItemDescription(item, CurrentLanguage);
 
-                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, item.ImagePath, item.GetTitle(_removeBrackets), authorText, false, description, GetItemExplorerListWidth);
+                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, item.ImagePath, item.GetTitle(_removeBrackets), authorText, false, description, GetExplorerListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -1515,7 +1532,7 @@ internal sealed partial class MainForm : Form
                 var itemCount = itemFolderInfo.GetItemCount(itemType);
                 if (itemCount == 0) continue;
 
-                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, LanguageUtils.Translate(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, string.Empty, GetItemExplorerListWidth);
+                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, LanguageUtils.Translate(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, string.Empty, GetExplorerListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -1573,7 +1590,7 @@ internal sealed partial class MainForm : Form
             try
             {
                 var imagePath = file.FileExtension is ".png" or ".jpg" ? file.FilePath : string.Empty;
-                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, imagePath, file.FileName, file.FileExtension.Replace(".", string.Empty) + LanguageUtils.Translate("ファイル", CurrentLanguage), false, LanguageUtils.Translate("開くファイルのパス: ", CurrentLanguage) + file.FilePath, GetItemExplorerListWidth);
+                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, imagePath, file.FileName, file.FileExtension.Replace(".", string.Empty) + LanguageUtils.Translate("ファイル", CurrentLanguage), false, LanguageUtils.Translate("開くファイルのパス: ", CurrentLanguage) + file.FilePath, GetExplorerListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -1929,7 +1946,7 @@ internal sealed partial class MainForm : Form
             {
                 var description = ItemUtils.GetItemDescription(item, CurrentLanguage);
 
-                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, item.ImagePath, item.GetTitle(_removeBrackets), LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName, false, description, GetItemExplorerListWidth);
+                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, item.ImagePath, item.GetTitle(_removeBrackets), LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName, false, description, GetExplorerListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -2251,7 +2268,7 @@ internal sealed partial class MainForm : Form
             try
             {
                 var imagePath = file.FileExtension is ".png" or ".jpg" ? file.FilePath : string.Empty;
-                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, imagePath, file.FileName, file.FileExtension.Replace(".", string.Empty) + LanguageUtils.Translate("ファイル", CurrentLanguage), false, LanguageUtils.Translate("開くファイルのパス: ", CurrentLanguage) + file.FilePath, GetItemExplorerListWidth);
+                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, imagePath, file.FileName, file.FileExtension.Replace(".", string.Empty) + LanguageUtils.Translate("ファイル", CurrentLanguage), false, LanguageUtils.Translate("開くファイルのパス: ", CurrentLanguage) + file.FilePath, GetExplorerListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -3005,6 +3022,14 @@ internal sealed partial class MainForm : Form
         SortingBox.Items.AddRange(sortingItems.Select(item => LanguageUtils.Translate(item, CurrentLanguage)).ToArray());
         SortingBox.SelectedIndex = selected;
 
+        var labelControl = ExplorerList.Controls.OfType<Label>().FirstOrDefault(label => label.Name == "StartLabel");
+        if (labelControl != null)
+        {
+            _controlNames.TryAdd(labelControl.Name, labelControl.Text);
+            labelControl.Text = LanguageUtils.Translate(_controlNames[labelControl.Name], CurrentLanguage);
+            ChangeControlFont(labelControl);
+        }
+
         ResizeControl();
 
         PathTextBox.Text = GeneratePath();
@@ -3462,8 +3487,8 @@ internal sealed partial class MainForm : Form
         const int baseItemExplorerWidth = 874;
         const int baseItemListWidth = 303;
 
-        int explorerWidth = baseItemExplorerWidth + GetItemExplorerListWidth;
-        int listWidth = baseItemListWidth + GetAvatarListWidth;
+        int explorerWidth = baseItemExplorerWidth + GetExplorerListWidth;
+        int listWidth = baseItemListWidth + GetFilterListWidth;
 
         ScaleItemButtonsInContainer(ExplorerList, explorerWidth, ExplorerList.Width);
         ScaleItemButtonsInContainer(FilterList, listWidth, FilterList.Width, true);
