@@ -121,6 +121,7 @@ internal sealed partial class AddItemForm : Form
 
         InitializeComponent();
         TranslateControls();
+        if (_mainForm.DarkMode) SetDarkMode();
 
         for (var i = 0; i < mainForm.CustomCategories.Count; i++)
         {
@@ -174,6 +175,14 @@ internal sealed partial class AddItemForm : Form
         }
 
         ValidCheck();
+    }
+
+    private void SetDarkMode()
+    {
+        foreach (Control contorol in Controls)
+        {
+            DarkModeUtils.SetDarkMode(contorol);
+        }
     }
 
     #region フォーム関連の処理

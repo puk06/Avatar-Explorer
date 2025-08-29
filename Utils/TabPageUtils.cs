@@ -11,7 +11,8 @@ internal static class TabPageUtils
     internal const int SmallButtonSpacing = 3;
 
     internal static void AddNavigationButtons(
-        TabPage tabPage,
+        Panel tabPage,
+        bool darkMode,
         int baseYLocation,
         int pageCount, int itemsPerPage, int totalCount, bool small,
         string currentLanguage,
@@ -69,8 +70,14 @@ internal static class TabPageUtils
                 Text = LanguageUtils.Translate("移動", currentLanguage),
                 Font = pageInfoLabel.Font,
                 Size = new Size(60, inputBox.Height),
-                Location = new Point(inputBox.Right + 5,inputBox.Top)
+                Location = new Point(inputBox.Right + 5, inputBox.Top)
             };
+
+            if (darkMode)
+            {
+                DarkModeUtils.SetDarkMode(goButton);
+                DarkModeUtils.SetDarkMode(inputBox);
+            }
 
             void DoNavigation()
             {
@@ -123,6 +130,8 @@ internal static class TabPageUtils
                 Font = small ? new Font("Yu Gothic UI", 10F) : new Font("Yu Gothic UI", 13F)
             };
 
+            if (darkMode) DarkModeUtils.SetDarkMode(firstButton);
+
             if (onFirstClick != null)
             {
                 firstButton.Click += onFirstClick;
@@ -142,6 +151,8 @@ internal static class TabPageUtils
                 Location = new Point(GetFirstButtonLocation(tabPage.Width, labelSize.Width, baseYLocation, small).X + (small ? SmallButtonSpacing + SmallButtonSize.Width : ButtonSpacing + ButtonSize.Width), baseYLocation),
                 Font = small ? new Font("Yu Gothic UI", 10F) : new Font("Yu Gothic UI", 13F)
             };
+
+            if (darkMode) DarkModeUtils.SetDarkMode(backButton);
 
             if (onBackClick != null)
             {
@@ -163,6 +174,8 @@ internal static class TabPageUtils
                 Font = small ? new Font("Yu Gothic UI", 10F) : new Font("Yu Gothic UI", 13F)
             };
 
+            if (darkMode) DarkModeUtils.SetDarkMode(lastButton);
+
             if (onLastClick != null)
             {
                 lastButton.Click += onLastClick;
@@ -182,6 +195,8 @@ internal static class TabPageUtils
                 Location = new Point(GetLastButtonLocation(tabPage.Width, labelSize.Width, baseYLocation, small).X - (small ? SmallButtonSpacing + SmallButtonSize.Width : ButtonSpacing + ButtonSize.Width), baseYLocation),
                 Font = small ? new Font("Yu Gothic UI", 10F) : new Font("Yu Gothic UI", 13F),
             };
+
+            if (darkMode) DarkModeUtils.SetDarkMode(nextButton);
 
             if (onNextClick != null)
             {

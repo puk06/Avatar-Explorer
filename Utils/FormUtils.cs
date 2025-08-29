@@ -23,7 +23,7 @@ internal static class FormUtils
     /// </summary>
     /// <param name="_"></param>
     /// <param name="e"></param>
-    internal static void DragEnter(object _, DragEventArgs e)
+    internal static void DragEnter(object? _, DragEventArgs e)
         => e.Effect = DragDropEffects.All;
 
     /// <summary>

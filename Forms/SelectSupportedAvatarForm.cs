@@ -25,11 +25,20 @@ internal sealed partial class SelectSupportedAvatarForm : Form
         _mainForm = mainForm;
         _addItem = addItem;
         InitializeComponent();
+        if (_mainForm.DarkMode) SetDarkMode();
 
         Text = LanguageUtils.Translate("対応アバターの選択", _mainForm.CurrentLanguage);
         TranslateControls();
 
         GenerateAvatarList();
+    }
+
+    private void SetDarkMode()
+    {
+        foreach (Control contorol in Controls)
+        {
+            DarkModeUtils.SetDarkMode(contorol);
+        }
     }
 
     #region フォーム関連の処理
@@ -69,7 +78,7 @@ internal sealed partial class SelectSupportedAvatarForm : Form
         foreach (Item item in items)
         {
             if (item.ItemPath == _addItem.ItemPath) continue;
-            Button button = CreateAvatarButton(_mainForm.ButtonSize, item, _mainForm.CurrentLanguage);
+            Button button = CreateAvatarButton(_mainForm.DarkMode, _mainForm.ButtonSize, item, _mainForm.CurrentLanguage);
             button.Location = new Point(0, ((_mainForm.ButtonSize + 6) * index) + 2);
             button.BackColor = _addItem.SupportedAvatar.Contains(item.ItemPath) ? Color.LightGreen : Color.FromKnownColor(KnownColor.Control);
             AvatarList.Controls.Add(button);
@@ -85,13 +94,14 @@ internal sealed partial class SelectSupportedAvatarForm : Form
     /// <summary>
     /// フォーム内のアバターのボタンを生成します。
     /// </summary>
+    /// <param name="darkMode"></param>
     /// <param name="buttonHeight"></param>
     /// <param name="item"></param>
     /// <param name="language"></param>
     /// <returns></returns>
-    private static CustomItemButton CreateAvatarButton(int buttonHeight, Item item, string language)
+    private static CustomItemButton CreateAvatarButton(bool darkMode, int buttonHeight, Item item, string language)
     {
-        CustomItemButton button = new(992, buttonHeight)
+        CustomItemButton button = new(992, buttonHeight, darkMode)
         {
             ImagePath = item.ImagePath,
             TitleText = item.Title,

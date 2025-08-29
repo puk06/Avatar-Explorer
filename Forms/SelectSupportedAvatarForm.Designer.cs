@@ -33,9 +33,7 @@ namespace Avatar_Explorer.Forms
         {
             label1 = new Label();
             ConfirmButton = new Button();
-            tabControl1 = new TabControl();
-            AvatarList = new TabPage();
-            tabControl1.SuspendLayout();
+            AvatarList = new Panel();
             SuspendLayout();
             // 
             // label1
@@ -44,7 +42,7 @@ namespace Avatar_Explorer.Forms
             label1.Font = new Font(_mainForm.GuiFont, 12F, FontStyle.Bold);
             label1.Location = new Point(12, 9);
             label1.Name = "label1";
-            label1.Size = new Size(359, 42);
+            label1.Size = new Size(424, 48);
             label1.TabIndex = 1;
             label1.Text = "対応アバターを選択してください。\r\n選択されてなければ、全アバター対応として扱われます！\r\n";
             // 
@@ -58,43 +56,28 @@ namespace Avatar_Explorer.Forms
             ConfirmButton.UseVisualStyleBackColor = true;
             ConfirmButton.Click += ConfirmButton_Click;
             // 
-            // tabControl1
-            // 
-            tabControl1.Controls.Add(AvatarList);
-            tabControl1.Location = new Point(12, 65);
-            tabControl1.Name = "tabControl1";
-            tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(1019, 495);
-            tabControl1.TabIndex = 3;
-            // 
             // AvatarList
             // 
-            AvatarList.AutoScroll = true;
-            AvatarList.Location = new Point(4, 24);
+            AvatarList.BackColor = Color.FromArgb(249, 249, 249);
+            AvatarList.Location = new Point(16, 89);
             AvatarList.Name = "AvatarList";
-            AvatarList.Padding = new Padding(3);
-            AvatarList.Size = new Size(1011, 474);
-            AvatarList.TabIndex = 0;
-            AvatarList.Text = "アバターリスト";
-            AvatarList.UseVisualStyleBackColor = true;
-            AvatarList.MouseWheel += AEUtils.OnScroll;
-            AvatarList.Scroll += AEUtils.OnScroll;
+            AvatarList.Size = new Size(1011, 467);
+            AvatarList.TabIndex = 4;
             // 
-            // SelectSupportedAvatar
+            // SelectSupportedAvatarForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1043, 615);
-            Controls.Add(tabControl1);
+            Controls.Add(AvatarList);
             Controls.Add(ConfirmButton);
             Controls.Add(label1);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
             MinimizeBox = false;
-            Name = "SelectSupportedAvatar";
+            Name = "SelectSupportedAvatarForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "SelectSupportedAvatar";
-            tabControl1.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -102,7 +85,6 @@ namespace Avatar_Explorer.Forms
         #endregion
         private Label label1;
         private Button ConfirmButton;
-        private TabControl tabControl1;
-        private TabPage AvatarList;
+        private Panel AvatarList;
     }
 }

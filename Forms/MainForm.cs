@@ -58,9 +58,14 @@ internal sealed partial class MainForm : Form
 
     #region 現在のウィンドウの種類に関する変数
     /// <summary>
-    /// 現在開かれている左ウィンドウのタイプを取得または設定します。
+    /// 現在開かれている左ウィンドウのタイプを取得または設定します。これはパスなどに使われます。フィルター用ではありません。
     /// </summary>
     private LeftWindow _leftWindow = LeftWindow.Default;
+
+    /// <summary>
+    /// 現在開かれている左ウィンドウのタイプを取得または設定します。これは現在のフィルターを取得するのに使用されます。
+    /// </summary>
+    private LeftWindow _leftWindowFilter = LeftWindow.Default;
 
     /// <summary>
     /// 現在開いているメイン画面ウィンドウタイプ
@@ -107,7 +112,7 @@ internal sealed partial class MainForm : Form
     /// <summary>
     /// メイン画面右のアイテム欄の初期幅
     /// </summary>
-    private readonly int _baseAvatarItemExplorerListWidth;
+    private readonly int _baseExplorerListListWidth;
 
     /// <summary>
     /// リサイズ用のタイマー
@@ -122,14 +127,14 @@ internal sealed partial class MainForm : Form
     /// </summary>
     /// <returns>AvatarList Width</returns>
     private int GetAvatarListWidth
-        => AvatarSearchFilterList.Width - _baseAvatarSearchFilterListWidth;
+        => FilterList.Width - _baseAvatarSearchFilterListWidth;
 
     /// <summary>
     /// Get ItemExplorerList Width
     /// </summary>
     /// <returns>ItemExplorerList Width</returns>
     private int GetItemExplorerListWidth
-        => AvatarItemExplorer.Width - _baseAvatarItemExplorerListWidth;
+        => ExplorerList.Width - _baseExplorerListListWidth;
     #endregion
 
     #region バックアップ関連の変数
@@ -178,11 +183,6 @@ internal sealed partial class MainForm : Form
 
     #region 設定ファイル関連の変数
     /// <summary>
-    /// 設定ファイルを管理するクラスです。
-    /// </summary>
-    private readonly ConfigurationManager Configuration = new();
-
-    /// <summary>
     /// 1ページあたりの表示数です。
     /// </summary>
     private int _itemsPerPage = 30;
@@ -211,19 +211,23 @@ internal sealed partial class MainForm : Form
     /// ボタンの高さです。
     /// </summary>
     internal int ButtonSize = 64;
+
+    /// <summary>
+    /// ダークモードかどうかを決めます。
+    /// </summary>
+    internal bool DarkMode = false;
     #endregion
 
     #region フォームの初期化
     /// <summary>
     /// メインフォームを初期化します。
     /// </summary>
-    internal MainForm(LaunchInfo launchInfo)
+    internal MainForm(LaunchInfo launchInfo, ConfigurationManager configurationManager)
     {
         try
         {
             // Load Configulation
-            Configuration.Load("settings.cfg");
-            SetConfigulationValue();
+            SetConfigulationValue(configurationManager);
 
             Items = DatabaseUtils.LoadItemsData();
             CommonAvatars = DatabaseUtils.LoadCommonAvatarData();
@@ -235,11 +239,14 @@ internal sealed partial class MainForm : Form
 
             AddFontFile();
             InitializeComponent();
+            AdditionalInitialize();
+
+            if (DarkMode) SetDarkMode();
 
             // Save the default Size
             _initialFormSize = ClientSize;
-            _baseAvatarSearchFilterListWidth = AvatarSearchFilterList.Width;
-            _baseAvatarItemExplorerListWidth = AvatarItemExplorer.Width;
+            _baseAvatarSearchFilterListWidth = FilterList.Width;
+            _baseExplorerListListWidth = ExplorerList.Width;
             _resizeTimer.Tick += (s, ev) =>
             {
                 _resizeTimer.Stop();
@@ -255,6 +262,12 @@ internal sealed partial class MainForm : Form
 
             // Set Backup Title Loop
             BackupTimeTitle();
+
+            // Render Filter
+            RenderFilter();
+
+            // Render Filter Text
+            RedrawFilterName();
 
             Text = $"VRChat Avatar Explorer {CurrentVersion} by ぷこるふ";
 
@@ -291,6 +304,22 @@ internal sealed partial class MainForm : Form
         }
     }
 
+    private void AdditionalInitialize()
+    {
+        FilterList.DragEnter += FormUtils.DragEnter;
+        FilterList.DragDrop += FilterList_DragDrop;
+        FilterList.MouseWheel += AEUtils.OnScroll;
+        FilterList.Scroll += AEUtils.OnScroll;
+
+        ExplorerList.DragEnter += FormUtils.DragEnter;
+        ExplorerList.DragDrop += ExplorerList_DragDrop;
+        ExplorerList.MouseWheel += AEUtils.OnScroll;
+        ExplorerList.Scroll += AEUtils.OnScroll;
+
+        LanguageBox.SelectedIndex = 0;
+        SortingBox.SelectedIndex = 0;
+    }
+
     /// <summary>
     /// フォントファイルをソフトに追加します。
     /// </summary>
@@ -321,16 +350,17 @@ internal sealed partial class MainForm : Form
         GuiFont = _fontFamilies.TryGetValue(CurrentLanguage, out var family) ? family : new FontFamily("Yu Gothic UI");
     }
 
-    private void SetConfigulationValue()
+    private void SetConfigulationValue(ConfigurationManager configuration)
     {
-        int itemsPerPage = int.TryParse(Configuration["ItemsPerPage"], out var ipp) ? Math.Clamp(ipp, 1, 1000) : 30;
-        float previewScale = float.TryParse(Configuration["PreviewScale"], out var ps) ? Math.Clamp(ps, 0.1f, 10f) : 1.0f;
-        int defaultLanguage = int.TryParse(Configuration["DefaultLanguage"], out var dl) ? dl : 1;
-        int defaultSortOrder = int.TryParse(Configuration["DefaultSortOrder"], out var dso) ? dso : 1;
-        int thumbnailUpdateTimeout = int.TryParse(Configuration["ThumbnailUpdateTimeout"], out var tut) ? Math.Clamp(tut, 0, 10000) : 200;
-        int backupInterval = int.TryParse(Configuration["BackupInterval"], out var bi) ? Math.Clamp(bi, 1, 1000) : 5;
-        bool removeBrackets = Configuration["RemoveBrackets"] == "true";
-        int buttonSize = int.TryParse(Configuration["ButtonSize"], out var bs) ? Math.Clamp(bs, 1, 500) : 64;
+        int itemsPerPage = int.TryParse(configuration["ItemsPerPage"], out var ipp) ? Math.Clamp(ipp, 1, 1000) : 30;
+        float previewScale = float.TryParse(configuration["PreviewScale"], out var ps) ? Math.Clamp(ps, 0.1f, 10f) : 1.0f;
+        int defaultLanguage = int.TryParse(configuration["DefaultLanguage"], out var dl) ? dl : 1;
+        int defaultSortOrder = int.TryParse(configuration["DefaultSortOrder"], out var dso) ? dso : 1;
+        int thumbnailUpdateTimeout = int.TryParse(configuration["ThumbnailUpdateTimeout"], out var tut) ? Math.Clamp(tut, 0, 10000) : 200;
+        int backupInterval = int.TryParse(configuration["BackupInterval"], out var bi) ? Math.Clamp(bi, 1, 1000) : 5;
+        bool removeBrackets = configuration["RemoveBrackets"] == "true";
+        int buttonSize = int.TryParse(configuration["ButtonSize"], out var bs) ? Math.Clamp(bs, 1, 500) : 64;
+        bool darkMode = configuration["DarkMode"] == "true";
 
         _itemsPerPage = itemsPerPage;
         _previewScale = previewScale;
@@ -340,8 +370,16 @@ internal sealed partial class MainForm : Form
         _backupInterval = backupInterval * 60000; // ms -> min
         _removeBrackets = removeBrackets;
         ButtonSize = buttonSize;
+        DarkMode = darkMode;
     }
 
+    private void SetDarkMode()
+    {
+        foreach (Control contorol in Controls)
+        {
+            DarkModeUtils.SetDarkMode(contorol);
+        }
+    }
     #endregion
 
     #region 左のリスト関連の処理
@@ -352,7 +390,7 @@ internal sealed partial class MainForm : Form
     private void GenerateAvatarList(bool pageReset = true)
     {
         if (pageReset) _currentPageAvatar = 0;
-        ResetAvatarPage(AvatarPage);
+        ResetAvatarPage(FilterList);
 
         var items = Items.Where(item => item.Type == ItemType.Avatar);
         if (!items.Any()) return;
@@ -369,15 +407,15 @@ internal sealed partial class MainForm : Form
         int totalCount = items.Count();
         _currentPageAvatar = Math.Clamp(_currentPageAvatar, 0, TabPageUtils.GetTotalPages(totalCount, _itemsPerPage) - 1);
 
-        AvatarPage.SuspendLayout();
-        AvatarPage.AutoScroll = false;
+        FilterList.SuspendLayout();
+        FilterList.AutoScroll = false;
 
         var index = 0;
         foreach (Item item in items.Skip(_currentPageAvatar * _itemsPerPage).Take(_itemsPerPage))
         {
             var description = ItemUtils.GetItemDescription(item, CurrentLanguage);
 
-            Button button = AEUtils.CreateButton(ButtonSize, _previewScale, item.ImagePath, item.GetTitle(_removeBrackets), LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName, true, description, GetAvatarListWidth);
+            Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, item.ImagePath, item.GetTitle(_removeBrackets), LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName, true, description, GetAvatarListWidth);
             button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
             button.MouseClick += OnMouseClick;
 
@@ -447,7 +485,7 @@ internal sealed partial class MainForm : Form
                     // 検索中だと、検索画面を再読込してあげる
                     if (_isSearching) SearchItems();
 
-                    GenerateAvatarList();
+                    RenderFilter(false);
                 },
                 Keys.T
             );
@@ -468,7 +506,7 @@ internal sealed partial class MainForm : Form
                     // 検索中だと、検索画面を再読込してあげる
                     if (_isSearching) SearchItems();
 
-                    GenerateAvatarList();
+                    RenderFilter(false);
                 },
                 Keys.R
             );
@@ -568,9 +606,7 @@ internal sealed partial class MainForm : Form
                         LanguageUtils.Translate("完了", CurrentLanguage)
                     );
 
-                    GenerateAvatarList(false);
-                    GenerateAuthorList(false);
-                    GenerateCategoryListLeft();
+                    RenderFilter(false);
 
                     if (_isSearching)
                     {
@@ -638,12 +674,13 @@ internal sealed partial class MainForm : Form
             );
 
             button.ContextMenuStrip = createContextMenu.ContextMenuStrip;
-            AvatarPage.Controls.Add(button);
+            FilterList.Controls.Add(button);
             index++;
         }
 
         TabPageUtils.AddNavigationButtons(
-            AvatarPage,
+            FilterList,
+            DarkMode,
             ((ButtonSize + 6) * index) + 2,
             _currentPageAvatar, _itemsPerPage, totalCount, true,
             CurrentLanguage,
@@ -651,17 +688,17 @@ internal sealed partial class MainForm : Form
             (_, _) => _currentPageAvatar++,
             (_, _) => _currentPageAvatar = 0,
             (_, _) => _currentPageAvatar = TabPageUtils.GetTotalPages(totalCount, _itemsPerPage) - 1,
-            (sender, _) => 
+            (sender, _) =>
             {
                 if (sender is int pageCount) _currentPageAvatar = pageCount;
-                GenerateAvatarList(false);
+                RenderFilter(false);
             }
         );
 
-        AvatarPage.ResumeLayout();
-        AvatarPage.AutoScroll = true;
+        FilterList.ResumeLayout();
+        FilterList.AutoScroll = true;
 
-        AEUtils.UpdateExplorerThumbnails(AvatarPage);
+        AEUtils.UpdateExplorerThumbnails(FilterList);
     }
 
     /// <summary>
@@ -671,7 +708,7 @@ internal sealed partial class MainForm : Form
     private void GenerateAuthorList(bool pageReset = true)
     {
         if (pageReset) _currentPageAuthor = 0;
-        ResetAvatarPage(AvatarAuthorPage);
+        ResetAvatarPage(FilterList);
 
         var authors = ItemUtils.GetAuthors(Items);
         if (authors.Count == 0) return;
@@ -680,15 +717,15 @@ internal sealed partial class MainForm : Form
         int totalCount = authors.Count;
         _currentPageAuthor = Math.Clamp(_currentPageAuthor, 0, TabPageUtils.GetTotalPages(totalCount, _itemsPerPage) - 1);
 
-        AvatarAuthorPage.SuspendLayout();
-        AvatarAuthorPage.AutoScroll = false;
+        FilterList.SuspendLayout();
+        FilterList.AutoScroll = false;
 
         var index = 0;
         foreach (var author in authors.Skip(_currentPageAuthor * _itemsPerPage).Take(_itemsPerPage))
         {
             try
             {
-                Button button = AEUtils.CreateButton(ButtonSize, _previewScale, author.AuthorImagePath, author.AuthorName, Items.Count(item => item.AuthorName == author.AuthorName) + LanguageUtils.Translate("個の項目", CurrentLanguage), true, author.AuthorName, GetAvatarListWidth);
+                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, author.AuthorImagePath, author.AuthorName, Items.Count(item => item.AuthorName == author.AuthorName) + LanguageUtils.Translate("個の項目", CurrentLanguage), true, author.AuthorName, GetAvatarListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -727,13 +764,13 @@ internal sealed partial class MainForm : Form
 
                         DatabaseUtils.SaveItemsData(Items);
 
-                        GenerateAuthorList(false);
+                        RenderFilter(false);
                     },
                     Keys.T
                 );
 
                 button.ContextMenuStrip = createContextMenu.ContextMenuStrip;
-                AvatarAuthorPage.Controls.Add(button);
+                FilterList.Controls.Add(button);
                 index++;
             }
             catch (Exception ex)
@@ -743,7 +780,8 @@ internal sealed partial class MainForm : Form
         }
 
         TabPageUtils.AddNavigationButtons(
-            AvatarAuthorPage,
+            FilterList,
+            DarkMode,
             ((ButtonSize + 6) * index) + 2,
             _currentPageAuthor, _itemsPerPage, totalCount, true,
             CurrentLanguage,
@@ -754,14 +792,14 @@ internal sealed partial class MainForm : Form
             (sender, _) =>
             {
                 if (sender is int pageCount) _currentPageAuthor = pageCount;
-                GenerateAuthorList(false);
+                RenderFilter(false);
             }
         );
 
-        AvatarAuthorPage.ResumeLayout();
-        AvatarAuthorPage.AutoScroll = true;
+        FilterList.ResumeLayout();
+        FilterList.AutoScroll = true;
 
-        AEUtils.UpdateExplorerThumbnails(AvatarAuthorPage);
+        AEUtils.UpdateExplorerThumbnails(FilterList);
     }
 
     /// <summary>
@@ -769,10 +807,10 @@ internal sealed partial class MainForm : Form
     /// </summary>
     private void GenerateCategoryListLeft()
     {
-        ResetAvatarPage(CategoryPage);
+        ResetAvatarPage(FilterList);
 
-        CategoryPage.SuspendLayout();
-        CategoryPage.AutoScroll = false;
+        FilterList.SuspendLayout();
+        FilterList.AutoScroll = false;
 
         var index = 0;
         foreach (ItemType itemType in Enum.GetValues<ItemType>())
@@ -784,7 +822,7 @@ internal sealed partial class MainForm : Form
                 var items = Items.Where(item => item.Type == itemType);
                 var itemCount = items.Count();
 
-                CustomItemButton button = AEUtils.CreateButton(ButtonSize, _previewScale, null, ItemUtils.GetCategoryName(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), true, string.Empty, GetAvatarListWidth);
+                CustomItemButton button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, ItemUtils.GetCategoryName(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), true, string.Empty, GetAvatarListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -811,7 +849,7 @@ internal sealed partial class MainForm : Form
                     button.ContextMenuStrip?.Dispose();
                 };
 
-                CategoryPage.Controls.Add(button);
+                FilterList.Controls.Add(button);
                 index++;
             }
             catch (Exception ex)
@@ -829,7 +867,7 @@ internal sealed partial class MainForm : Form
                     var items = Items.Where(item => item.CustomCategory == customCategory);
                     var itemCount = items.Count();
 
-                    Button button = AEUtils.CreateButton(ButtonSize, _previewScale, null, customCategory, itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), true, string.Empty, GetAvatarListWidth);
+                    Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, customCategory, itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), true, string.Empty, GetAvatarListWidth);
                     button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                     button.MouseClick += OnMouseClick;
 
@@ -858,7 +896,7 @@ internal sealed partial class MainForm : Form
                         button.ContextMenuStrip?.Dispose();
                     };
 
-                    CategoryPage.Controls.Add(button);
+                    FilterList.Controls.Add(button);
                     index++;
                 }
                 catch (Exception ex)
@@ -868,11 +906,71 @@ internal sealed partial class MainForm : Form
             }
         }
 
-        CategoryPage.ResumeLayout();
-        CategoryPage.AutoScroll = true;
+        FilterList.ResumeLayout();
+        FilterList.AutoScroll = true;
 
-        AEUtils.UpdateExplorerThumbnails(CategoryPage);
+        AEUtils.UpdateExplorerThumbnails(FilterList);
     }
+
+    /// <summary>
+    /// 左のフィルター画面を変更します
+    /// </summary>
+    private void ChangeFilter()
+    {
+        if (_leftWindowFilter == LeftWindow.Nothing)
+        {
+            _leftWindowFilter = LeftWindow.Default;
+        }
+        else if (_leftWindowFilter == LeftWindow.Default)
+        {
+            _leftWindowFilter = LeftWindow.Author;
+        }
+        else if (_leftWindowFilter == LeftWindow.Author)
+        {
+            _leftWindowFilter = LeftWindow.Category;
+        }
+        else if (_leftWindowFilter == LeftWindow.Category)
+        {
+            _leftWindowFilter = LeftWindow.Nothing;
+        }
+
+        RenderFilter(false);
+    }
+
+    /// <summary>
+    /// 左の画面を読み込みます。
+    /// </summary>
+    /// <param name="reset"></param>
+    private void RenderFilter(bool reset = true)
+    {
+        if (_leftWindowFilter == LeftWindow.Nothing)
+        {
+            FilterList.Visible = false;
+        }
+        else if (_leftWindowFilter == LeftWindow.Default)
+        {
+            FilterList.Visible = true;
+            GenerateAvatarList(reset);
+        }
+        else if (_leftWindowFilter == LeftWindow.Author)
+        {
+            FilterList.Visible = true;
+            GenerateAuthorList(reset);
+        }
+        else if (_leftWindowFilter == LeftWindow.Category)
+        {
+            FilterList.Visible = true;
+            GenerateCategoryListLeft();
+        }
+
+        ResizeControl();
+    }
+
+    /// <summary>
+    /// フィルターテキストを描画します。
+    /// </summary>
+    private void RedrawFilterName()
+        => ChangeFilterButton.Text = LanguageUtils.Translate("フィルター: {0}", CurrentLanguage, FilterUtils.GetFilterName(_leftWindowFilter, CurrentLanguage));
     #endregion
 
     #region 右のリスト関連の処理
@@ -884,8 +982,8 @@ internal sealed partial class MainForm : Form
         _openingWindow = Window.ItemCategoryList;
         ResetAvatarExplorer();
 
-        AvatarItemExplorer.SuspendLayout();
-        AvatarItemExplorer.AutoScroll = false;
+        ExplorerList.SuspendLayout();
+        ExplorerList.AutoScroll = false;
 
         var index = 0;
         foreach (ItemType itemType in Enum.GetValues<ItemType>())
@@ -909,7 +1007,7 @@ internal sealed partial class MainForm : Form
 
                 if (itemCount == 0) continue;
 
-                Button button = AEUtils.CreateButton(ButtonSize, _previewScale, null, ItemUtils.GetCategoryName(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, string.Empty, GetItemExplorerListWidth);
+                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, ItemUtils.GetCategoryName(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, string.Empty, GetItemExplorerListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -927,7 +1025,7 @@ internal sealed partial class MainForm : Form
                     button.ContextMenuStrip?.Dispose();
                 };
 
-                AvatarItemExplorer.Controls.Add(button);
+                ExplorerList.Controls.Add(button);
                 index++;
             }
             catch (Exception ex)
@@ -960,7 +1058,7 @@ internal sealed partial class MainForm : Form
 
                     if (itemCount == 0) continue;
 
-                    Button button = AEUtils.CreateButton(ButtonSize, _previewScale, null, customCategory, itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, string.Empty, GetItemExplorerListWidth);
+                    Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, customCategory, itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, string.Empty, GetItemExplorerListWidth);
                     button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                     button.MouseClick += OnMouseClick;
 
@@ -979,7 +1077,7 @@ internal sealed partial class MainForm : Form
                         button.ContextMenuStrip?.Dispose();
                     };
 
-                    AvatarItemExplorer.Controls.Add(button);
+                    ExplorerList.Controls.Add(button);
                     index++;
                 }
                 catch (Exception ex)
@@ -989,10 +1087,10 @@ internal sealed partial class MainForm : Form
             }
         }
 
-        AvatarItemExplorer.ResumeLayout();
-        AvatarItemExplorer.AutoScroll = true;
+        ExplorerList.ResumeLayout();
+        ExplorerList.AutoScroll = true;
 
-        AEUtils.UpdateExplorerThumbnails(AvatarItemExplorer);
+        AEUtils.UpdateExplorerThumbnails(ExplorerList);
     }
 
     /// <summary>
@@ -1044,8 +1142,8 @@ internal sealed partial class MainForm : Form
         int totalCount = filteredItems.Count();
         _currentPage = Math.Clamp(_currentPage, 0, TabPageUtils.GetTotalPages(totalCount, _itemsPerPage) - 1);
 
-        AvatarItemExplorer.SuspendLayout();
-        AvatarItemExplorer.AutoScroll = false;
+        ExplorerList.SuspendLayout();
+        ExplorerList.AutoScroll = false;
 
         var index = 0;
         foreach (Item item in filteredItems.Skip(_currentPage * _itemsPerPage).Take(_itemsPerPage))
@@ -1066,7 +1164,7 @@ internal sealed partial class MainForm : Form
 
                 var description = ItemUtils.GetItemDescription(item, CurrentLanguage);
 
-                Button button = AEUtils.CreateButton(ButtonSize, _previewScale, item.ImagePath, item.GetTitle(_removeBrackets), authorText, false, description, GetItemExplorerListWidth);
+                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, item.ImagePath, item.GetTitle(_removeBrackets), authorText, false, description, GetItemExplorerListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -1184,7 +1282,7 @@ internal sealed partial class MainForm : Form
                             GenerateItems(false);
                         }
 
-                        GenerateAvatarList(false);
+                        RenderFilter(false);
                     },
                     Keys.T
                 );
@@ -1205,7 +1303,7 @@ internal sealed partial class MainForm : Form
                         // 検索中だと、検索画面を再読込してあげる
                         if (_isSearching) SearchItems();
 
-                        GenerateAvatarList();
+                        RenderFilter(false);
                     },
                     Keys.R
                 );
@@ -1246,7 +1344,7 @@ internal sealed partial class MainForm : Form
 
                         DatabaseUtils.SaveItemsData(Items);
 
-                        GenerateAuthorList(false);
+                        RenderFilter(false);
                         GenerateItems(false);
                     },
                     Keys.M
@@ -1340,9 +1438,7 @@ internal sealed partial class MainForm : Form
                             SearchResultLabel.Text = string.Empty;
                             _isSearching = false;
 
-                            GenerateAvatarList(false);
-                            GenerateAuthorList(false);
-                            GenerateCategoryListLeft();
+                            RenderFilter(false);
                             ResetAvatarExplorer(true);
                         }
                         else
@@ -1354,7 +1450,7 @@ internal sealed partial class MainForm : Form
                 );
 
                 button.ContextMenuStrip = createContextMenu.ContextMenuStrip;
-                AvatarItemExplorer.Controls.Add(button);
+                ExplorerList.Controls.Add(button);
                 index++;
             }
             catch (Exception ex)
@@ -1364,7 +1460,8 @@ internal sealed partial class MainForm : Form
         }
 
         TabPageUtils.AddNavigationButtons(
-            AvatarItemExplorer,
+            ExplorerList,
+            DarkMode,
             ((ButtonSize + 6) * index) + 2,
             _currentPage, _itemsPerPage, totalCount, false,
             CurrentLanguage,
@@ -1379,10 +1476,10 @@ internal sealed partial class MainForm : Form
             }
         );
 
-        AvatarItemExplorer.ResumeLayout();
-        AvatarItemExplorer.AutoScroll = true;
+        ExplorerList.ResumeLayout();
+        ExplorerList.AutoScroll = true;
 
-        AEUtils.UpdateExplorerThumbnails(AvatarItemExplorer);
+        AEUtils.UpdateExplorerThumbnails(ExplorerList);
     }
 
     /// <summary>
@@ -1407,8 +1504,8 @@ internal sealed partial class MainForm : Form
 
         ResetAvatarExplorer();
 
-        AvatarItemExplorer.SuspendLayout();
-        AvatarItemExplorer.AutoScroll = false;
+        ExplorerList.SuspendLayout();
+        ExplorerList.AutoScroll = false;
 
         var index = 0;
         foreach (var itemType in types)
@@ -1418,7 +1515,7 @@ internal sealed partial class MainForm : Form
                 var itemCount = itemFolderInfo.GetItemCount(itemType);
                 if (itemCount == 0) continue;
 
-                Button button = AEUtils.CreateButton(ButtonSize, _previewScale, null, LanguageUtils.Translate(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, string.Empty, GetItemExplorerListWidth);
+                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, LanguageUtils.Translate(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, string.Empty, GetItemExplorerListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -1436,7 +1533,7 @@ internal sealed partial class MainForm : Form
                     button.ContextMenuStrip?.Dispose();
                 };
 
-                AvatarItemExplorer.Controls.Add(button);
+                ExplorerList.Controls.Add(button);
                 index++;
             }
             catch (Exception ex)
@@ -1445,10 +1542,10 @@ internal sealed partial class MainForm : Form
             }
         }
 
-        AvatarItemExplorer.ResumeLayout();
-        AvatarItemExplorer.AutoScroll = true;
+        ExplorerList.ResumeLayout();
+        ExplorerList.AutoScroll = true;
 
-        AEUtils.UpdateExplorerThumbnails(AvatarItemExplorer);
+        AEUtils.UpdateExplorerThumbnails(ExplorerList);
     }
 
     /// <summary>
@@ -1467,8 +1564,8 @@ internal sealed partial class MainForm : Form
         int totalCount = files.Count();
         _currentPage = Math.Clamp(_currentPage, 0, TabPageUtils.GetTotalPages(totalCount, _itemsPerPage) - 1);
 
-        AvatarItemExplorer.SuspendLayout();
-        AvatarItemExplorer.AutoScroll = false;
+        ExplorerList.SuspendLayout();
+        ExplorerList.AutoScroll = false;
 
         var index = 0;
         foreach (var file in files.OrderBy(file => file.FileName).Skip(_currentPage * _itemsPerPage).Take(_itemsPerPage))
@@ -1476,7 +1573,7 @@ internal sealed partial class MainForm : Form
             try
             {
                 var imagePath = file.FileExtension is ".png" or ".jpg" ? file.FilePath : string.Empty;
-                Button button = AEUtils.CreateButton(ButtonSize, _previewScale, imagePath, file.FileName, file.FileExtension.Replace(".", string.Empty) + LanguageUtils.Translate("ファイル", CurrentLanguage), false, LanguageUtils.Translate("開くファイルのパス: ", CurrentLanguage) + file.FilePath, GetItemExplorerListWidth);
+                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, imagePath, file.FileName, file.FileExtension.Replace(".", string.Empty) + LanguageUtils.Translate("ファイル", CurrentLanguage), false, LanguageUtils.Translate("開くファイルのパス: ", CurrentLanguage) + file.FilePath, GetItemExplorerListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -1523,7 +1620,7 @@ internal sealed partial class MainForm : Form
                 );
 
                 button.ContextMenuStrip = createContextMenu.ContextMenuStrip;
-                AvatarItemExplorer.Controls.Add(button);
+                ExplorerList.Controls.Add(button);
                 index++;
             }
             catch (Exception ex)
@@ -1533,7 +1630,8 @@ internal sealed partial class MainForm : Form
         }
 
         TabPageUtils.AddNavigationButtons(
-            AvatarItemExplorer,
+            ExplorerList,
+            DarkMode,
             ((ButtonSize + 6) * index) + 2,
             _currentPage, _itemsPerPage, totalCount, false,
             CurrentLanguage,
@@ -1548,14 +1646,20 @@ internal sealed partial class MainForm : Form
             }
         );
 
-        AvatarItemExplorer.ResumeLayout();
-        AvatarItemExplorer.AutoScroll = true;
+        ExplorerList.ResumeLayout();
+        ExplorerList.AutoScroll = true;
 
-        AEUtils.UpdateExplorerThumbnails(AvatarItemExplorer);
+        AEUtils.UpdateExplorerThumbnails(ExplorerList);
     }
     #endregion
 
     #region ボタンの処理
+    private void ChangeFilterButton_Click(object sender, EventArgs e)
+    {
+        ChangeFilter();
+        RedrawFilterName();
+    }
+
     private bool ChangeThumbnail(Item item)
     {
         var previousPath = item.ImagePath;
@@ -1631,7 +1735,7 @@ internal sealed partial class MainForm : Form
         }
 
         FormUtils.ShowMessageBox(LanguageUtils.Translate("フォルダの追加が完了しました。", CurrentLanguage), LanguageUtils.Translate("完了", CurrentLanguage));
-    } 
+    }
 
     private async Task<bool> ReacquisitionThumbnailImage(Item item)
     {
@@ -1815,8 +1919,8 @@ internal sealed partial class MainForm : Form
         int totalCount = filteredItems.Count();
         _currentPage = Math.Clamp(_currentPage, 0, TabPageUtils.GetTotalPages(totalCount, _itemsPerPage) - 1);
 
-        AvatarItemExplorer.SuspendLayout();
-        AvatarItemExplorer.AutoScroll = false;
+        ExplorerList.SuspendLayout();
+        ExplorerList.AutoScroll = false;
 
         var index = 0;
         foreach (Item item in filteredItems.Skip(_currentPage * _itemsPerPage).Take(_itemsPerPage))
@@ -1825,7 +1929,7 @@ internal sealed partial class MainForm : Form
             {
                 var description = ItemUtils.GetItemDescription(item, CurrentLanguage);
 
-                Button button = AEUtils.CreateButton(ButtonSize, _previewScale, item.ImagePath, item.GetTitle(_removeBrackets), LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName, false, description, GetItemExplorerListWidth);
+                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, item.ImagePath, item.GetTitle(_removeBrackets), LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName, false, description, GetItemExplorerListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -1860,9 +1964,7 @@ internal sealed partial class MainForm : Form
                         DatabaseUtils.SaveItemsData(Items);
 
                         GenerateFilteredItem(searchFilter, false);
-                        GenerateAvatarList(false);
-                        GenerateAuthorList(false);
-                        GenerateCategoryListLeft();
+                        RenderFilter(false);
                     }
 
                     _leftWindow = LeftWindow.Default;
@@ -1930,7 +2032,7 @@ internal sealed partial class MainForm : Form
                         DatabaseUtils.SaveItemsData(Items);
 
                         GenerateFilteredItem(searchFilter, false);
-                        GenerateAvatarList(false);
+                        RenderFilter(false);
                     },
                     Keys.T
                 );
@@ -1951,7 +2053,7 @@ internal sealed partial class MainForm : Form
                         // 検索中だと、検索画面を再読込してあげる
                         if (_isSearching) SearchItems();
 
-                        GenerateAvatarList();
+                        RenderFilter(false);
                     },
                     Keys.R
                 );
@@ -1978,9 +2080,7 @@ internal sealed partial class MainForm : Form
                         }
 
                         GenerateFilteredItem(searchFilter, false);
-                        GenerateAvatarList(false);
-                        GenerateAuthorList(false);
-                        GenerateCategoryListLeft();
+                        RenderFilter(false);
                     },
                     Keys.E
                 );
@@ -1995,7 +2095,7 @@ internal sealed partial class MainForm : Form
                         DatabaseUtils.SaveItemsData(Items);
 
                         GenerateFilteredItem(searchFilter, false);
-                        GenerateAvatarList(false);
+                        RenderFilter(false);
                     },
                     Keys.M
                 );
@@ -2075,15 +2175,13 @@ internal sealed partial class MainForm : Form
                         );
 
                         GenerateFilteredItem(searchFilter, false);
-                        GenerateAvatarList(false);
-                        GenerateAuthorList(false);
-                        GenerateCategoryListLeft();
+                        RenderFilter(false);
                     },
                     Keys.D
                 );
 
                 button.ContextMenuStrip = createContextMenu.ContextMenuStrip;
-                AvatarItemExplorer.Controls.Add(button);
+                ExplorerList.Controls.Add(button);
                 index++;
             }
             catch (Exception ex)
@@ -2093,7 +2191,8 @@ internal sealed partial class MainForm : Form
         }
 
         TabPageUtils.AddNavigationButtons(
-            AvatarItemExplorer,
+            ExplorerList,
+            DarkMode,
             ((ButtonSize + 6) * index) + 2,
             _currentPage, _itemsPerPage, totalCount, false,
             CurrentLanguage,
@@ -2108,10 +2207,10 @@ internal sealed partial class MainForm : Form
             }
         );
 
-        AvatarItemExplorer.ResumeLayout();
-        AvatarItemExplorer.AutoScroll = true;
+        ExplorerList.ResumeLayout();
+        ExplorerList.AutoScroll = true;
 
-        AEUtils.UpdateExplorerThumbnails(AvatarItemExplorer);
+        AEUtils.UpdateExplorerThumbnails(ExplorerList);
     }
 
     /// <summary>
@@ -2143,8 +2242,8 @@ internal sealed partial class MainForm : Form
         int totalCount = filteredFileData.Count();
         _currentPage = Math.Clamp(_currentPage, 0, TabPageUtils.GetTotalPages(totalCount, _itemsPerPage) - 1);
 
-        AvatarItemExplorer.SuspendLayout();
-        AvatarItemExplorer.AutoScroll = false;
+        ExplorerList.SuspendLayout();
+        ExplorerList.AutoScroll = false;
 
         var index = 0;
         foreach (var file in filteredFileData.Skip(_currentPage * _itemsPerPage).Take(_itemsPerPage))
@@ -2152,7 +2251,7 @@ internal sealed partial class MainForm : Form
             try
             {
                 var imagePath = file.FileExtension is ".png" or ".jpg" ? file.FilePath : string.Empty;
-                Button button = AEUtils.CreateButton(ButtonSize, _previewScale, imagePath, file.FileName, file.FileExtension.Replace(".", string.Empty) + LanguageUtils.Translate("ファイル", CurrentLanguage), false, LanguageUtils.Translate("開くファイルのパス: ", CurrentLanguage) + file.FilePath, GetItemExplorerListWidth);
+                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, imagePath, file.FileName, file.FileExtension.Replace(".", string.Empty) + LanguageUtils.Translate("ファイル", CurrentLanguage), false, LanguageUtils.Translate("開くファイルのパス: ", CurrentLanguage) + file.FilePath, GetItemExplorerListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -2185,7 +2284,7 @@ internal sealed partial class MainForm : Form
                 );
 
                 button.ContextMenuStrip = createContextMenu.ContextMenuStrip;
-                AvatarItemExplorer.Controls.Add(button);
+                ExplorerList.Controls.Add(button);
                 index++;
             }
             catch (Exception ex)
@@ -2195,7 +2294,8 @@ internal sealed partial class MainForm : Form
         }
 
         TabPageUtils.AddNavigationButtons(
-            AvatarItemExplorer,
+            ExplorerList,
+            DarkMode,
             ((ButtonSize + 6) * index) + 2,
             _currentPage, _itemsPerPage, totalCount, false,
             CurrentLanguage,
@@ -2210,10 +2310,10 @@ internal sealed partial class MainForm : Form
             }
         );
 
-        AvatarItemExplorer.ResumeLayout();
-        AvatarItemExplorer.AutoScroll = true;
+        ExplorerList.ResumeLayout();
+        ExplorerList.AutoScroll = true;
 
-        AEUtils.UpdateExplorerThumbnails(AvatarItemExplorer);
+        AEUtils.UpdateExplorerThumbnails(ExplorerList);
     }
     #endregion
 
@@ -2560,10 +2660,10 @@ internal sealed partial class MainForm : Form
             CurrentPath = new CurrentPath();
         }
 
-        var controls = AvatarItemExplorer.Controls.Cast<Control>().Reverse().ToList();
+        var controls = ExplorerList.Controls.Cast<Control>().Reverse().ToList();
 
-        AvatarItemExplorer.SuspendLayout();
-        AvatarItemExplorer.AutoScroll = false;
+        ExplorerList.SuspendLayout();
+        ExplorerList.AutoScroll = false;
 
         controls.ForEach(control =>
         {
@@ -2577,20 +2677,20 @@ internal sealed partial class MainForm : Form
             control.Dispose();
         });
 
-        AvatarItemExplorer.ResumeLayout();
-        AvatarItemExplorer.AutoScroll = true;
+        ExplorerList.ResumeLayout();
+        ExplorerList.AutoScroll = true;
     }
 
     /// <summary>
     /// メイン画面左の画面をリセットします。
     /// </summary>
-    /// <param name="page"></param>
-    private static void ResetAvatarPage(TabPage page)
+    /// <param name="panel"></param>
+    private static void ResetAvatarPage(Panel panel)
     {
-        var controls = page.Controls.Cast<Control>().Reverse().ToList();
+        var controls = panel.Controls.Cast<Control>().Reverse().ToList();
 
-        page.SuspendLayout();
-        page.AutoScroll = false;
+        panel.SuspendLayout();
+        panel.AutoScroll = false;
 
         controls.ForEach(control =>
         {
@@ -2598,8 +2698,8 @@ internal sealed partial class MainForm : Form
             control.Dispose();
         });
 
-        page.ResumeLayout();
-        page.AutoScroll = true;
+        panel.ResumeLayout();
+        panel.AutoScroll = true;
     }
 
     /// <summary>
@@ -2612,9 +2712,7 @@ internal sealed partial class MainForm : Form
         if (_isSearching)
         {
             SearchItems();
-            GenerateAvatarList(false);
-            GenerateAuthorList(false);
-            GenerateCategoryListLeft();
+            RenderFilter(false);
             return;
         }
 
@@ -2639,9 +2737,7 @@ internal sealed partial class MainForm : Form
         }
 
         if (!reloadLeft) return;
-        GenerateAvatarList(false);
-        GenerateAuthorList(false);
-        GenerateCategoryListLeft();
+        RenderFilter(false);
     }
     #endregion
 
@@ -2651,7 +2747,7 @@ internal sealed partial class MainForm : Form
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void AvatarItemExplorer_DragDrop(object sender, DragEventArgs e)
+    private void ExplorerList_DragDrop(object? sender, DragEventArgs e)
     {
         var files = AEUtils.GetFileDropPaths(e);
 
@@ -2679,7 +2775,7 @@ internal sealed partial class MainForm : Form
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void AvatarPage_DragDrop(object sender, DragEventArgs e)
+    private void FilterList_DragDrop(object? sender, DragEventArgs e)
     {
         var files = AEUtils.GetFileDropPaths(e);
 
@@ -2901,24 +2997,13 @@ internal sealed partial class MainForm : Form
             ChangeControlFont(control);
         }
 
+        RedrawFilterName();
+
         string[] sortingItems = ["タイトル", "作者", "登録日時", "更新日時", "実装済み", "未実装"];
         var selected = SortingBox.SelectedIndex;
         SortingBox.Items.Clear();
         SortingBox.Items.AddRange(sortingItems.Select(item => LanguageUtils.Translate(item, CurrentLanguage)).ToArray());
         SortingBox.SelectedIndex = selected;
-
-        Control[] listPages = { AvatarSearchFilterList, ExplorerList, AvatarItemExplorer };
-
-        foreach (Control control in listPages)
-        {
-            foreach (Control control1 in control.Controls)
-            {
-                if (string.IsNullOrEmpty(control1.Text)) continue;
-                _controlNames.TryAdd(control1.Name, control1.Text);
-                control1.Text = LanguageUtils.Translate(_controlNames[control1.Name], CurrentLanguage);
-                ChangeControlFont(control1);
-            }
-        }
 
         ResizeControl();
 
@@ -3106,9 +3191,7 @@ internal sealed partial class MainForm : Form
                     SearchResultLabel.Text = string.Empty;
                     _isSearching = false;
 
-                    GenerateAvatarList();
-                    GenerateAuthorList();
-                    GenerateCategoryListLeft();
+                    RenderFilter();
                     ResetAvatarExplorer(true);
                     PathTextBox.Text = GeneratePath();
 
@@ -3210,9 +3293,7 @@ internal sealed partial class MainForm : Form
         SearchBox.Text = string.Empty;
         SearchResultLabel.Text = string.Empty;
         _isSearching = false;
-        GenerateAvatarList();
-        GenerateAuthorList();
-        GenerateCategoryListLeft();
+        RenderFilter();
         ResetAvatarExplorer(true);
         PathTextBox.Text = GeneratePath();
 
@@ -3272,9 +3353,9 @@ internal sealed partial class MainForm : Form
         if (!_initialized) return;
 
         SuspendLayout();
-        AvatarItemExplorer.SuspendLayout();
+        ExplorerList.SuspendLayout();
 
-        var labelControl = AvatarItemExplorer.Controls.OfType<Label>().FirstOrDefault(label => label.Name == "StartLabel");
+        var labelControl = ExplorerList.Controls.OfType<Label>().FirstOrDefault(label => label.Name == "StartLabel");
         var allControls = Controls.OfType<Control>().ToList();
         if (labelControl != null) allControls.Add(labelControl);
 
@@ -3312,27 +3393,35 @@ internal sealed partial class MainForm : Form
 
                 control.Font = new Font(control.Font.FontFamily, newFontSize, control.Font.Style);
             }
+            else if (_leftWindowFilter == LeftWindow.Nothing && control is Panel panel && panel.Name == "ExplorerList")
+            {
+                var leftWindowPosition = FilterList.Location;
+                var mainWindowPosition = ExplorerList.Location;
+
+                var diffWidth = mainWindowPosition.X - leftWindowPosition.X;
+
+                ExplorerList.Location = ExplorerList.Location with { X = mainWindowPosition.X - diffWidth };
+                ExplorerList.Size = new Size(ExplorerList.Size.Width + diffWidth, ExplorerList.Size.Height);
+            }
         }
-        
+
         if (labelControl != null)
         {
             labelControl.Location = labelControl.Location with
             {
-                X = (AvatarItemExplorer.Width - labelControl.Width) / 2,
-                Y = (AvatarItemExplorer.Height - labelControl.Height) / 2
+                X = (ExplorerList.Width - labelControl.Width) / 2,
+                Y = (ExplorerList.Height - labelControl.Height) / 2
             };
         }
 
         AdjustLabelPosition();
         ScaleItemButtons();
 
-        AvatarItemExplorer.ResumeLayout();
+        ExplorerList.ResumeLayout();
         ResumeLayout();
 
-        AEUtils.UpdateExplorerThumbnails(AvatarItemExplorer);
-        AEUtils.UpdateExplorerThumbnails(AvatarPage);
-        AEUtils.UpdateExplorerThumbnails(AvatarAuthorPage);
-        AEUtils.UpdateExplorerThumbnails(CategoryPage);
+        AEUtils.UpdateExplorerThumbnails(ExplorerList);
+        AEUtils.UpdateExplorerThumbnails(FilterList);
     }
 
     /// <summary>
@@ -3376,14 +3465,8 @@ internal sealed partial class MainForm : Form
         int explorerWidth = baseItemExplorerWidth + GetItemExplorerListWidth;
         int listWidth = baseItemListWidth + GetAvatarListWidth;
 
-        ScaleItemButtonsInContainer(AvatarItemExplorer, explorerWidth, AvatarItemExplorer.Width);
-
-        Control[] listPages = { AvatarPage, AvatarAuthorPage, CategoryPage };
-        var currentPage = AvatarSearchFilterList.SelectedTab;
-        foreach (var page in listPages)
-        {
-            ScaleItemButtonsInContainer(page, listWidth, currentPage?.Width ?? 0, true);
-        }
+        ScaleItemButtonsInContainer(ExplorerList, explorerWidth, ExplorerList.Width);
+        ScaleItemButtonsInContainer(FilterList, listWidth, FilterList.Width, true);
     }
 
     private static void ScaleItemButtonsInContainer(Control container, int buttonWidth, int listWidth = 0, bool small = false)

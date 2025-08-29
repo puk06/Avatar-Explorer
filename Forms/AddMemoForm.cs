@@ -25,6 +25,7 @@ internal partial class AddMemoForm : Form
         _mainForm = MainForm;
 
         InitializeComponent();
+        if (_mainForm.DarkMode) SetDarkMode();
 
         Text = LanguageUtils.Translate(Text, _mainForm.CurrentLanguage);
         Text += " - " + item.Title;
@@ -32,6 +33,14 @@ internal partial class AddMemoForm : Form
         TranslateControls();
 
         MemoTextBox.Text = item.ItemMemo;
+    }
+
+    private void SetDarkMode()
+    {
+        foreach (Control contorol in Controls)
+        {
+            DarkModeUtils.SetDarkMode(contorol);
+        }
     }
 
     #region フォーム関連の処理

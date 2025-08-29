@@ -4,9 +4,9 @@ const files = [
     { path: "Forms/MainForm.Designer.cs", replacement: "GuiFont" },
     { path: "Forms/AddItemForm.Designer.cs", replacement: "_mainForm.GuiFont" },
     { path: "Forms/SelectSupportedAvatarForm.Designer.cs", replacement: "_mainForm.GuiFont" },
-    { path: "Forms/ManageCommonAvatarsFrom.Designer.cs", replacement: "_mainForm.GuiFont" },
+    { path: "Forms/ManageCommonAvatarsForm.Designer.cs", replacement: "_mainForm.GuiFont" },
     { path: "Forms/SelectAutoBackupForm.Designer.cs", replacement: "_mainForm.GuiFont" },
-    { path: "Forms/AddNoteForm.Designer.cs", replacement: "_mainForm.GuiFont" }
+    { path: "Forms/AddMemoForm.Designer.cs", replacement: "_mainForm.GuiFont" }
 ];
 
 files.forEach(({ path, replacement }) => {

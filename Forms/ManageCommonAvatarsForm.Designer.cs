@@ -35,11 +35,9 @@ namespace Avatar_Explorer.Forms
             label2 = new Label();
             label3 = new Label();
             DeleteSelectedGroupButton = new Button();
-            AvatarList = new TabPage();
-            AvatarListTab = new TabControl();
             AddButton = new Button();
             NewLabel = new Label();
-            AvatarListTab.SuspendLayout();
+            AvatarList = new Panel();
             SuspendLayout();
             // 
             // CommonAvatarsCombobox
@@ -68,7 +66,7 @@ namespace Avatar_Explorer.Forms
             label2.Font = new Font(_mainForm.GuiFont, 13F);
             label2.Location = new Point(16, 53);
             label2.Name = "label2";
-            label2.Size = new Size(112, 26);
+            label2.Size = new Size(111, 26);
             label2.TabIndex = 2;
             label2.Text = "共通素体名: ";
             // 
@@ -78,7 +76,7 @@ namespace Avatar_Explorer.Forms
             label3.Font = new Font(_mainForm.GuiFont, 11F);
             label3.Location = new Point(475, 9);
             label3.Name = "label3";
-            label3.Size = new Size(441, 46);
+            label3.Size = new Size(414, 42);
             label3.TabIndex = 3;
             label3.Text = "新しく入力すると新しい共通素体グループが作成されます！\r\n選ぶと編集画面になります！";
             // 
@@ -92,28 +90,6 @@ namespace Avatar_Explorer.Forms
             DeleteSelectedGroupButton.Text = "選択中のグループを削除";
             DeleteSelectedGroupButton.UseVisualStyleBackColor = true;
             DeleteSelectedGroupButton.Click += DeleteSelectedGroupButton_Click;
-            // 
-            // AvatarList
-            // 
-            AvatarList.AutoScroll = true;
-            AvatarList.Location = new Point(4, 24);
-            AvatarList.Name = "AvatarList";
-            AvatarList.Padding = new Padding(3);
-            AvatarList.Size = new Size(900, 380);
-            AvatarList.TabIndex = 0;
-            AvatarList.Text = "アバターリスト";
-            AvatarList.UseVisualStyleBackColor = true;
-            AvatarList.MouseWheel += AEUtils.OnScroll;
-            AvatarList.Scroll += AEUtils.OnScroll;
-            // 
-            // AvatarListTab
-            // 
-            AvatarListTab.Controls.Add(AvatarList);
-            AvatarListTab.Location = new Point(12, 90);
-            AvatarListTab.Name = "AvatarListTab";
-            AvatarListTab.SelectedIndex = 0;
-            AvatarListTab.Size = new Size(908, 408);
-            AvatarListTab.TabIndex = 5;
             // 
             // AddButton
             // 
@@ -138,25 +114,32 @@ namespace Avatar_Explorer.Forms
             NewLabel.Text = "新しく共通素体グループが作成されます";
             NewLabel.Visible = false;
             // 
-            // ManageCommonAvatars
+            // AvatarList
+            // 
+            AvatarList.BackColor = Color.FromArgb(249, 249, 249);
+            AvatarList.Location = new Point(16, 114);
+            AvatarList.Name = "AvatarList";
+            AvatarList.Size = new Size(900, 380);
+            AvatarList.TabIndex = 7;
+            // 
+            // ManageCommonAvatarsForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(932, 553);
+            Controls.Add(AvatarList);
             Controls.Add(NewLabel);
             Controls.Add(AddButton);
-            Controls.Add(AvatarListTab);
             Controls.Add(DeleteSelectedGroupButton);
             Controls.Add(label3);
             Controls.Add(label2);
             Controls.Add(label1);
             Controls.Add(CommonAvatarsCombobox);
-            Name = "ManageCommonAvatars";
-            Text = "共通素体の管理";
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
             MinimizeBox = false;
-            FormBorderStyle = FormBorderStyle.FixedSingle;
-            AvatarListTab.ResumeLayout(false);
+            Name = "ManageCommonAvatarsForm";
+            Text = "共通素体の管理";
             ResumeLayout(false);
             PerformLayout();
         }
@@ -168,9 +151,8 @@ namespace Avatar_Explorer.Forms
         private Label label2;
         private Label label3;
         private Button DeleteSelectedGroupButton;
-        private TabPage AvatarList;
-        private TabControl AvatarListTab;
         private Button AddButton;
         private Label NewLabel;
+        private Panel AvatarList;
     }
 }

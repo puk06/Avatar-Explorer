@@ -6,6 +6,11 @@
 internal enum LeftWindow
 {
     /// <summary>
+    /// 非表示
+    /// </summary>
+    Nothing,
+
+    /// <summary>
     /// デフォルト
     /// </summary>
     Default,

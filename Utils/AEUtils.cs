@@ -46,8 +46,10 @@ internal static partial class AEUtils
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    internal static void OnScroll(object sender, EventArgs e)
+    internal static void OnScroll(object? sender, EventArgs e)
     {
+        if (sender == null) return;
+
         lock (_pendingScrollSenders)
         {
             _pendingScrollSenders.Add(sender);
@@ -72,7 +74,7 @@ internal static partial class AEUtils
         {
             progressForm.UpdateProgress(0, LanguageUtils.Translate("準備中", currentLanguage));
 
-            var (saveFolder, saveFilePath, unityPackagePath) = PrepareSavePaths(file, currentPath, currentLanguage);
+            var (saveFolder, saveFilePath, unityPackagePath) = PrepareSavePaths(file, currentPath);
             PrepareSaveDirectory(saveFolder, saveFilePath);
 
             var extractingStatus = LanguageUtils.Translate("ファイルの展開中", currentLanguage);
@@ -111,7 +113,7 @@ internal static partial class AEUtils
         }
     }
 
-    private static (string saveFolder, string saveFilePath, string unityPackagePath) PrepareSavePaths(FileData file, CurrentPath currentPath, string language)
+    private static (string saveFolder, string saveFilePath, string unityPackagePath) PrepareSavePaths(FileData file, CurrentPath currentPath)
     {
         string authorName = FileSystemUtils.CheckFilePath(currentPath.CurrentSelectedItem?.AuthorName ?? "Unknown");
         string itemTitle = FileSystemUtils.CheckFilePath(currentPath.CurrentSelectedItem?.Title ?? "Unknown");
@@ -200,15 +202,15 @@ internal static partial class AEUtils
     {
         try
         {
-            if (senderObject is not TabPage tabPage) return;
+            if (senderObject is not Panel panel) return;
 
-            var visibleArea = new Rectangle(0, tabPage.VerticalScroll.Value, tabPage.ClientSize.Width, tabPage.ClientSize.Height);
+            var visibleArea = new Rectangle(0, panel.VerticalScroll.Value, panel.ClientSize.Width, panel.ClientSize.Height);
 
-            foreach (Control control in tabPage.Controls)
+            foreach (Control control in panel.Controls)
             {
                 if (control is not CustomItemButton button) continue;
 
-                var buttonAbsoluteLocation = button.Location with { Y = button.Location.Y + tabPage.VerticalScroll.Value };
+                var buttonAbsoluteLocation = button.Location with { Y = button.Location.Y + panel.VerticalScroll.Value };
                 button.CheckThmbnail(buttonAbsoluteLocation, button.Size, visibleArea);
             }
         }
@@ -221,6 +223,7 @@ internal static partial class AEUtils
     /// <summary>
     /// 渡された情報からアイテム用のボタンを生成します。
     /// </summary>
+    /// <param name="darkmode"></param>
     /// <param name="buttonHeight"></param>
     /// <param name="previewScale"></param>
     /// <param name="imagePath"></param>
@@ -230,12 +233,12 @@ internal static partial class AEUtils
     /// <param name="tooltip"></param>
     /// <param name="listWidthDiff"></param>
     /// <returns></returns>
-    internal static CustomItemButton CreateButton(int buttonHeight, float previewScale, string? imagePath, string labelTitle, string? description, bool @short = false, string tooltip = "", int listWidthDiff = 0)
+    internal static CustomItemButton CreateButton(bool darkmode, int buttonHeight, float previewScale, string? imagePath, string labelTitle, string? description, bool @short = false, string tooltip = "", int listWidthDiff = 0)
     {
         var buttonWidth = @short ? 303 : 874;
         if (listWidthDiff != 0) buttonWidth += listWidthDiff;
 
-        CustomItemButton button = new(buttonWidth, buttonHeight)
+        CustomItemButton button = new(buttonWidth, buttonHeight, darkmode)
         {
             PreviewScale = previewScale,
             ImagePath = imagePath,

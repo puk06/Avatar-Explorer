@@ -183,5 +183,7 @@
   "商品URLが見つかりませんでした。": "Product URL not found.",
   "アイテム: {0}\n\n追加予定のフォルダ一覧:\n{1}\n\n選択したフォルダをアイテムに追加してもよろしいですか？": "- Item: {0}\n\n- List of folders to be added: {1}\n\nDo you want to add the selected folders to the item?",
   "フォルダの追加が完了しました。": "Folder addition completed.",
-  "アイテムフォルダの追加": "Add Item Folder"
+  "アイテムフォルダの追加": "Add Item Folder",
+  "フィルター: {0}": "Filter: {0}",
+  "非表示": "Hidden"
 }

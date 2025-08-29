@@ -1,3 +1,5 @@
+using Avatar_Explorer.Utils;
+
 namespace Avatar_Explorer.Models;
 
 internal class CustomItemButton : Button
@@ -42,9 +44,11 @@ internal class CustomItemButton : Button
         }
     }
 
-    internal CustomItemButton(int buttonWidth, int buttonHeight)
+    internal CustomItemButton(int buttonWidth, int buttonHeight, bool darkMode)
     {
         _buttonHeight = buttonHeight;
+
+        if (darkMode) DarkModeUtils.SetDarkMode(this);
 
         UseVisualStyleBackColor = true;
         Size = new Size(buttonWidth, buttonHeight);
@@ -59,7 +63,8 @@ internal class CustomItemButton : Button
         {
             Location = new Point(4, 4),
             Size = new Size(buttonHeight - 8, buttonHeight - 8),
-            SizeMode = PictureBoxSizeMode.StretchImage
+            SizeMode = PictureBoxSizeMode.StretchImage,
+            BackColor = Color.Transparent
         };
         Controls.Add(_pictureBox);
 
@@ -71,14 +76,16 @@ internal class CustomItemButton : Button
         {
             Location = new Point(buttonHeight - 4, 3),
             Size = new Size(labelWidth, 24),
-            Font = new Font("Yu Gothic UI", 12F)
+            Font = new Font("Yu Gothic UI", 12F),
+            BackColor = Color.Transparent
         };
         Controls.Add(_title);
 
         _authorName = new Label
         {
             Location = new Point(buttonHeight - 4, 25),
-            Size = new Size(labelWidth, 40)
+            Size = new Size(labelWidth, 40),
+            BackColor = Color.Transparent
         };
         Controls.Add(_authorName);
 

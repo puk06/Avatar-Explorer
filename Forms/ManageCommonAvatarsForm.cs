@@ -24,6 +24,7 @@ internal sealed partial class ManageCommonAvatarsForm : Form
         _mainForm = mainform;
         _commonAvatars = _mainForm.CommonAvatars;
         InitializeComponent();
+        if (_mainForm.DarkMode) SetDarkMode();
 
         Text = LanguageUtils.Translate("共通素体の管理", _mainForm.CurrentLanguage);
         TranslateControls();
@@ -40,6 +41,14 @@ internal sealed partial class ManageCommonAvatarsForm : Form
 
         GenerateAvatarList();
         RefleshCommonAvatarButtonColor();
+    }
+
+    private void SetDarkMode()
+    {
+        foreach (Control contorol in Controls)
+        {
+            DarkModeUtils.SetDarkMode(contorol);
+        }
     }
 
     #region フォーム関連の処理
@@ -77,8 +86,7 @@ internal sealed partial class ManageCommonAvatarsForm : Form
         var index = 0;
         foreach (Item item in _mainForm.Items.Where(item => item.Type == ItemType.Avatar))
         {
-            Button button = CreateAvatarButton(_mainForm.ButtonSize, item, _mainForm.CurrentLanguage);
-            button.Text = item.Title;
+            Button button = CreateAvatarButton(_mainForm.DarkMode, _mainForm.ButtonSize, item, _mainForm.CurrentLanguage);
             button.Location = new Point(0, ((_mainForm.ButtonSize + 6) * index) + 2);
             button.Tag = item.ItemPath;
 
@@ -106,9 +114,9 @@ internal sealed partial class ManageCommonAvatarsForm : Form
     /// <param name="item"></param>
     /// <param name="language"></param>
     /// <returns></returns>
-    private static CustomItemButton CreateAvatarButton(int buttonHeight, Item item, string language)
+    private static CustomItemButton CreateAvatarButton(bool darkMode, int buttonHeight, Item item, string language)
     {
-        CustomItemButton button = new(875, buttonHeight)
+        CustomItemButton button = new(875, buttonHeight, darkMode)
         {
             ImagePath = item.ImagePath,
             TitleText = item.Title,

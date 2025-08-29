@@ -29,6 +29,7 @@ internal partial class SelectAutoBackupForm : Form
         _mainForm = mainForm;
 
         InitializeComponent();
+        if (_mainForm.DarkMode) SetDarkMode();
 
         TranslateControls();
 
@@ -42,6 +43,14 @@ internal partial class SelectAutoBackupForm : Form
         }
 
         if (SelectBackup.Items.Count > 0) SelectBackup.SelectedIndex = 0;
+    }
+
+    private void SetDarkMode()
+    {
+        foreach (Control contorol in Controls)
+        {
+            DarkModeUtils.SetDarkMode(contorol);
+        }
     }
 
     #region フォーム関連の処理

@@ -15,7 +15,8 @@ internal class ConfigurationManager
         { "ThumbnailUpdateTimeout", "200" },
         { "BackupInterval", "5" },
         { "RemoveBrackets", "false" },
-        { "ButtonSize", "64" }
+        { "ButtonSize", "64" },
+        { "DarkMode", "false" }
     };
     private readonly Dictionary<string, string> _defaultKeysDescriptions = new()
     {
@@ -26,7 +27,8 @@ internal class ConfigurationManager
         { "ThumbnailUpdateTimeout", "# スクロール終了後、何ms後にサムネイルを描画し直すかを変えることが出来ます。デフォルトは200msです。範囲: 1 - 10000" },
         { "BackupInterval", "# 自動バックアップの間隔を変更することが出来ます。単位は分で、デフォルトは5分です。範囲: 1 - 1000" },
         { "RemoveBrackets", "# 商品タイトルに含まれる【】のような括弧を非表示にします。表示上のみ影響され、データベースに影響はありません。trueで括弧の非表示、falseで表示です。" },
-        { "ButtonSize", "# ボタンのサイズ(高さ)を変更できます。変更されるのはボタンの画像サイズです。デフォルトは64です。範囲: 1 - 500" }
+        { "ButtonSize", "# ボタンのサイズ(高さ)を変更できます。変更されるのはボタンの画像サイズです。デフォルトは64です。範囲: 1 - 500" },
+        { "DarkMode", "# ソフトのダークモードを有効にします。trueで有効、falseで無効です。" }
     };
     private const string _configulationDescription = "# このファイルはAvatar Explorerの起動時に読み込まれる設定ファイルです。書き換えた際はAvatar Explorerを再起動してください。";
 

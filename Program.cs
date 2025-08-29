@@ -26,9 +26,18 @@ internal static class Program
             SchemeUtils.CheckScheme();
 
             var launchInfo = args.Length > 0 ? AEUtils.GetLaunchInfo(args[0]) : new LaunchInfo();
+            ConfigurationManager configuration = new();
+            configuration.Load("settings.cfg");
 
             ApplicationConfiguration.Initialize();
-            Application.Run(new MainForm(launchInfo));
+
+#pragma warning disable WFO5001 // 種類は、評価の目的でのみ提供されています。将来の更新で変更または削除されることがあります。続行するには、この診断を非表示にします。
+
+            if (configuration["DarkMode"] == "true") Application.SetColorMode(SystemColorMode.Dark);
+
+#pragma warning restore WFO5001 // 種類は、評価の目的でのみ提供されています。将来の更新で変更または削除されることがあります。続行するには、この診断を非表示にします。
+
+            Application.Run(new MainForm(launchInfo, configuration));
         }
         catch (Exception ex)
         {
