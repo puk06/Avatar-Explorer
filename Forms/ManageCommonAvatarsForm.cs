@@ -24,6 +24,7 @@ internal sealed partial class ManageCommonAvatarsForm : Form
         _mainForm = mainform;
         _commonAvatars = _mainForm.CommonAvatars;
         InitializeComponent();
+        AdditionalInitialize();
         if (_mainForm.DarkMode) SetDarkMode();
 
         Text = LanguageUtils.Translate("共通素体の管理", _mainForm.CurrentLanguage);
@@ -41,6 +42,12 @@ internal sealed partial class ManageCommonAvatarsForm : Form
 
         GenerateAvatarList();
         RefleshCommonAvatarButtonColor();
+    }
+
+    private void AdditionalInitialize()
+    {
+        AvatarList.MouseWheel += AEUtils.OnScroll;
+        AvatarList.Scroll += AEUtils.OnScroll;
     }
 
     private void SetDarkMode()
@@ -126,9 +133,9 @@ internal sealed partial class ManageCommonAvatarsForm : Form
 
         button.Click += (_, _) =>
         {
-            button.BackColor = button.BackColor == Color.LightGreen
-                ? Color.FromKnownColor(KnownColor.Control)
-                : Color.LightGreen;
+            button.BackColor = button.BackColor == Color.LightGreen || button.BackColor == Color.Green
+                ? (darkMode ? Color.FromArgb(44, 44, 44) : Color.FromKnownColor(KnownColor.Control))
+                : (darkMode ? Color.Green : Color.LightGreen);
         };
 
         return button;
@@ -199,7 +206,7 @@ internal sealed partial class ManageCommonAvatarsForm : Form
             {
                 Name = name,
                 Avatars = AvatarList.Controls.OfType<Button>()
-                    .Where(button => button.BackColor == Color.LightGreen)
+                    .Where(button => button.BackColor == Color.LightGreen || button.BackColor == Color.Green)
                     .Select(button => button.Tag?.ToString() ?? string.Empty)
                     .Where(tag => !string.IsNullOrWhiteSpace(tag))
                     .ToList()
@@ -214,7 +221,7 @@ internal sealed partial class ManageCommonAvatarsForm : Form
         else
         {
             commonAvatar.Avatars = AvatarList.Controls.OfType<Button>()
-                .Where(button => button.BackColor == Color.LightGreen)
+                .Where(button => button.BackColor == Color.LightGreen || button.BackColor == Color.Green)
                 .Select(button => button.Tag?.ToString() ?? string.Empty)
                 .Where(tag => !string.IsNullOrWhiteSpace(tag))
                 .ToList();
@@ -253,9 +260,9 @@ internal sealed partial class ManageCommonAvatarsForm : Form
             DeleteSelectedGroupButton.Enabled = !string.IsNullOrWhiteSpace(CommonAvatarsCombobox.Text) && commonAvatar != null;
             button.BackColor = commonAvatar != null
                 ? commonAvatar.Avatars.Contains(button.Tag?.ToString() ?? string.Empty)
-                    ? Color.LightGreen
-                    : Color.FromKnownColor(KnownColor.Control)
-                : Color.FromKnownColor(KnownColor.Control);
+                    ? (_mainForm.DarkMode ? Color.Green : Color.LightGreen)
+                    : (_mainForm.DarkMode ? Color.FromArgb(44, 44, 44) : Color.FromKnownColor(KnownColor.Control))
+                : (_mainForm.DarkMode ? Color.FromArgb(44, 44, 44) : Color.FromKnownColor(KnownColor.Control));
         }
     }
     #endregion

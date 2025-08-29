@@ -1180,7 +1180,7 @@ internal sealed partial class MainForm : Form
                     var currentAvatar = CurrentPath.CurrentSelectedAvatarPath;
                     if (!string.IsNullOrEmpty(currentAvatar))
                     {
-                        button.BackColor = item.ImplementedAvatars.Contains(currentAvatar) ? Color.LightGreen : Color.LightPink;
+                        button.BackColor = item.ImplementedAvatars.Contains(currentAvatar) ? (DarkMode ? Color.Green : Color.LightGreen) : (DarkMode ? Color.IndianRed : Color.LightPink);
                     }
                 }
 
@@ -1398,7 +1398,7 @@ internal sealed partial class MainForm : Form
                                 var currentAvatar = CurrentPath.CurrentSelectedAvatarPath;
                                 if (!string.IsNullOrEmpty(currentAvatar))
                                 {
-                                    button.BackColor = item.ImplementedAvatars.Contains(currentAvatar) ? Color.LightGreen : Color.LightPink;
+                                    button.BackColor = item.ImplementedAvatars.Contains(currentAvatar) ? (DarkMode ? Color.Green : Color.LightGreen) : (DarkMode ? Color.IndianRed : Color.LightPink);
                                 }
                             }
 
@@ -2148,7 +2148,7 @@ internal sealed partial class MainForm : Form
                                 var currentAvatar = CurrentPath.CurrentSelectedAvatarPath;
                                 if (!string.IsNullOrEmpty(currentAvatar))
                                 {
-                                    button.BackColor = item.ImplementedAvatars.Contains(currentAvatar) ? Color.LightGreen : Color.LightPink;
+                                    button.BackColor = item.ImplementedAvatars.Contains(currentAvatar) ? (DarkMode ? Color.Green : Color.LightGreen) : (DarkMode ? Color.IndianRed : Color.LightPink);
                                 }
                             }
 

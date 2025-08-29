@@ -25,12 +25,19 @@ internal sealed partial class SelectSupportedAvatarForm : Form
         _mainForm = mainForm;
         _addItem = addItem;
         InitializeComponent();
+        AdditionalInitialize();
         if (_mainForm.DarkMode) SetDarkMode();
 
         Text = LanguageUtils.Translate("対応アバターの選択", _mainForm.CurrentLanguage);
         TranslateControls();
 
         GenerateAvatarList();
+    }
+
+    private void AdditionalInitialize()
+    {
+        AvatarList.MouseWheel += AEUtils.OnScroll;
+        AvatarList.Scroll += AEUtils.OnScroll;
     }
 
     private void SetDarkMode()
@@ -80,7 +87,7 @@ internal sealed partial class SelectSupportedAvatarForm : Form
             if (item.ItemPath == _addItem.ItemPath) continue;
             Button button = CreateAvatarButton(_mainForm.DarkMode, _mainForm.ButtonSize, item, _mainForm.CurrentLanguage);
             button.Location = new Point(0, ((_mainForm.ButtonSize + 6) * index) + 2);
-            button.BackColor = _addItem.SupportedAvatar.Contains(item.ItemPath) ? Color.LightGreen : Color.FromKnownColor(KnownColor.Control);
+            button.BackColor = _addItem.SupportedAvatar.Contains(item.ItemPath) ? (_mainForm.DarkMode ? Color.Green : Color.LightGreen) : (_mainForm.DarkMode ? Color.FromArgb(44, 44, 44) : Color.FromKnownColor(KnownColor.Control));
             AvatarList.Controls.Add(button);
             index++;
         }
@@ -112,7 +119,9 @@ internal sealed partial class SelectSupportedAvatarForm : Form
 
         button.Click += (_, _) =>
         {
-            button.BackColor = button.BackColor == Color.LightGreen ? Color.FromKnownColor(KnownColor.Control) : Color.LightGreen;
+            button.BackColor = button.BackColor == Color.LightGreen || button.BackColor == Color.Green
+                ? (darkMode ? Color.FromArgb(44, 44, 44) : Color.FromKnownColor(KnownColor.Control))
+                : (darkMode ? Color.Green : Color.LightGreen);
         };
 
         return button;
@@ -123,7 +132,7 @@ internal sealed partial class SelectSupportedAvatarForm : Form
     private void ConfirmButton_Click(object sender, EventArgs e)
     {
         _addItem.SupportedAvatar = AvatarList.Controls.OfType<Button>()
-            .Where(button => button.BackColor == Color.LightGreen)
+            .Where(button => button.BackColor == Color.LightGreen || button.BackColor == Color.Green)
             .Select(button => button.Tag?.ToString() ?? string.Empty)
             .Where(tag => !string.IsNullOrWhiteSpace(tag))
             .ToList();
