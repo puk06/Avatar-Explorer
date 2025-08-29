@@ -84,8 +84,10 @@ internal partial class SelectAutoBackupForm : Form
 
         if (!string.IsNullOrEmpty(backupPath) && Directory.Exists(backupPath))
         {
-            customCategoryCount = DatabaseUtils.GetCustomCategoryCount(backupPath);
-            itemDatabaseCount = DatabaseUtils.GetItemDatabaseCount(backupPath);
+            var itemData = DatabaseUtils.LoadItemsData(backupPath + "/ItemsData.json");
+
+            customCategoryCount = DatabaseUtils.GetCustomCategories(itemData).Count;
+            itemDatabaseCount = itemData.Count;
             commonAvatarDatabaseCount = DatabaseUtils.GetCommonAvatarDatabaseCount(backupPath);
         }
 

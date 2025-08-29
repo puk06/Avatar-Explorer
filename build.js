@@ -51,10 +51,6 @@ for (let i = 0; i < fontFilesLength; i++) {
     console.log("Copying: " + file);
 }
 
-console.log("Generating Empty CustomCategory");
-const customCategoryPath = path.join("Datas", "CustomCategory.txt");
-fs.writeFileSync(customCategoryPath, "", "utf8");
-
 const LICENSE_FILES = [
     "../../../LICENSE.txt",
     "../../../THIRD_PARTY_LICENSES.txt"

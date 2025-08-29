@@ -5,8 +5,8 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Style", "IDE1006:命名スタイル", Justification = "<保留中>", Scope = "member", Target = "~M:Avatar_Explorer.Forms.AddItemForm.openFolderButton_Click(System.Object,System.EventArgs)")]
-[assembly: SuppressMessage("Style", "IDE1006:命名スタイル", Justification = "<保留中>", Scope = "member", Target = "~M:Avatar_Explorer.Forms.AddItemForm.openMaterialFolderButton_Click(System.Object,System.EventArgs)")]
+[assembly: SuppressMessage("Style", "IDE1006:命名スタイル", Justification = "<保留中>", Scope = "member", Target = "~M:Avatar_Explorer.Forms.AddItemForm.OpenFolderButton_Click(System.Object,System.EventArgs)")]
+[assembly: SuppressMessage("Style", "IDE1006:命名スタイル", Justification = "<保留中>", Scope = "member", Target = "~M:Avatar_Explorer.Forms.AddItemForm.OpenMaterialFolderButton_Click(System.Object,System.EventArgs)")]
 [assembly: SuppressMessage("Style", "IDE0028:コレクションの初期化を簡略化します", Justification = "<保留中>", Scope = "member", Target = "~F:Avatar_Explorer.Forms.MainForm._defaultControlSize")]
 [assembly: SuppressMessage("Style", "IDE0301:コレクションの初期化を簡略化します", Justification = "<保留中>", Scope = "member", Target = "~P:Avatar_Explorer.Models.Item.SupportedAvatar")]
 [assembly: SuppressMessage("Style", "IDE0305:コレクションの初期化を簡略化します", Justification = "<保留中>", Scope = "member", Target = "~M:Avatar_Explorer.Forms.AddItemForm.AddButton_Click(System.Object,System.EventArgs)")]

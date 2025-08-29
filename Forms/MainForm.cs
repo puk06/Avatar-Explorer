@@ -34,9 +34,10 @@ internal sealed partial class MainForm : Form
     internal List<CommonAvatar> CommonAvatars;
 
     /// <summary>
-    /// カスタムカテゴリーデータベース
+    /// カスタムカテゴリデータベース
     /// </summary>
-    internal List<string> CustomCategories;
+    internal List<string> CustomCategories
+        => DatabaseUtils.GetCustomCategories(Items);
     #endregion
 
     #region フォント関連の変数
@@ -231,11 +232,6 @@ internal sealed partial class MainForm : Form
 
             Items = DatabaseUtils.LoadItemsData();
             CommonAvatars = DatabaseUtils.LoadCommonAvatarData();
-            CustomCategories = DatabaseUtils.LoadCustomCategoriesData();
-
-            // Add Missing Custom Categories
-            var added = DatabaseUtils.CheckMissingCustomCategories(Items, CustomCategories);
-            if (added) DatabaseUtils.SaveCustomCategoriesData(CustomCategories);
 
             AddFontFile();
             InitializeComponent();
@@ -858,51 +854,48 @@ internal sealed partial class MainForm : Form
             }
         }
 
-        if (CustomCategories.Count != 0)
+        foreach (var customCategory in CustomCategories)
         {
-            foreach (var customCategory in CustomCategories)
+            try
             {
-                try
+                var items = Items.Where(item => item.CustomCategory == customCategory);
+                var itemCount = items.Count();
+
+                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, customCategory, itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), true, string.Empty, GetFilterListWidth);
+                button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
+                button.MouseClick += OnMouseClick;
+
+                void ButtonClick(object? sender, EventArgs? e)
                 {
-                    var items = Items.Where(item => item.CustomCategory == customCategory);
-                    var itemCount = items.Count();
-
-                    Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, customCategory, itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), true, string.Empty, GetFilterListWidth);
-                    button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
-                    button.MouseClick += OnMouseClick;
-
-                    void ButtonClick(object? sender, EventArgs? e)
+                    CurrentPath = new CurrentPath
                     {
-                        CurrentPath = new CurrentPath
-                        {
-                            CurrentSelectedCategory = ItemType.Custom,
-                            CurrentSelectedCustomCategory = customCategory
-                        };
-
-                        _leftWindow = LeftWindow.Category;
-
-                        SearchBox.Text = string.Empty;
-                        SearchResultLabel.Text = string.Empty;
-                        _isSearching = false;
-
-                        GenerateItems();
-                        PathTextBox.Text = GeneratePath();
-                    }
-
-                    button.Click += ButtonClick;
-                    button.Disposed += (_, _) =>
-                    {
-                        button.Click -= ButtonClick;
-                        button.ContextMenuStrip?.Dispose();
+                        CurrentSelectedCategory = ItemType.Custom,
+                        CurrentSelectedCustomCategory = customCategory
                     };
 
-                    FilterList.Controls.Add(button);
-                    index++;
+                    _leftWindow = LeftWindow.Category;
+
+                    SearchBox.Text = string.Empty;
+                    SearchResultLabel.Text = string.Empty;
+                    _isSearching = false;
+
+                    GenerateItems();
+                    PathTextBox.Text = GeneratePath();
                 }
-                catch (Exception ex)
+
+                button.Click += ButtonClick;
+                button.Disposed += (_, _) =>
                 {
-                    FormUtils.ShowMessageBox("Error Occured while rendering item button\n\nError: " + ex, "Button Error", true);
-                }
+                    button.Click -= ButtonClick;
+                    button.ContextMenuStrip?.Dispose();
+                };
+
+                FilterList.Controls.Add(button);
+                index++;
+            }
+            catch (Exception ex)
+            {
+                FormUtils.ShowMessageBox("Error Occured while rendering item button\n\nError: " + ex, "Button Error", true);
             }
         }
 
@@ -1051,56 +1044,53 @@ internal sealed partial class MainForm : Form
             }
         }
 
-        if (CustomCategories.Count != 0)
+        foreach (var customCategory in CustomCategories)
         {
-            foreach (var customCategory in CustomCategories)
+            try
             {
-                try
+                var itemCount = 0;
+                if (_leftWindow == LeftWindow.Author)
                 {
-                    var itemCount = 0;
-                    if (_leftWindow == LeftWindow.Author)
-                    {
-                        itemCount = Items.Count(item =>
-                            item.CustomCategory == customCategory &&
-                            item.AuthorName == CurrentPath.CurrentSelectedAuthor?.AuthorName
-                        );
-                    }
-                    else
-                    {
-                        itemCount = Items.Count(item =>
-                            item.CustomCategory == customCategory &&
-                            (ItemUtils.IsSupportedAvatarOrCommon(item, CommonAvatars, CurrentPath.CurrentSelectedAvatarPath).IsSupportedOrCommon || item.SupportedAvatar.Count == 0 || CurrentPath.CurrentSelectedAvatar == "*")
-                        );
-                    }
-
-                    if (itemCount == 0) continue;
-
-                    Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, customCategory, itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, string.Empty, GetExplorerListWidth);
-                    button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
-                    button.MouseClick += OnMouseClick;
-
-                    void ButtonClick(object? sender, EventArgs? e)
-                    {
-                        CurrentPath.CurrentSelectedCategory = ItemType.Custom;
-                        CurrentPath.CurrentSelectedCustomCategory = customCategory;
-                        GenerateItems();
-                        PathTextBox.Text = GeneratePath();
-                    }
-
-                    button.Click += ButtonClick;
-                    button.Disposed += (_, _) =>
-                    {
-                        button.Click -= ButtonClick;
-                        button.ContextMenuStrip?.Dispose();
-                    };
-
-                    ExplorerList.Controls.Add(button);
-                    index++;
+                    itemCount = Items.Count(item =>
+                        item.CustomCategory == customCategory &&
+                        item.AuthorName == CurrentPath.CurrentSelectedAuthor?.AuthorName
+                    );
                 }
-                catch (Exception ex)
+                else
                 {
-                    FormUtils.ShowMessageBox("Error Occured while rendering item button\n\nError: " + ex, "Button Error", true);
+                    itemCount = Items.Count(item =>
+                        item.CustomCategory == customCategory &&
+                        (ItemUtils.IsSupportedAvatarOrCommon(item, CommonAvatars, CurrentPath.CurrentSelectedAvatarPath).IsSupportedOrCommon || item.SupportedAvatar.Count == 0 || CurrentPath.CurrentSelectedAvatar == "*")
+                    );
                 }
+
+                if (itemCount == 0) continue;
+
+                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, customCategory, itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, string.Empty, GetExplorerListWidth);
+                button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
+                button.MouseClick += OnMouseClick;
+
+                void ButtonClick(object? sender, EventArgs? e)
+                {
+                    CurrentPath.CurrentSelectedCategory = ItemType.Custom;
+                    CurrentPath.CurrentSelectedCustomCategory = customCategory;
+                    GenerateItems();
+                    PathTextBox.Text = GeneratePath();
+                }
+
+                button.Click += ButtonClick;
+                button.Disposed += (_, _) =>
+                {
+                    button.Click -= ButtonClick;
+                    button.ContextMenuStrip?.Dispose();
+                };
+
+                ExplorerList.Controls.Add(button);
+                index++;
+            }
+            catch (Exception ex)
+            {
+                FormUtils.ShowMessageBox("Error Occured while rendering item button\n\nError: " + ex, "Button Error", true);
             }
         }
 
@@ -2723,7 +2713,6 @@ internal sealed partial class MainForm : Form
     /// メイン画面の全ての画面を読み込み直します。
     /// </summary>
     /// <param name="reloadLeft"></param>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
     private void RefleshWindow(bool reloadLeft = true)
     {
         if (_isSearching)
@@ -3113,21 +3102,6 @@ internal sealed partial class MainForm : Form
                     DatabaseUtils.SaveCommonAvatarData(CommonAvatars);
                 }
 
-                var customCategoryPath = backupPath + "/CustomCategory.txt";
-                if (!File.Exists(customCategoryPath))
-                {
-                    FormUtils.ShowMessageBox(
-                        LanguageUtils.Translate("カスタムカテゴリーファイルが見つかりませんでした。", CurrentLanguage),
-                        LanguageUtils.Translate("エラー", CurrentLanguage),
-                        true
-                    );
-                }
-                else
-                {
-                    CustomCategories = DatabaseUtils.LoadCustomCategoriesData(customCategoryPath);
-                    DatabaseUtils.SaveCustomCategoriesData(CustomCategories);
-                }
-
                 FormUtils.ShowMessageBox(
                     LanguageUtils.Translate("復元が完了しました。", CurrentLanguage),
                     LanguageUtils.Translate("完了", CurrentLanguage)
@@ -3188,21 +3162,6 @@ internal sealed partial class MainForm : Form
                 {
                     CommonAvatars = DatabaseUtils.LoadCommonAvatarData(filePath2);
                     DatabaseUtils.SaveCommonAvatarData(CommonAvatars);
-                }
-
-                var customCategoryPath = fbd.SelectedPath + "/CustomCategory.txt";
-                if (!File.Exists(customCategoryPath))
-                {
-                    FormUtils.ShowMessageBox(
-                        LanguageUtils.Translate("カスタムカテゴリーファイルが見つかりませんでした。", CurrentLanguage),
-                        LanguageUtils.Translate("エラー", CurrentLanguage),
-                        true
-                    );
-                }
-                else
-                {
-                    CustomCategories = DatabaseUtils.LoadCustomCategoriesData(customCategoryPath);
-                    DatabaseUtils.SaveCustomCategoriesData(CustomCategories);
                 }
 
                 var result2 = FormUtils.ShowConfirmDialog(
@@ -3307,10 +3266,6 @@ internal sealed partial class MainForm : Form
                 Visible = true;
             }
         }
-
-        // Add Missing Custom Categories
-        var added = DatabaseUtils.CheckMissingCustomCategories(Items, CustomCategories);
-        if (added) DatabaseUtils.SaveCustomCategoriesData(CustomCategories);
 
         // Check Broken Item Paths
         DatabaseUtils.CheckBrokenItemPaths(Items, CurrentLanguage);

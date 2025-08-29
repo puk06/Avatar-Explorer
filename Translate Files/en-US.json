@@ -111,7 +111,6 @@
   "以前のバージョンのDatasフォルダ、もしくは展開したバックアップフォルダを選択してください": "Please select the Datas folder from a previous version or the extracted backup folder.",
   "アイテムファイルが見つかりませんでした。": "Item file not found.",
   "共通素体ファイルが見つかりませんでした。": "Common avatar file not found.",
-  "カスタムカテゴリーファイルが見つかりませんでした。": "Custom category file not found.",
   "Thumbnailフォルダ、AuthorImageフォルダ、Itemsフォルダもコピーしますか？": "Copy Thumbnail, AuthorImage, and Items folders?",
   "コピーが完了しました。": "Copy completed.",
   "データの読み込みに失敗しました。詳細はErrorLog.txtをご覧ください。": "Failed to load data. Please see ErrorLog.txt for details.",
@@ -185,5 +184,7 @@
   "フォルダの追加が完了しました。": "Folder addition completed.",
   "アイテムフォルダの追加": "Add Item Folder",
   "フィルター: {0}": "Filter: {0}",
-  "非表示": "Hidden"
+  "非表示": "Hidden",
+  "新規カスタムカテゴリが作成されます": "A new custom category will be created",
+  "エラー: タイプが入力されていません": "Error: Type is missing"
 }

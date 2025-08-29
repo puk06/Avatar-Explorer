@@ -140,74 +140,6 @@ internal static class DatabaseUtils
     }
 
     /// <summary>
-    /// 指定されたパスからカスタムカテゴリーデータを取得します。
-    /// </summary>
-    /// <returns></returns>
-    internal static List<string> LoadCustomCategoriesData(string path = "./Datas/CustomCategory.txt", bool createNewFile = true)
-    {
-        try
-        {
-            if (!File.Exists(path))
-            {
-                if (createNewFile)
-                {
-                    File.WriteAllText(path, string.Empty, Encoding.UTF8);
-                }
-
-                return [];
-            }
-
-            var categories = File.ReadAllLines(path, Encoding.UTF8)
-                .Select(line => line.Trim())
-                .Where(line => !string.IsNullOrEmpty(line))
-                .Distinct()
-                .ToList();
-
-            return categories;
-        }
-        catch (Exception ex)
-        {
-            FormUtils.ShowMessageBox("カスタムカテゴリデータの読み込みに失敗しました。詳細はErrorLog.txtをご覧ください。", "エラー", true);
-            LogUtils.ErrorLogger("カスタムカテゴリデータの読み込みに失敗しました", ex);
-            return [];
-        }
-    }
-
-    /// <summary>
-    /// カスタムカテゴリーデータを保存します。
-    /// </summary>
-    /// <param name="customCategories"></param>
-    internal static void SaveCustomCategoriesData(List<string> customCategories)
-    {
-        try
-        {
-            Directory.CreateDirectory("./Datas");
-
-            File.WriteAllLines(
-                "./Datas/CustomCategory.txt",
-                customCategories.Distinct().Where(c => !string.IsNullOrWhiteSpace(c)),
-                Encoding.UTF8
-            );
-        }
-        catch (Exception ex)
-        {
-            FormUtils.ShowMessageBox("カスタムカテゴリデータの保存に失敗しました。詳細はErrorLog.txtをご覧ください。", "エラー", true);
-            LogUtils.ErrorLogger("カスタムカテゴリデータの保存に失敗しました", ex);
-        }
-    }
-
-    /// <summary>
-    /// カスタムカテゴリーデータの数を取得します。
-    /// </summary>
-    /// <param name="path"></param>
-    /// <returns></returns>
-    internal static int GetCustomCategoryCount(string path)
-    {
-        var customCategoryDatas = LoadCustomCategoriesData(path + "/CustomCategory.txt", false);
-        return customCategoryDatas.Count;
-    }
-
-    /// <summary>
     /// アイテムデータベースの数を取得します。
     /// </summary>
     /// <param name="path"></param>
@@ -227,6 +159,20 @@ internal static class DatabaseUtils
     {
         var commonAvatars = LoadCommonAvatarData(path + "/CommonAvatar.json");
         return commonAvatars.Count;
+    }
+
+    /// <summary>
+    /// アイテムデータベース内の全てのカスタムカテゴリを取得します。
+    /// </summary>
+    /// <param name="items"></param>
+    /// <returns></returns>
+    internal static List<string> GetCustomCategories(List<Item> items)
+    {
+        return items
+            .Where(item => item.Type == ItemType.Custom)
+            .Select(item => item.CustomCategory)
+            .Distinct()
+            .ToList();
     }
 
     /// <summary>
@@ -616,33 +562,5 @@ internal static class DatabaseUtils
                     .ToList();
             }
         }
-    }
-
-    /// <summary>
-    /// 不足しているカスタムカテゴリを検知して、自動で追加します。
-    /// </summary>
-    /// <param name="items"></param>
-    /// <param name="categories"></param>
-    /// <returns></returns>
-    internal static bool CheckMissingCustomCategories(List<Item> items, List<string> categories)
-    {
-        List<string> missingCategories = new();
-
-        foreach (var item in items)
-        {
-            if (item.Type != ItemType.Custom || string.IsNullOrEmpty(item.CustomCategory)) continue;
-            if (missingCategories.Contains(item.CustomCategory) || categories.Contains(item.CustomCategory)) continue;
-
-            missingCategories.Add(item.CustomCategory);
-        }
-
-        if (missingCategories.Count == 0) return false;
-
-        foreach (var item in missingCategories)
-        {
-            categories.Add(item);
-        }
-
-        return true;
     }
 }

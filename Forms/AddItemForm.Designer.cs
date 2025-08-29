@@ -50,10 +50,10 @@ namespace Avatar_Explorer.Forms
             CustomButton = new Button();
             openFolderButton = new Button();
             label9 = new Label();
-            openMaterialFolderButton = new Button();
+            OpenMaterialFolderButton = new Button();
             MaterialTextBox = new TextBox();
             label10 = new Label();
-            otherFolderCount = new Label();
+            OtherFolderCount = new Label();
             SuspendLayout();
             // 
             // label1
@@ -106,6 +106,7 @@ namespace Avatar_Explorer.Forms
             BoothURLTextBox.Name = "BoothURLTextBox";
             BoothURLTextBox.Size = new Size(415, 31);
             BoothURLTextBox.TabIndex = 4;
+            BoothURLTextBox.PlaceholderText = "https://booth.pm/ja/items/123456";
             BoothURLTextBox.KeyDown += BoothURLTextBox_KeyDown;
             BoothURLTextBox.KeyDown += AddItem_KeyDown;
             // 
@@ -131,14 +132,14 @@ namespace Avatar_Explorer.Forms
             // 
             // TypeComboBox
             // 
-            TypeComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            TypeComboBox.DropDownStyle = ComboBoxStyle.DropDown;
             TypeComboBox.FormattingEnabled = true;
             TypeComboBox.Items.AddRange(new object[] { "アバター", "衣装", "テクスチャ", "ギミック", "アクセサリー", "髪型", "アニメーション", "ツール", "シェーダー" });
             TypeComboBox.Location = new Point(128, 335);
             TypeComboBox.Name = "TypeComboBox";
             TypeComboBox.Size = new Size(186, 23);
             TypeComboBox.TabIndex = 8;
-            TypeComboBox.SelectedIndexChanged += TypeComboBox_SelectedIndexChanged;
+            TypeComboBox.TextChanged += TypeComboBox_TextChanged;
             // 
             // label5
             // 
@@ -168,7 +169,7 @@ namespace Avatar_Explorer.Forms
             AuthorTextBox.Name = "AuthorTextBox";
             AuthorTextBox.Size = new Size(407, 27);
             AuthorTextBox.TabIndex = 14;
-            AuthorTextBox.Text = "作者未取得";
+            AuthorTextBox.PlaceholderText = "作者未取得";
             AuthorTextBox.TextChanged += CheckText;
             AuthorTextBox.KeyDown += AddItem_KeyDown;
             // 
@@ -180,7 +181,7 @@ namespace Avatar_Explorer.Forms
             TitleTextBox.Name = "TitleTextBox";
             TitleTextBox.Size = new Size(407, 27);
             TitleTextBox.TabIndex = 13;
-            TitleTextBox.Text = "タイトル未取得";
+            TitleTextBox.PlaceholderText = "タイトル未取得";
             TitleTextBox.TextChanged += CheckText;
             TitleTextBox.KeyDown += AddItem_KeyDown;
             // 
@@ -254,7 +255,7 @@ namespace Avatar_Explorer.Forms
             openFolderButton.TabIndex = 19;
             openFolderButton.Text = "フォルダを選択";
             openFolderButton.UseVisualStyleBackColor = true;
-            openFolderButton.Click += openFolderButton_Click;
+            openFolderButton.Click += OpenFolderButton_Click;
             // 
             // label9
             // 
@@ -266,15 +267,15 @@ namespace Avatar_Explorer.Forms
             label9.TabIndex = 20;
             label9.Text = "Tip: フォルダを下の欄にドラッグアンドドロップすることでも入力できます！";
             // 
-            // openMaterialFolderButton
+            // OpenMaterialFolderButton
             // 
-            openMaterialFolderButton.Location = new Point(452, 119);
-            openMaterialFolderButton.Name = "openMaterialFolderButton";
-            openMaterialFolderButton.Size = new Size(85, 31);
-            openMaterialFolderButton.TabIndex = 23;
-            openMaterialFolderButton.Text = "フォルダを選択";
-            openMaterialFolderButton.UseVisualStyleBackColor = true;
-            openMaterialFolderButton.Click += openMaterialFolderButton_Click;
+            OpenMaterialFolderButton.Location = new Point(452, 119);
+            OpenMaterialFolderButton.Name = "openMaterialFolderButton";
+            OpenMaterialFolderButton.Size = new Size(85, 31);
+            OpenMaterialFolderButton.TabIndex = 23;
+            OpenMaterialFolderButton.Text = "フォルダを選択";
+            OpenMaterialFolderButton.UseVisualStyleBackColor = true;
+            OpenMaterialFolderButton.Click += OpenMaterialFolderButton_Click;
             // 
             // MaterialTextBox
             // 
@@ -299,22 +300,22 @@ namespace Avatar_Explorer.Forms
             label10.TabIndex = 21;
             label10.Text = "マテリアル";
             // 
-            // otherFolderCount
+            // OtherFolderCount
             // 
-            otherFolderCount.AutoSize = true;
-            otherFolderCount.Font = new Font(_mainForm.GuiFont, 12F);
-            otherFolderCount.Location = new Point(350, 85);
-            otherFolderCount.Name = "otherFolderCount";
-            otherFolderCount.Size = new Size(0, 23);
-            otherFolderCount.TabIndex = 24;
+            OtherFolderCount.AutoSize = true;
+            OtherFolderCount.Font = new Font(_mainForm.GuiFont, 12F);
+            OtherFolderCount.Location = new Point(350, 85);
+            OtherFolderCount.Name = "otherFolderCount";
+            OtherFolderCount.Size = new Size(0, 23);
+            OtherFolderCount.TabIndex = 24;
             // 
             // AddItem
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(550, 490);
-            Controls.Add(otherFolderCount);
-            Controls.Add(openMaterialFolderButton);
+            Controls.Add(OtherFolderCount);
+            Controls.Add(OpenMaterialFolderButton);
             Controls.Add(MaterialTextBox);
             Controls.Add(label10);
             Controls.Add(label9);
@@ -370,9 +371,9 @@ namespace Avatar_Explorer.Forms
         private Button CustomButton;
         private Button openFolderButton;
         private Label label9;
-        private Button openMaterialFolderButton;
+        private Button OpenMaterialFolderButton;
         private TextBox MaterialTextBox;
         private Label label10;
-        private Label otherFolderCount;
+        private Label OtherFolderCount;
     }
 }

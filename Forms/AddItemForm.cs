@@ -96,11 +96,11 @@ internal sealed partial class AddItemForm : Form
         if (ItemFolderPaths.Length > 0)
         {
             FolderTextBox.Text = ItemFolderPaths[0];
-            otherFolderCount.Text = "+" + " " + (ItemFolderPaths.Length - 1) + " " + LanguageUtils.Translate("個", _mainForm.CurrentLanguage);
+            OtherFolderCount.Text = "+" + " " + (ItemFolderPaths.Length - 1) + " " + LanguageUtils.Translate("個", _mainForm.CurrentLanguage);
         }
         else
         {
-            otherFolderCount.Text = "+" + " " + 0 + " " + LanguageUtils.Translate("個", _mainForm.CurrentLanguage);
+            OtherFolderCount.Text = "+" + " " + 0 + " " + LanguageUtils.Translate("個", _mainForm.CurrentLanguage);
         }
     }
 
@@ -199,6 +199,11 @@ internal sealed partial class AddItemForm : Form
             {
                 control.Text = LanguageUtils.Translate(control.Text, _mainForm.CurrentLanguage);
             }
+
+            if (control is TextBox textBox && !string.IsNullOrEmpty(textBox.PlaceholderText))
+            {
+                textBox.PlaceholderText = LanguageUtils.Translate(textBox.PlaceholderText, _mainForm.CurrentLanguage);
+            }
         }
 
         for (var i = 0; i < TypeComboBox.Items.Count; i++)
@@ -230,8 +235,27 @@ internal sealed partial class AddItemForm : Form
         }
         else
         {
-            TypeComboBox.SelectedIndex = (int)itemType == 10 ? 0 : (int)itemType;
+            TypeComboBox.SelectedIndex = itemType == ItemType.Unknown ? 0 : (int)itemType;
         }
+    }
+
+    private (ItemType, string, bool) GetTypeCombobox(string categoryText)
+    {
+        ItemType itemType;
+        var exists = true;
+
+        var typeIndex = TypeComboBox.Items.IndexOf(categoryText);
+        if (typeIndex > 9 || typeIndex == -1)
+        {
+            itemType = ItemType.Custom;
+            if (typeIndex == -1) exists = false;
+        }
+        else
+        {
+            itemType = (ItemType)typeIndex;
+        }
+
+        return (itemType, categoryText, exists);
     }
 
     /// <summary>
@@ -301,6 +325,18 @@ internal sealed partial class AddItemForm : Form
             return;
         }
 
+        if (string.IsNullOrEmpty(TypeComboBox.Text))
+        {
+            SetErrorState(LanguageUtils.Translate("エラー: タイプが入力されていません", _mainForm.CurrentLanguage));
+            return;
+        }
+
+        if (!GetTypeCombobox(TypeComboBox.Text).Item3)
+        {
+            SetInfomationState(LanguageUtils.Translate("新規カスタムカテゴリが作成されます", _mainForm.CurrentLanguage));
+            return;
+        }
+
         ClearErrorState();
     }
 
@@ -310,8 +346,20 @@ internal sealed partial class AddItemForm : Form
     /// <param name="errorMessage"></param>
     private void SetErrorState(string errorMessage)
     {
+        ErrorLabel.ForeColor = Color.Red;
         ErrorLabel.Text = errorMessage;
         AddButton.Enabled = false;
+    }
+
+    /// <summary>
+    /// 通常メッセージを設定します。
+    /// </summary>
+    /// <param name="message"></param>
+    private void SetInfomationState(string message)
+    {
+        ErrorLabel.ForeColor = Color.LightGreen;
+        ErrorLabel.Text = message;
+        AddButton.Enabled = true;
     }
 
     /// <summary>
@@ -325,7 +373,7 @@ internal sealed partial class AddItemForm : Form
     #endregion
 
     #region イベントハンドラ
-    private void openFolderButton_Click(object sender, EventArgs e)
+    private void OpenFolderButton_Click(object sender, EventArgs e)
     {
         var fbd = new FolderBrowserDialog
         {
@@ -339,7 +387,7 @@ internal sealed partial class AddItemForm : Form
         ItemFolderPaths = fbd.SelectedPaths;
     }
 
-    private void openMaterialFolderButton_Click(object sender, EventArgs e)
+    private void OpenMaterialFolderButton_Click(object sender, EventArgs e)
     {
         var fbd = new FolderBrowserDialog
         {
@@ -382,8 +430,11 @@ internal sealed partial class AddItemForm : Form
         }
     }
 
-    private void TypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        => SelectAvatar.Enabled = TypeComboBox.SelectedIndex != (int)ItemType.Avatar;
+    private void TypeComboBox_TextChanged(object sender, EventArgs e)
+    {
+        SelectAvatar.Enabled = GetTypeCombobox(TypeComboBox.Text).Item1 != ItemType.Avatar;
+        ValidCheck();
+    }
 
     private void SelectAvatar_Click(object sender, EventArgs e)
     {
@@ -498,8 +549,9 @@ internal sealed partial class AddItemForm : Form
         _item.Title = TitleTextBox.Text;
         _item.AuthorName = AuthorTextBox.Text;
 
-        _item.Type = TypeComboBox.SelectedIndex >= 9 ? ItemType.Custom : (ItemType)TypeComboBox.SelectedIndex;
-        if (_item.Type == ItemType.Custom) _item.CustomCategory = TypeComboBox.Text;
+        var typeInfo = GetTypeCombobox(TypeComboBox.Text);
+        _item.Type = typeInfo.Item1;
+        if (_item.Type == ItemType.Custom) _item.CustomCategory = typeInfo.Item2;
 
         var itemFolderArray = Array.Empty<string>();
         foreach (var itemFolderPath in ItemFolderPaths)
