@@ -3425,8 +3425,8 @@ internal sealed partial class MainForm : Form
 
                 var diffWidth = mainWindowPosition.X - leftWindowPosition.X;
 
-                ExplorerList.Location = ExplorerList.Location with { X = mainWindowPosition.X - diffWidth };
                 ExplorerList.Size = new Size(ExplorerList.Size.Width + diffWidth, ExplorerList.Size.Height);
+                ExplorerList.Location = ExplorerList.Location with { X = mainWindowPosition.X - diffWidth };
             }
         }
 
