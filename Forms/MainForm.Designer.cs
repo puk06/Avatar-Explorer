@@ -53,7 +53,7 @@ namespace Avatar_Explorer.Forms
             // 
             // UndoButton
             // 
-            UndoButton.Location = new Point(23, 15);
+            UndoButton.Location = new Point(23, 16);
             UndoButton.Name = "UndoButton";
             UndoButton.Size = new Size(97, 23);
             UndoButton.TabIndex = 0;
