@@ -292,6 +292,12 @@ internal sealed partial class MainForm : Form
 
             // Check Broken Item Paths
             DatabaseUtils.CheckBrokenItemPaths(Items, CurrentLanguage);
+
+            // Update Check
+            if (configurationManager["UpdateCheck"] == "true")
+            {
+                _ = UpdateUtils.CheckUpdate(CurrentVersion, CurrentLanguage);
+            }
         }
         catch (Exception ex)
         {

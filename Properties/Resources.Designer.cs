@@ -101,6 +101,15 @@ namespace Avatar_Explorer.Properties {
         }
         
         /// <summary>
+        ///   https://pukorufu.booth.pm/items/6372968 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string ItemURL {
+            get {
+                return ResourceManager.GetString("ItemURL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   型 System.Byte[] のローカライズされたリソースを検索します。
         /// </summary>
         internal static byte[] OpenIcon {
@@ -117,6 +126,15 @@ namespace Avatar_Explorer.Properties {
             get {
                 object obj = ResourceManager.GetObject("TrashIcon", resourceCulture);
                 return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   https://update.pukosrv.net/check/avatarexplorer に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string UpdateCheckURL {
+            get {
+                return ResourceManager.GetString("UpdateCheckURL", resourceCulture);
             }
         }
     }
