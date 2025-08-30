@@ -26,4 +26,25 @@ internal static class DarkModeUtils
             textBox.BorderStyle = BorderStyle.FixedSingle;
         }
     }
+
+    /// <summary>
+    /// 選択時のボタンの色です
+    /// </summary>
+    /// <param name="darkMode"></param>
+    /// <returns></returns>
+    internal static Color GetSelectedButtonColor(bool darkMode) => darkMode ? Color.Green : Color.LightGreen;
+    
+    /// <summary>
+    /// 未選択時のボタンの色です
+    /// </summary>
+    /// <param name="darkMode"></param>
+    /// <returns></returns>
+    internal static Color GetUnSelectedButtonColor(bool darkMode) => darkMode ? Color.IndianRed : Color.LightPink;
+    
+    /// <summary>
+    /// 通常のボタンの色です
+    /// </summary>
+    /// <param name="darkMode"></param>
+    /// <returns></returns>
+    internal static Color GetNormalButtonColor(bool darkMode) => darkMode ? Color.FromArgb(44, 44, 44) : Color.FromKnownColor(KnownColor.Control);
 }

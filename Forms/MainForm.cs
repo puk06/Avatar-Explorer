@@ -417,6 +417,8 @@ internal sealed partial class MainForm : Form
 
             void ButtonClick(object? sender, EventArgs? e)
             {
+                ActiveControl = null;
+
                 CurrentPath = new CurrentPath
                 {
                     CurrentSelectedAvatar = item.Title,
@@ -727,6 +729,8 @@ internal sealed partial class MainForm : Form
 
                 void ButtonClick(object? sender, EventArgs? e)
                 {
+                    ActiveControl = null;
+
                     CurrentPath = new CurrentPath
                     {
                         CurrentSelectedAuthor = author
@@ -824,6 +828,8 @@ internal sealed partial class MainForm : Form
 
                 void ButtonClick(object? sender, EventArgs? e)
                 {
+                    ActiveControl = null;
+
                     CurrentPath = new CurrentPath
                     {
                         CurrentSelectedCategory = itemType
@@ -867,6 +873,8 @@ internal sealed partial class MainForm : Form
 
                 void ButtonClick(object? sender, EventArgs? e)
                 {
+                    ActiveControl = null;
+
                     CurrentPath = new CurrentPath
                     {
                         CurrentSelectedCategory = ItemType.Custom,
@@ -1023,6 +1031,8 @@ internal sealed partial class MainForm : Form
 
                 void ButtonClick(object? sender, EventArgs? e)
                 {
+                    ActiveControl = null;
+
                     CurrentPath.CurrentSelectedCategory = itemType;
                     GenerateItems();
                     PathTextBox.Text = GeneratePath();
@@ -1072,6 +1082,8 @@ internal sealed partial class MainForm : Form
 
                 void ButtonClick(object? sender, EventArgs? e)
                 {
+                    ActiveControl = null;
+
                     CurrentPath.CurrentSelectedCategory = ItemType.Custom;
                     CurrentPath.CurrentSelectedCustomCategory = customCategory;
                     GenerateItems();
@@ -1180,12 +1192,14 @@ internal sealed partial class MainForm : Form
                     var currentAvatar = CurrentPath.CurrentSelectedAvatarPath;
                     if (!string.IsNullOrEmpty(currentAvatar))
                     {
-                        button.BackColor = item.ImplementedAvatars.Contains(currentAvatar) ? (DarkMode ? Color.Green : Color.LightGreen) : (DarkMode ? Color.IndianRed : Color.LightPink);
+                        button.BackColor = item.ImplementedAvatars.Contains(currentAvatar) ? DarkModeUtils.GetSelectedButtonColor(DarkMode) : DarkModeUtils.GetUnSelectedButtonColor(DarkMode);
                     }
                 }
 
                 void ButtonClick(object? sender, EventArgs? e)
                 {
+                    ActiveControl = null;
+
                     if (!Directory.Exists(item.ItemPath))
                     {
                         var result = FormUtils.ShowConfirmDialog(
@@ -1398,7 +1412,7 @@ internal sealed partial class MainForm : Form
                                 var currentAvatar = CurrentPath.CurrentSelectedAvatarPath;
                                 if (!string.IsNullOrEmpty(currentAvatar))
                                 {
-                                    button.BackColor = item.ImplementedAvatars.Contains(currentAvatar) ? (DarkMode ? Color.Green : Color.LightGreen) : (DarkMode ? Color.IndianRed : Color.LightPink);
+                                    button.BackColor = item.ImplementedAvatars.Contains(currentAvatar) ? DarkModeUtils.GetSelectedButtonColor(DarkMode) : DarkModeUtils.GetUnSelectedButtonColor(DarkMode);
                                 }
                             }
 
@@ -1528,6 +1542,8 @@ internal sealed partial class MainForm : Form
 
                 void ButtonClick(object? sender, EventArgs? e)
                 {
+                    ActiveControl = null;
+
                     CurrentPath.CurrentSelectedItemCategory = itemType;
                     GenerateItemFiles();
                     PathTextBox.Text = GeneratePath();
@@ -1586,6 +1602,8 @@ internal sealed partial class MainForm : Form
 
                 void ButtonClick(object? sender, EventArgs? e)
                 {
+                    ActiveControl = null;
+
                     try
                     {
                         if (file.FileExtension is ".unitypackage")
@@ -1942,6 +1960,8 @@ internal sealed partial class MainForm : Form
 
                 void ButtonClick(object? sender, EventArgs? e)
                 {
+                    ActiveControl = null;
+
                     if (!Directory.Exists(item.ItemPath))
                     {
                         bool result = FormUtils.ShowConfirmDialog(
@@ -2148,7 +2168,7 @@ internal sealed partial class MainForm : Form
                                 var currentAvatar = CurrentPath.CurrentSelectedAvatarPath;
                                 if (!string.IsNullOrEmpty(currentAvatar))
                                 {
-                                    button.BackColor = item.ImplementedAvatars.Contains(currentAvatar) ? (DarkMode ? Color.Green : Color.LightGreen) : (DarkMode ? Color.IndianRed : Color.LightPink);
+                                    button.BackColor = item.ImplementedAvatars.Contains(currentAvatar) ? DarkModeUtils.GetSelectedButtonColor(DarkMode) : DarkModeUtils.GetUnSelectedButtonColor(DarkMode);
                                 }
                             }
 
@@ -2264,6 +2284,8 @@ internal sealed partial class MainForm : Form
 
                 void ButtonClick(object? sender, EventArgs? e)
                 {
+                    ActiveControl = null;
+
                     FileSystemUtils.OpenItemFile(file, true, CurrentLanguage);
                 }
 

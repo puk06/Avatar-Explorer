@@ -87,7 +87,7 @@ internal sealed partial class SelectSupportedAvatarForm : Form
             if (item.ItemPath == _addItem.ItemPath) continue;
             Button button = CreateAvatarButton(_mainForm.DarkMode, _mainForm.ButtonSize, item, _mainForm.CurrentLanguage);
             button.Location = new Point(0, ((_mainForm.ButtonSize + 6) * index) + 2);
-            button.BackColor = _addItem.SupportedAvatar.Contains(item.ItemPath) ? (_mainForm.DarkMode ? Color.Green : Color.LightGreen) : (_mainForm.DarkMode ? Color.FromArgb(44, 44, 44) : Color.FromKnownColor(KnownColor.Control));
+            button.BackColor = _addItem.SupportedAvatar.Contains(item.ItemPath) ? DarkModeUtils.GetSelectedButtonColor(_mainForm.DarkMode) : DarkModeUtils.GetNormalButtonColor(_mainForm.DarkMode);
             AvatarList.Controls.Add(button);
             index++;
         }
@@ -106,7 +106,7 @@ internal sealed partial class SelectSupportedAvatarForm : Form
     /// <param name="item"></param>
     /// <param name="language"></param>
     /// <returns></returns>
-    private static CustomItemButton CreateAvatarButton(bool darkMode, int buttonHeight, Item item, string language)
+    private CustomItemButton CreateAvatarButton(bool darkMode, int buttonHeight, Item item, string language)
     {
         CustomItemButton button = new(992, buttonHeight, darkMode)
         {
@@ -119,9 +119,11 @@ internal sealed partial class SelectSupportedAvatarForm : Form
 
         button.Click += (_, _) =>
         {
-            button.BackColor = button.BackColor == Color.LightGreen || button.BackColor == Color.Green
-                ? (darkMode ? Color.FromArgb(44, 44, 44) : Color.FromKnownColor(KnownColor.Control))
-                : (darkMode ? Color.Green : Color.LightGreen);
+            ActiveControl = null;
+
+            button.BackColor = button.BackColor == DarkModeUtils.GetSelectedButtonColor(darkMode)
+                ? DarkModeUtils.GetNormalButtonColor(darkMode)
+                : DarkModeUtils.GetSelectedButtonColor(darkMode);
         };
 
         return button;
@@ -132,7 +134,7 @@ internal sealed partial class SelectSupportedAvatarForm : Form
     private void ConfirmButton_Click(object sender, EventArgs e)
     {
         _addItem.SupportedAvatar = AvatarList.Controls.OfType<Button>()
-            .Where(button => button.BackColor == Color.LightGreen || button.BackColor == Color.Green)
+            .Where(button => button.BackColor == DarkModeUtils.GetSelectedButtonColor(_mainForm.DarkMode))
             .Select(button => button.Tag?.ToString() ?? string.Empty)
             .Where(tag => !string.IsNullOrWhiteSpace(tag))
             .ToList();

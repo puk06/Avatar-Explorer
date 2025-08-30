@@ -100,9 +100,9 @@ internal sealed partial class ManageCommonAvatarsForm : Form
             var commonAvatar = GetCommonAvatar(CommonAvatarsCombobox.Text);
             button.BackColor = commonAvatar != null
                 ? commonAvatar.Avatars.Contains(item.ItemPath)
-                    ? Color.LightGreen
-                    : Color.FromKnownColor(KnownColor.Control)
-                : Color.FromKnownColor(KnownColor.Control);
+                    ? DarkModeUtils.GetSelectedButtonColor(_mainForm.DarkMode)
+                    : DarkModeUtils.GetNormalButtonColor(_mainForm.DarkMode)
+                : DarkModeUtils.GetNormalButtonColor(_mainForm.DarkMode);
 
             AvatarList.Controls.Add(button);
             index++;
@@ -121,7 +121,7 @@ internal sealed partial class ManageCommonAvatarsForm : Form
     /// <param name="item"></param>
     /// <param name="language"></param>
     /// <returns></returns>
-    private static CustomItemButton CreateAvatarButton(bool darkMode, int buttonHeight, Item item, string language)
+    private CustomItemButton CreateAvatarButton(bool darkMode, int buttonHeight, Item item, string language)
     {
         CustomItemButton button = new(875, buttonHeight, darkMode)
         {
@@ -133,9 +133,11 @@ internal sealed partial class ManageCommonAvatarsForm : Form
 
         button.Click += (_, _) =>
         {
-            button.BackColor = button.BackColor == Color.LightGreen || button.BackColor == Color.Green
-                ? (darkMode ? Color.FromArgb(44, 44, 44) : Color.FromKnownColor(KnownColor.Control))
-                : (darkMode ? Color.Green : Color.LightGreen);
+            ActiveControl = null;
+
+            button.BackColor = button.BackColor == DarkModeUtils.GetSelectedButtonColor(darkMode)
+                ? DarkModeUtils.GetNormalButtonColor(darkMode)
+                : DarkModeUtils.GetSelectedButtonColor(darkMode);
         };
 
         return button;
@@ -206,7 +208,7 @@ internal sealed partial class ManageCommonAvatarsForm : Form
             {
                 Name = name,
                 Avatars = AvatarList.Controls.OfType<Button>()
-                    .Where(button => button.BackColor == Color.LightGreen || button.BackColor == Color.Green)
+                    .Where(button => button.BackColor == DarkModeUtils.GetSelectedButtonColor(_mainForm.DarkMode))
                     .Select(button => button.Tag?.ToString() ?? string.Empty)
                     .Where(tag => !string.IsNullOrWhiteSpace(tag))
                     .ToList()
@@ -221,7 +223,7 @@ internal sealed partial class ManageCommonAvatarsForm : Form
         else
         {
             commonAvatar.Avatars = AvatarList.Controls.OfType<Button>()
-                .Where(button => button.BackColor == Color.LightGreen || button.BackColor == Color.Green)
+                .Where(button => button.BackColor == DarkModeUtils.GetSelectedButtonColor(_mainForm.DarkMode))
                 .Select(button => button.Tag?.ToString() ?? string.Empty)
                 .Where(tag => !string.IsNullOrWhiteSpace(tag))
                 .ToList();
@@ -260,9 +262,9 @@ internal sealed partial class ManageCommonAvatarsForm : Form
             DeleteSelectedGroupButton.Enabled = !string.IsNullOrWhiteSpace(CommonAvatarsCombobox.Text) && commonAvatar != null;
             button.BackColor = commonAvatar != null
                 ? commonAvatar.Avatars.Contains(button.Tag?.ToString() ?? string.Empty)
-                    ? (_mainForm.DarkMode ? Color.Green : Color.LightGreen)
-                    : (_mainForm.DarkMode ? Color.FromArgb(44, 44, 44) : Color.FromKnownColor(KnownColor.Control))
-                : (_mainForm.DarkMode ? Color.FromArgb(44, 44, 44) : Color.FromKnownColor(KnownColor.Control));
+                    ? DarkModeUtils.GetSelectedButtonColor(_mainForm.DarkMode)
+                    : DarkModeUtils.GetNormalButtonColor(_mainForm.DarkMode)
+                : DarkModeUtils.GetNormalButtonColor(_mainForm.DarkMode);
         }
     }
     #endregion

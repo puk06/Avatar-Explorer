@@ -52,6 +52,7 @@ internal class CustomItemButton : Button
 
         UseVisualStyleBackColor = true;
         Size = new Size(buttonWidth, buttonHeight);
+
         SizeChanged += (_, _) =>
         {
             if (_title == null || _authorName == null) return;
