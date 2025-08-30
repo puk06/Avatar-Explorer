@@ -45,6 +45,13 @@ internal class ConfigurationManager
         }
     }
 
+    internal ConfigurationManager() : this("settings.cfg")
+    {
+    }
+
+    internal ConfigurationManager(string path)
+        => Load(path);
+
     internal void Load(string path)
     {
         _data.Clear();

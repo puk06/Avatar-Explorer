@@ -26,8 +26,7 @@ internal static class Program
             SchemeUtils.CheckScheme();
 
             var launchInfo = args.Length > 0 ? AEUtils.GetLaunchInfo(args[0]) : new LaunchInfo();
-            ConfigurationManager configuration = new();
-            configuration.Load("settings.cfg");
+            ConfigurationManager configuration = new("settings.cfg");
 
             ApplicationConfiguration.Initialize();
 
