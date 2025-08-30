@@ -185,4 +185,68 @@ internal static class ItemUtils
 
         return description;
     }
+
+    /// <summary>
+    /// アイテムのフォルダに新しくフォルダを追加します。
+    /// </summary>
+    /// <param name="item"></param>
+    internal static async void AddFolderToItem(Item item, string currentLanguage)
+    {
+        var fbd = new FolderBrowserDialog
+        {
+            Description = LanguageUtils.Translate("アイテムフォルダを選択してください", currentLanguage),
+            UseDescriptionForTitle = true,
+            ShowNewFolderButton = true,
+            Multiselect = true
+        };
+
+        if (fbd.ShowDialog() != DialogResult.OK) return;
+        var itemFolderArray = fbd.SelectedPaths;
+
+        var result = FormUtils.ShowConfirmDialog(LanguageUtils.Translate("アイテム: {0}\n\n追加予定のフォルダ一覧:\n{1}\n\n選択したフォルダをアイテムに追加してもよろしいですか？", currentLanguage, item.Title, string.Join("\n", itemFolderArray.Select(log => $"・{Path.GetFileName(log)}"))), LanguageUtils.Translate("アイテムフォルダの追加", currentLanguage));
+        if (!result) return;
+
+        var parentFolder = item.ItemPath;
+
+        for (var i = 0; i < itemFolderArray.Length; i++)
+        {
+            var folderName = Path.GetFileName(itemFolderArray[i]);
+            var newPath = Path.Combine(parentFolder, "Others", folderName);
+
+            await FileSystemUtils.CopyDirectoryWithProgress(Path.GetFullPath(itemFolderArray[i]), newPath);
+        }
+
+        FormUtils.ShowMessageBox(LanguageUtils.Translate("フォルダの追加が完了しました。", currentLanguage), LanguageUtils.Translate("完了", currentLanguage));
+    }
+
+    /// <summary>
+    /// 対応アバター
+    /// </summary>
+    /// <param name="items"></param>
+    /// <param name="item"></param>
+    /// <param name="commonAvatars"></param>
+    /// <param name="currentLanguage"></param>
+    internal static void DeleteAvatarFromSupported(List<Item> items, Item item, List<CommonAvatar> commonAvatars, string currentLanguage)
+    {
+        var result = FormUtils.ShowConfirmDialog(
+            LanguageUtils.Translate("このアバターを対応アバターとしているアイテムの対応アバターからこのアバターを削除しますか？", currentLanguage),
+            LanguageUtils.Translate("確認", currentLanguage)
+        );
+
+        DatabaseUtils.DeleteAvatarFromItems(items, item.ItemPath, result);
+
+        if (commonAvatars.Any(commonAvatar => commonAvatar.Avatars.Contains(item.ItemPath)))
+        {
+            var result1 = FormUtils.ShowConfirmDialog(
+                LanguageUtils.Translate("このアバターを共通素体グループから削除しますか？", currentLanguage),
+                LanguageUtils.Translate("確認", currentLanguage)
+            );
+
+            if (result1)
+            {
+                DatabaseUtils.DeleteAvatarFromCommonAvatars(commonAvatars, item.ItemPath);
+                DatabaseUtils.SaveCommonAvatarData(commonAvatars);
+            }
+        }
+    }
 }

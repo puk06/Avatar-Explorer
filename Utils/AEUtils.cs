@@ -360,4 +360,66 @@ internal static partial class AEUtils
 
         return (string[]?)dragEventArgs.Data.GetData(DataFormats.FileDrop, false) ?? [];
     }
+
+    /// <summary>
+    /// サムネイルを変更します。
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="currentLanguage"></param>
+    /// <returns></returns>
+    internal static bool ChangeThumbnail(Item item, string currentLanguage)
+    {
+        var previousPath = item.ImagePath;
+        OpenFileDialog ofd = new()
+        {
+            Filter = LanguageUtils.Translate("画像ファイル|*.png;*.jpg", currentLanguage),
+            Title = LanguageUtils.Translate("サムネイル変更", currentLanguage),
+            Multiselect = false
+        };
+        if (ofd.ShowDialog() != DialogResult.OK) return false;
+
+        item.ImagePath = ofd.FileName;
+
+        FormUtils.ShowMessageBox(
+            LanguageUtils.Translate("サムネイルを変更しました！", currentLanguage) + "\n\n" +
+            LanguageUtils.Translate("変更前: ", currentLanguage) + "\n" + previousPath + "\n\n" +
+            LanguageUtils.Translate("変更後: ", currentLanguage) + "\n" + ofd.FileName,
+            LanguageUtils.Translate("完了", currentLanguage)
+        );
+
+        return true;
+    }
+
+    /// <summary>
+    /// サムネイルを変更します。
+    /// </summary>
+    /// <param name="items"></param>
+    /// <param name="author"></param>
+    /// <param name="currentLanguage"></param>
+    /// <returns></returns>
+    internal static bool ChangeThumbnail(List<Item> items, Author author, string currentLanguage)
+    {
+        var previousPath = author.AuthorImagePath;
+        OpenFileDialog ofd = new()
+        {
+            Filter = LanguageUtils.Translate("画像ファイル|*.png;*.jpg", currentLanguage),
+            Title = LanguageUtils.Translate("サムネイル変更", currentLanguage),
+            Multiselect = false
+        };
+        if (ofd.ShowDialog() != DialogResult.OK) return false;
+
+        foreach (var item in items.Where(item => item.AuthorImageFilePath == previousPath))
+        {
+            item.AuthorImageFilePath = ofd.FileName;
+        }
+
+        FormUtils.ShowMessageBox(
+            LanguageUtils.Translate("サムネイルを変更しました！", currentLanguage) + "\n\n" +
+            LanguageUtils.Translate("変更前: ", currentLanguage) + "\n" + previousPath + "\n\n" +
+            LanguageUtils.Translate("変更後: ", currentLanguage) + "\n" + ofd.FileName,
+            "完了"
+        );
+
+        return true;
+    }
 }

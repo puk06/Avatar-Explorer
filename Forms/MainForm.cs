@@ -473,7 +473,7 @@ internal sealed partial class MainForm : Form
                 SharedImages.GetImage(SharedImages.Images.EditIcon),
                 (_, _) =>
                 {
-                    if (!ChangeThumbnail(item)) return;
+                    if (!AEUtils.ChangeThumbnail(item, CurrentLanguage)) return;
 
                     DatabaseUtils.SaveItemsData(Items);
 
@@ -562,7 +562,7 @@ internal sealed partial class MainForm : Form
             createContextMenu.AddItem(
                 LanguageUtils.Translate("アイテムフォルダの追加", CurrentLanguage),
                 SharedImages.GetImage(SharedImages.Images.EditIcon),
-                (_, _) => AddFolderToItem(item),
+                (_, _) => ItemUtils.AddFolderToItem(item, CurrentLanguage),
                 Keys.A
             );
 
@@ -593,7 +593,7 @@ internal sealed partial class MainForm : Form
                     }
 
                     // アバターのときは対応アバター削除、共通素体グループから削除用の処理を実行する
-                    if (item.Type == ItemType.Avatar) DeleteAvatarFromSupported(item);
+                    if (item.Type == ItemType.Avatar) ItemUtils.DeleteAvatarFromSupported(Items, item, CommonAvatars, CurrentLanguage);
 
                     Items.RemoveAll(i => i.ItemPath == item.ItemPath);
 
@@ -760,7 +760,7 @@ internal sealed partial class MainForm : Form
                     SharedImages.GetImage(SharedImages.Images.EditIcon),
                     (_, _) =>
                     {
-                        if (!ChangeThumbnail(author)) return;
+                        if (!AEUtils.ChangeThumbnail(Items, author, CurrentLanguage)) return;
 
                         DatabaseUtils.SaveItemsData(Items);
 
@@ -1290,7 +1290,7 @@ internal sealed partial class MainForm : Form
                     SharedImages.GetImage(SharedImages.Images.EditIcon),
                     (_, _) =>
                     {
-                        if (!ChangeThumbnail(item)) return;
+                        if (!AEUtils.ChangeThumbnail(item, CurrentLanguage)) return;
 
                         DatabaseUtils.SaveItemsData(Items);
 
@@ -1374,7 +1374,7 @@ internal sealed partial class MainForm : Form
                 createContextMenu.AddItem(
                     LanguageUtils.Translate("アイテムフォルダの追加", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.EditIcon),
-                    (_, _) => AddFolderToItem(item),
+                    (_, _) => ItemUtils.AddFolderToItem(item, CurrentLanguage),
                     Keys.A
                 );
 
@@ -1442,7 +1442,7 @@ internal sealed partial class MainForm : Form
                         }
 
                         // アバターのときは対応アバター削除、共通素体グループから削除用の処理を実行する
-                        if (item.Type == ItemType.Avatar) DeleteAvatarFromSupported(item);
+                        if (item.Type == ItemType.Avatar) ItemUtils.DeleteAvatarFromSupported(Items, item, CommonAvatars, CurrentLanguage);
 
                         Items.RemoveAll(i => i.ItemPath == item.ItemPath);
 
@@ -1685,83 +1685,6 @@ internal sealed partial class MainForm : Form
         RedrawFilterName();
     }
 
-    private bool ChangeThumbnail(Item item)
-    {
-        var previousPath = item.ImagePath;
-        OpenFileDialog ofd = new()
-        {
-            Filter = LanguageUtils.Translate("画像ファイル|*.png;*.jpg", CurrentLanguage),
-            Title = LanguageUtils.Translate("サムネイル変更", CurrentLanguage),
-            Multiselect = false
-        };
-        if (ofd.ShowDialog() != DialogResult.OK) return false;
-
-        item.ImagePath = ofd.FileName;
-
-        FormUtils.ShowMessageBox(
-            LanguageUtils.Translate("サムネイルを変更しました！", CurrentLanguage) + "\n\n" +
-            LanguageUtils.Translate("変更前: ", CurrentLanguage) + "\n" + previousPath + "\n\n" +
-            LanguageUtils.Translate("変更後: ", CurrentLanguage) + "\n" + ofd.FileName,
-            LanguageUtils.Translate("完了", CurrentLanguage)
-        );
-
-        return true;
-    }
-    private bool ChangeThumbnail(Author author)
-    {
-        var previousPath = author.AuthorImagePath;
-        OpenFileDialog ofd = new()
-        {
-            Filter = LanguageUtils.Translate("画像ファイル|*.png;*.jpg", CurrentLanguage),
-            Title = LanguageUtils.Translate("サムネイル変更", CurrentLanguage),
-            Multiselect = false
-        };
-        if (ofd.ShowDialog() != DialogResult.OK) return false;
-
-        foreach (var item in Items.Where(item => item.AuthorImageFilePath == previousPath))
-        {
-            item.AuthorImageFilePath = ofd.FileName;
-        }
-
-        FormUtils.ShowMessageBox(
-            LanguageUtils.Translate("サムネイルを変更しました！", CurrentLanguage) + "\n\n" +
-            LanguageUtils.Translate("変更前: ", CurrentLanguage) + "\n" + previousPath + "\n\n" +
-            LanguageUtils.Translate("変更後: ", CurrentLanguage) + "\n" + ofd.FileName,
-            "完了"
-        );
-
-        return true;
-    }
-
-    private async void AddFolderToItem(Item item)
-    {
-        var fbd = new FolderBrowserDialog
-        {
-            Description = LanguageUtils.Translate("アイテムフォルダを選択してください", CurrentLanguage),
-            UseDescriptionForTitle = true,
-            ShowNewFolderButton = true,
-            Multiselect = true
-        };
-
-        if (fbd.ShowDialog() != DialogResult.OK) return;
-        var itemFolderArray = fbd.SelectedPaths;
-
-        var result = FormUtils.ShowConfirmDialog(LanguageUtils.Translate("アイテム: {0}\n\n追加予定のフォルダ一覧:\n{1}\n\n選択したフォルダをアイテムに追加してもよろしいですか？", CurrentLanguage, item.Title, string.Join("\n", itemFolderArray.Select(log => $"・{Path.GetFileName(log)}"))), LanguageUtils.Translate("アイテムフォルダの追加", CurrentLanguage));
-        if (!result) return;
-
-        var parentFolder = item.ItemPath;
-
-        for (var i = 0; i < itemFolderArray.Length; i++)
-        {
-            var folderName = Path.GetFileName(itemFolderArray[i]);
-            var newPath = Path.Combine(parentFolder, "Others", folderName);
-
-            await FileSystemUtils.CopyDirectoryWithProgress(Path.GetFullPath(itemFolderArray[i]), newPath);
-        }
-
-        FormUtils.ShowMessageBox(LanguageUtils.Translate("フォルダの追加が完了しました。", CurrentLanguage), LanguageUtils.Translate("完了", CurrentLanguage));
-    }
-
     private async Task<bool> ReacquisitionThumbnailImage(Item item)
     {
         if (item.BoothId != -1)
@@ -1856,30 +1779,6 @@ internal sealed partial class MainForm : Form
     {
         SearchBox.Text = $"Author=\"{item.AuthorName}\"";
         SearchItems();
-    }
-
-    private void DeleteAvatarFromSupported(Item item)
-    {
-        var result = FormUtils.ShowConfirmDialog(
-            LanguageUtils.Translate("このアバターを対応アバターとしているアイテムの対応アバターからこのアバターを削除しますか？", CurrentLanguage),
-            LanguageUtils.Translate("確認", CurrentLanguage)
-        );
-
-        DatabaseUtils.DeleteAvatarFromItems(Items, item.ItemPath, result);
-
-        if (CommonAvatars.Any(commonAvatar => commonAvatar.Avatars.Contains(item.ItemPath)))
-        {
-            var result1 = FormUtils.ShowConfirmDialog(
-                LanguageUtils.Translate("このアバターを共通素体グループから削除しますか？", CurrentLanguage),
-                LanguageUtils.Translate("確認", CurrentLanguage)
-            );
-
-            if (result1)
-            {
-                DatabaseUtils.DeleteAvatarFromCommonAvatars(CommonAvatars, item.ItemPath);
-                DatabaseUtils.SaveCommonAvatarData(CommonAvatars);
-            }
-        }
     }
     #endregion
 
@@ -2054,7 +1953,7 @@ internal sealed partial class MainForm : Form
                     SharedImages.GetImage(SharedImages.Images.EditIcon),
                     (_, _) =>
                     {
-                        if (!ChangeThumbnail(item)) return;
+                        if (!AEUtils.ChangeThumbnail(item, CurrentLanguage)) return;
 
                         DatabaseUtils.SaveItemsData(Items);
 
@@ -2130,7 +2029,7 @@ internal sealed partial class MainForm : Form
                 createContextMenu.AddItem(
                     LanguageUtils.Translate("アイテムフォルダの追加", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.EditIcon),
-                    (_, _) => AddFolderToItem(item),
+                    (_, _) => ItemUtils.AddFolderToItem(item, CurrentLanguage),
                     Keys.A
                 );
 
@@ -2190,7 +2089,7 @@ internal sealed partial class MainForm : Form
                         if (!result) return;
 
                         // アバターのときは対応アバター削除、共通素体グループから削除用の処理を実行する
-                        if (item.Type == ItemType.Avatar) DeleteAvatarFromSupported(item);
+                        if (item.Type == ItemType.Avatar) ItemUtils.DeleteAvatarFromSupported(Items, item, CommonAvatars, CurrentLanguage);
 
                         Items.RemoveAll(i => i.ItemPath == item.ItemPath);
 
