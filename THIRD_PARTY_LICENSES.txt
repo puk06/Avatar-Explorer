@@ -125,7 +125,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 	THE SOFTWARE.
 ------------------------------------------------------------
-- ZstdSharp
+- ZstdSharp (Used by SharpCompress)
   https://github.com/oleg-st/ZstdSharp 
 
 	The MIT License (MIT)
@@ -151,6 +151,9 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 	SOFTWARE.
 
 ------------------------------------------------------------
-	This software includes System.Buffers,
-	which is licensed under the MIT License.
+- System.Buffers (Used by SharpCompress)
+  https://www.nuget.org/packages/System.Buffers
+
+	The MIT License (MIT)
+
 	Copyright (c) .NET Foundation and Contributors
