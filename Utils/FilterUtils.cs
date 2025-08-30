@@ -1,4 +1,4 @@
-﻿using Avatar_Explorer.Models;
+using Avatar_Explorer.Models;
 
 namespace Avatar_Explorer.Utils;
 

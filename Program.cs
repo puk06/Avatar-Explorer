@@ -18,7 +18,7 @@ internal static class Program
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
 
-            // ‘Š‘ÎƒpƒX‚ğæ“¾‚µAƒJƒŒƒ“ƒgƒfƒBƒŒƒNƒgƒŠ‚ğİ’è
+            // ç›¸å¯¾ãƒ‘ã‚¹ã‚’å–å¾—ã—ã€ã‚«ãƒ¬ãƒ³ãƒˆãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’è¨­å®š
             var currentDirectory = Path.GetDirectoryName(Process.GetCurrentProcess()?.MainModule?.FileName);
             if (currentDirectory != null) Directory.SetCurrentDirectory(currentDirectory);
 
@@ -31,19 +31,19 @@ internal static class Program
 
             ApplicationConfiguration.Initialize();
 
-#pragma warning disable WFO5001 // í—Ş‚ÍA•]‰¿‚Ì–Ú“I‚Å‚Ì‚İ’ñ‹Ÿ‚³‚ê‚Ä‚¢‚Ü‚·B«—ˆ‚ÌXV‚Å•ÏX‚Ü‚½‚Ííœ‚³‚ê‚é‚±‚Æ‚ª‚ ‚è‚Ü‚·B‘±s‚·‚é‚É‚ÍA‚±‚Ìf’f‚ğ”ñ•\¦‚É‚µ‚Ü‚·B
+#pragma warning disable WFO5001 // ç¨®é¡ã¯ã€è©•ä¾¡ã®ç›®çš„ã§ã®ã¿æä¾›ã•ã‚Œã¦ã„ã¾ã™ã€‚å°†æ¥ã®æ›´æ–°ã§å¤‰æ›´ã¾ãŸã¯å‰Šé™¤ã•ã‚Œã‚‹ã“ã¨ãŒã‚ã‚Šã¾ã™ã€‚ç¶šè¡Œã™ã‚‹ã«ã¯ã€ã“ã®è¨ºæ–­ã‚’éè¡¨ç¤ºã«ã—ã¾ã™ã€‚
 
             if (configuration["DarkMode"] == "true") Application.SetColorMode(SystemColorMode.Dark);
 
-#pragma warning restore WFO5001 // í—Ş‚ÍA•]‰¿‚Ì–Ú“I‚Å‚Ì‚İ’ñ‹Ÿ‚³‚ê‚Ä‚¢‚Ü‚·B«—ˆ‚ÌXV‚Å•ÏX‚Ü‚½‚Ííœ‚³‚ê‚é‚±‚Æ‚ª‚ ‚è‚Ü‚·B‘±s‚·‚é‚É‚ÍA‚±‚Ìf’f‚ğ”ñ•\¦‚É‚µ‚Ü‚·B
+#pragma warning restore WFO5001 // ç¨®é¡ã¯ã€è©•ä¾¡ã®ç›®çš„ã§ã®ã¿æä¾›ã•ã‚Œã¦ã„ã¾ã™ã€‚å°†æ¥ã®æ›´æ–°ã§å¤‰æ›´ã¾ãŸã¯å‰Šé™¤ã•ã‚Œã‚‹ã“ã¨ãŒã‚ã‚Šã¾ã™ã€‚ç¶šè¡Œã™ã‚‹ã«ã¯ã€ã“ã®è¨ºæ–­ã‚’éè¡¨ç¤ºã«ã—ã¾ã™ã€‚
 
             Application.Run(new MainForm(launchInfo, configuration));
         }
         catch (Exception ex)
         {
             FormUtils.ShowMessageBox(
-                "ƒ\ƒtƒg‚Ì‹N“®’†‚ÉƒGƒ‰[‚ª”­¶‚µ‚Ü‚µ‚½B\n\n" + ex,
-                "ƒGƒ‰[",
+                "ã‚½ãƒ•ãƒˆã®èµ·å‹•ä¸­ã«ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸã€‚\n\n" + ex,
+                "ã‚¨ãƒ©ãƒ¼",
                 true
             );
         }

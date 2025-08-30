@@ -1,4 +1,4 @@
-﻿namespace Avatar_Explorer.Models;
+namespace Avatar_Explorer.Models;
 
 /// <summary>
 /// アイテムのフォルダ情報を表します。

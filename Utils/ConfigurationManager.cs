@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace Avatar_Explorer.Utils;
 
@@ -64,13 +64,10 @@ internal class ConfigurationManager
         }
 
         bool updated = false;
-        foreach (var pair in _defaultKeys)
+        foreach (var pair in _defaultKeys.Where(pair => !_data.ContainsKey(pair.Key)))
         {
-            if (!_data.ContainsKey(pair.Key))
-            {
-                _data[pair.Key] = pair.Value;
-                updated = true;
-            }
+            _data[pair.Key] = pair.Value;
+            updated = true;
         }
 
         if (!File.Exists(path) || updated)

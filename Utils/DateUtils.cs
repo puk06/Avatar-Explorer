@@ -1,6 +1,8 @@
-﻿namespace Avatar_Explorer.Utils;
+using System.Text;
 
-internal class DateUtils
+namespace Avatar_Explorer.Utils;
+
+internal static class DateUtils
 {
     /// <summary>
     /// UnixTimeから日付文字列を取得します。
@@ -13,9 +15,7 @@ internal class DateUtils
 
         if (long.TryParse(unixTime, out var unixTimeLong))
         {
-            var dateTime = DateTimeOffset.FromUnixTimeMilliseconds(unixTimeLong)
-                                             .ToLocalTime()
-                                             .DateTime;
+            var dateTime = DateTimeOffset.FromUnixTimeMilliseconds(unixTimeLong).ToLocalTime().DateTime;
             return dateTime.ToString("yyyy/MM/dd HH:mm:ss");
         }
 
@@ -35,11 +35,12 @@ internal class DateUtils
         {
             if (date.All(char.IsDigit)) return DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(date)).UtcDateTime;
 
-            var allDigits = string.Empty;
-            foreach (var c in date)
+            var sb = new StringBuilder();
+            foreach (var c in date.Where(char.IsDigit))
             {
-                if (char.IsDigit(c)) allDigits += c;
+                sb.Append(c);
             }
+            var allDigits = sb.ToString();
 
             if (allDigits.Length != 14) return DateTime.Now;
 
@@ -50,8 +51,7 @@ internal class DateUtils
             var minute = allDigits.Substring(10, 2);
             var second = allDigits.Substring(12, 2);
 
-            var dateTime = new DateTime(int.Parse(year), int.Parse(month), int.Parse(day), int.Parse(hour), int.Parse(minute),
-                int.Parse(second));
+            var dateTime = new DateTime(int.Parse(year), int.Parse(month), int.Parse(day), int.Parse(hour), int.Parse(minute), int.Parse(second), DateTimeKind.Local);
 
             var utcDateTime = TimeZoneInfo.ConvertTimeToUtc(dateTime, TimeZoneInfo.Local);
 

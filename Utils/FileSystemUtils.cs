@@ -1,4 +1,4 @@
-﻿using Avatar_Explorer.Forms;
+using Avatar_Explorer.Forms;
 using Avatar_Explorer.Models;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Tar;
@@ -170,6 +170,7 @@ internal static class FileSystemUtils
             }, cts.Token);
 
             UpdateProgress(100, LanguageUtils.Translate("完了", currentLanguage));
+            cts.Dispose();
         }
         finally
         {

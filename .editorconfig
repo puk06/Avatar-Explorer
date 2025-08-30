@@ -1,7 +1,9 @@
-﻿[*.{cs,vb}]
+[*.{cs,vb}]
 
 # IDE0301: コレクションの初期化を簡略化します
 dotnet_style_prefer_collection_expression = never
 
- # WFO1000: プロパティ コンテンツのコード シリアル化構成がありません
- dotnet_diagnostic.WFO1000.severity = none
+# WFO1000: プロパティ コンテンツのコード シリアル化構成がありません
+dotnet_diagnostic.WFO1000.severity = none
+
+charset = utf-8

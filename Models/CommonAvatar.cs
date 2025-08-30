@@ -1,4 +1,4 @@
-﻿namespace Avatar_Explorer.Models;
+namespace Avatar_Explorer.Models;
 
 /// <summary>
 /// 共通素体グループを表します。

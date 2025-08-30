@@ -1,4 +1,4 @@
-﻿using Avatar_Explorer.Forms;
+using Avatar_Explorer.Forms;
 using Avatar_Explorer.Models;
 using System.Diagnostics;
 using System.Formats.Tar;

@@ -1,4 +1,4 @@
-﻿namespace Avatar_Explorer.Models.Booth;
+namespace Avatar_Explorer.Models.Booth;
 
 public class ImageInfo
 {

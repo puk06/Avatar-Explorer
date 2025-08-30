@@ -1,4 +1,4 @@
-﻿namespace Avatar_Explorer.Models;
+namespace Avatar_Explorer.Models;
 
 /// <summary>
 /// 現在開いている左のウィンドウの種類を表します。

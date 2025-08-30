@@ -21,17 +21,16 @@ internal static class ItemUtils
         var commonAvatarBool = item.SupportedAvatar.Any(supportedAvatar => commonAvatarsArray.Any(x => x.Avatars.Contains(supportedAvatar)));
 
         if (!commonAvatarBool) return new SupportedOrCommonAvatar();
-        {
-            var commonAvatar = item.SupportedAvatar
-                .Select(supportedAvatar => commonAvatarsArray.FirstOrDefault(x => x.Avatars.Contains(supportedAvatar)))
-                .FirstOrDefault(x => x != null);
 
-            return new SupportedOrCommonAvatar
-            {
-                IsCommon = true,
-                CommonAvatarName = commonAvatar?.Name ?? string.Empty
-            };
-        }
+        var commonAvatar = item.SupportedAvatar
+            .Select(supportedAvatar => commonAvatarsArray.FirstOrDefault(x => x.Avatars.Contains(supportedAvatar)))
+            .FirstOrDefault(x => x != null);
+
+        return new SupportedOrCommonAvatar
+        {
+            IsCommon = true,
+            CommonAvatarName = commonAvatar?.Name ?? string.Empty
+        };
     }
 
     /// <summary>
@@ -190,7 +189,7 @@ internal static class ItemUtils
     /// アイテムのフォルダに新しくフォルダを追加します。
     /// </summary>
     /// <param name="item"></param>
-    internal static async void AddFolderToItem(Item item, string currentLanguage)
+    internal static async Task AddFolderToItem(Item item, string currentLanguage)
     {
         var fbd = new FolderBrowserDialog
         {

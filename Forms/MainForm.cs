@@ -10,113 +10,113 @@ namespace Avatar_Explorer.Forms;
 
 internal sealed partial class MainForm : Form
 {
-    #region ƒtƒH[ƒ€‚ÌƒeƒLƒXƒgŠÖ˜A‚Ì•Ï”
+    #region ãƒ•ã‚©ãƒ¼ãƒ ã®ãƒ†ã‚­ã‚¹ãƒˆé–¢é€£ã®å¤‰æ•°
     /// <summary>
-    /// ƒ\ƒtƒg‚ÌŒ»İ‚Ìƒo[ƒWƒ‡ƒ“
+    /// ã‚½ãƒ•ãƒˆã®ç¾åœ¨ã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³
     /// </summary>
     private const string CurrentVersion = "v1.1.5";
 
     /// <summary>
-    /// ƒfƒtƒHƒ‹ƒg‚ÌƒtƒH[ƒ€ƒeƒLƒXƒg
+    /// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ãƒ•ã‚©ãƒ¼ãƒ ãƒ†ã‚­ã‚¹ãƒˆ
     /// </summary>
-    private const string CurrentVersionFormText = $"VRChat Avatar Explorer {CurrentVersion} by ‚Õ‚±‚é‚Ó";
+    private const string CurrentVersionFormText = $"VRChat Avatar Explorer {CurrentVersion} by ã·ã“ã‚‹ãµ";
     #endregion
 
-    #region ƒ\ƒtƒg‚Ìƒf[ƒ^ƒx[ƒXŠÖ˜A‚Ì•Ï”
+    #region ã‚½ãƒ•ãƒˆã®ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹é–¢é€£ã®å¤‰æ•°
     /// <summary>
-    /// ƒAƒCƒeƒ€ƒf[ƒ^ƒx[ƒX
+    /// ã‚¢ã‚¤ãƒ†ãƒ ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹
     /// </summary>
     internal List<Item> Items;
 
     /// <summary>
-    /// ‹¤’Ê‘f‘Ìƒf[ƒ^ƒx[ƒX
+    /// å…±é€šç´ ä½“ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹
     /// </summary>
     internal List<CommonAvatar> CommonAvatars;
 
     /// <summary>
-    /// ƒJƒXƒ^ƒ€ƒJƒeƒSƒŠƒf[ƒ^ƒx[ƒX
+    /// ã‚«ã‚¹ã‚¿ãƒ ã‚«ãƒ†ã‚´ãƒªãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹
     /// </summary>
     internal List<string> CustomCategories
         => DatabaseUtils.GetCustomCategories(Items);
     #endregion
 
-    #region ƒtƒHƒ“ƒgŠÖ˜A‚Ì•Ï”
+    #region ãƒ•ã‚©ãƒ³ãƒˆé–¢é€£ã®å¤‰æ•°
     /// <summary>
-    /// ƒtƒHƒ“ƒgƒRƒŒƒNƒVƒ‡ƒ“
+    /// ãƒ•ã‚©ãƒ³ãƒˆã‚³ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³
     /// </summary>
     private readonly PrivateFontCollection _fontCollection = new();
 
     /// <summary>
-    /// ƒtƒHƒ“ƒgƒtƒ@ƒ~ƒŠ[
+    /// ãƒ•ã‚©ãƒ³ãƒˆãƒ•ã‚¡ãƒŸãƒªãƒ¼
     /// </summary>
     private readonly Dictionary<string, FontFamily> _fontFamilies = new();
 
     /// <summary>
-    /// ƒtƒH[ƒ€‚ÌGUIƒtƒHƒ“ƒg
+    /// ãƒ•ã‚©ãƒ¼ãƒ ã®GUIãƒ•ã‚©ãƒ³ãƒˆ
     /// </summary>
     internal FontFamily? GuiFont;
     #endregion
 
-    #region Œ»İ‚ÌƒEƒBƒ“ƒhƒE‚Ìí—Ş‚ÉŠÖ‚·‚é•Ï”
+    #region ç¾åœ¨ã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ç¨®é¡ã«é–¢ã™ã‚‹å¤‰æ•°
     /// <summary>
-    /// Œ»İŠJ‚©‚ê‚Ä‚¢‚é¶ƒEƒBƒ“ƒhƒE‚Ìƒ^ƒCƒv‚ğæ“¾‚Ü‚½‚Íİ’è‚µ‚Ü‚·B‚±‚ê‚ÍƒpƒX‚È‚Ç‚Ég‚í‚ê‚Ü‚·BƒtƒBƒ‹ƒ^[—p‚Å‚Í‚ ‚è‚Ü‚¹‚ñB
+    /// ç¾åœ¨é–‹ã‹ã‚Œã¦ã„ã‚‹å·¦ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚¿ã‚¤ãƒ—ã‚’å–å¾—ã¾ãŸã¯è¨­å®šã—ã¾ã™ã€‚ã“ã‚Œã¯ãƒ‘ã‚¹ãªã©ã«ä½¿ã‚ã‚Œã¾ã™ã€‚ãƒ•ã‚£ãƒ«ã‚¿ãƒ¼ç”¨ã§ã¯ã‚ã‚Šã¾ã›ã‚“ã€‚
     /// </summary>
     private LeftWindow _leftWindow = LeftWindow.Default;
 
     /// <summary>
-    /// Œ»İŠJ‚©‚ê‚Ä‚¢‚é¶ƒEƒBƒ“ƒhƒE‚Ìƒ^ƒCƒv‚ğæ“¾‚Ü‚½‚Íİ’è‚µ‚Ü‚·B‚±‚ê‚ÍŒ»İ‚ÌƒtƒBƒ‹ƒ^[‚ğæ“¾‚·‚é‚Ì‚Ég—p‚³‚ê‚Ü‚·B
+    /// ç¾åœ¨é–‹ã‹ã‚Œã¦ã„ã‚‹å·¦ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚¿ã‚¤ãƒ—ã‚’å–å¾—ã¾ãŸã¯è¨­å®šã—ã¾ã™ã€‚ã“ã‚Œã¯ç¾åœ¨ã®ãƒ•ã‚£ãƒ«ã‚¿ãƒ¼ã‚’å–å¾—ã™ã‚‹ã®ã«ä½¿ç”¨ã•ã‚Œã¾ã™ã€‚
     /// </summary>
     private LeftWindow _leftWindowFilter = LeftWindow.Default;
 
     /// <summary>
-    /// Œ»İŠJ‚¢‚Ä‚¢‚éƒƒCƒ“‰æ–ÊƒEƒBƒ“ƒhƒEƒ^ƒCƒv
+    /// ç¾åœ¨é–‹ã„ã¦ã„ã‚‹ãƒ¡ã‚¤ãƒ³ç”»é¢ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¿ã‚¤ãƒ—
     /// </summary>
     private Window _openingWindow = Window.Nothing;
 
     /// <summary>
-    /// ¶‚ÌƒEƒBƒ“ƒhƒE(ƒAƒoƒ^[)‚Å‚Ìƒy[ƒW”‚Å‚·B
+    /// å·¦ã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦(ã‚¢ãƒã‚¿ãƒ¼)ã§ã®ãƒšãƒ¼ã‚¸æ•°ã§ã™ã€‚
     /// </summary>
     private int _currentPageAvatar = 0;
 
     /// <summary>
-    /// ¶‚ÌƒEƒBƒ“ƒhƒE(ƒAƒoƒ^[)‚Å‚Ìƒy[ƒW”‚Å‚·B
+    /// å·¦ã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦(ã‚¢ãƒã‚¿ãƒ¼)ã§ã®ãƒšãƒ¼ã‚¸æ•°ã§ã™ã€‚
     /// </summary>
     private int _currentPageAuthor = 0;
 
     /// <summary>
-    /// ‰E‚ÌƒEƒBƒ“ƒhƒE‚Å‚Ìƒy[ƒW”‚Å‚·B
+    /// å³ã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã§ã®ãƒšãƒ¼ã‚¸æ•°ã§ã™ã€‚
     /// </summary>
     private int _currentPage = 0;
     #endregion
 
-    #region ƒtƒH[ƒ€ƒŠƒTƒCƒYŠÖ˜A‚Ì•Ï”
+    #region ãƒ•ã‚©ãƒ¼ãƒ ãƒªã‚µã‚¤ã‚ºé–¢é€£ã®å¤‰æ•°
     /// <summary>
-    /// ƒtƒH[ƒ€ƒŠƒTƒCƒY‚Ég—p‚³‚ê‚éƒRƒ“ƒgƒ[ƒ‹–¼‚ÌƒfƒBƒNƒVƒ‡ƒiƒŠ[
+    /// ãƒ•ã‚©ãƒ¼ãƒ ãƒªã‚µã‚¤ã‚ºæ™‚ã«ä½¿ç”¨ã•ã‚Œã‚‹ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«åã®ãƒ‡ã‚£ã‚¯ã‚·ãƒ§ãƒŠãƒªãƒ¼
     /// </summary>
     private readonly Dictionary<string, string> _controlNames = new();
 
     /// <summary>
-    /// ƒtƒH[ƒ€ƒŠƒTƒCƒY‚Ég—p‚³‚ê‚éƒRƒ“ƒgƒ[ƒ‹‚ÌƒfƒtƒHƒ‹ƒgƒTƒCƒY
+    /// ãƒ•ã‚©ãƒ¼ãƒ ãƒªã‚µã‚¤ã‚ºæ™‚ã«ä½¿ç”¨ã•ã‚Œã‚‹ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã‚µã‚¤ã‚º
     /// </summary>
     private readonly Dictionary<string, ControlScale> _defaultControlSize = new();
 
     /// <summary>
-    /// ƒtƒH[ƒ€‚Ì‰ŠúƒTƒCƒY
+    /// ãƒ•ã‚©ãƒ¼ãƒ ã®åˆæœŸã‚µã‚¤ã‚º
     /// </summary>
     private readonly Size _initialFormSize;
 
     /// <summary>
-    /// ƒƒCƒ“‰æ–Ê¶‚ÌƒAƒoƒ^[—“‚Ì‰Šú•
+    /// ãƒ¡ã‚¤ãƒ³ç”»é¢å·¦ã®ã‚¢ãƒã‚¿ãƒ¼æ¬„ã®åˆæœŸå¹…
     /// </summary>
     private readonly int _baseFilterListWidth;
 
     /// <summary>
-    /// ƒƒCƒ“‰æ–Ê‰E‚ÌƒAƒCƒeƒ€—“‚Ì‰Šú•
+    /// ãƒ¡ã‚¤ãƒ³ç”»é¢å³ã®ã‚¢ã‚¤ãƒ†ãƒ æ¬„ã®åˆæœŸå¹…
     /// </summary>
     private readonly int _baseExplorerListWidth;
 
     /// <summary>
-    /// ƒŠƒTƒCƒY—p‚Ìƒ^ƒCƒ}[
+    /// ãƒªã‚µã‚¤ã‚ºç”¨ã®ã‚¿ã‚¤ãƒãƒ¼
     /// </summary>
     private readonly Timer _resizeTimer = new()
     {
@@ -124,104 +124,104 @@ internal sealed partial class MainForm : Form
     };
 
     /// <summary>
-    /// FilterList‚Ì‰¡‚Ì’·‚³‚ğŒ³‚Ì’·‚³‚©‚çŒvZ‚µ‚Ü‚·B
+    /// FilterListã®æ¨ªã®é•·ã•ã‚’å…ƒã®é•·ã•ã‹ã‚‰è¨ˆç®—ã—ã¾ã™ã€‚
     /// </summary>
     /// <returns></returns>
     private int GetFilterListWidth
         => FilterList.Width - _baseFilterListWidth;
 
     /// <summary>
-    /// ExplorerList‚Ì‰¡‚Ì’·‚³‚ğŒ³‚Ì’·‚³‚©‚çŒvZ‚µ‚Ü‚·B
+    /// ExplorerListã®æ¨ªã®é•·ã•ã‚’å…ƒã®é•·ã•ã‹ã‚‰è¨ˆç®—ã—ã¾ã™ã€‚
     /// </summary>
     /// <returns>ItemExplorerList Width</returns>
     private int GetExplorerListWidth
         => ExplorerList.Width - _baseExplorerListWidth;
     #endregion
 
-    #region ƒoƒbƒNƒAƒbƒvŠÖ˜A‚Ì•Ï”
+    #region ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—é–¢é€£ã®å¤‰æ•°
     /// <summary>
-    /// ƒoƒbƒNƒAƒbƒv‚·‚éŠÔŠu(ms)
+    /// ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ã™ã‚‹é–“éš”(ms)
     /// </summary>
     private int _backupInterval = 300000; // 5 Minutes
 
     /// <summary>
-    /// ÅŒã‚ÌƒoƒbƒNƒAƒbƒv‚ğæ“¾‚Ü‚½‚Íİ’è‚µ‚Ü‚·B
+    /// æœ€å¾Œã®ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—æ™‚åˆ»ã‚’å–å¾—ã¾ãŸã¯è¨­å®šã—ã¾ã™ã€‚
     /// </summary>
     private DateTime _lastBackupTime;
 
     /// <summary>
-    /// ÅŒã‚ÌƒoƒbƒNƒAƒbƒv‚ÉƒGƒ‰[‚ª”­¶‚µ‚½‚©‚Ç‚¤‚©‚ğæ“¾‚Ü‚½‚Íİ’è‚µ‚Ü‚·B
+    /// æœ€å¾Œã®ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—æ™‚ã«ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ãŸã‹ã©ã†ã‹ã‚’å–å¾—ã¾ãŸã¯è¨­å®šã—ã¾ã™ã€‚
     /// </summary>
     private bool _lastBackupError;
     #endregion
 
-    #region ƒ\ƒtƒg‚ÌƒXƒe[ƒ^ƒX‚ÉŠÖ‚·‚é•Ï”
+    #region ã‚½ãƒ•ãƒˆã®ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ã«é–¢ã™ã‚‹å¤‰æ•°
     /// <summary>
-    /// Œ»İ‚Ìƒ\ƒtƒg‚ÌŒ¾Œê
+    /// ç¾åœ¨ã®ã‚½ãƒ•ãƒˆã®è¨€èª
     /// </summary>
     internal string CurrentLanguage = "ja-JP";
 
     /// <summary>
-    /// Œ»İ‚ÌƒpƒX
+    /// ç¾åœ¨ã®ãƒ‘ã‚¹
     /// </summary>
     internal CurrentPath CurrentPath = new();
 
     /// <summary>
-    /// ŒŸõ’†‚©‚Ç‚¤‚©‚ğæ“¾‚Ü‚½‚Íİ’è‚µ‚Ü‚·B
+    /// æ¤œç´¢ä¸­ã‹ã©ã†ã‹ã‚’å–å¾—ã¾ãŸã¯è¨­å®šã—ã¾ã™ã€‚
     /// </summary>
     private bool _isSearching;
 
     /// <summary>
-    /// ƒtƒH[ƒ€‚ª‰Šú‰»‚³‚ê‚½‚©‚Ç‚¤‚©‚ğæ“¾‚µ‚Ü‚·B
+    /// ãƒ•ã‚©ãƒ¼ãƒ ãŒåˆæœŸåŒ–ã•ã‚ŒãŸã‹ã©ã†ã‹ã‚’å–å¾—ã—ã¾ã™ã€‚
     /// </summary>
     private readonly bool _initialized;
 
     /// <summary>
-    /// ÅŒã‚ÉBooth‚Ìî•ñ‚ğæ“¾‚µ‚½ŠÔ‚ğæ“¾‚Ü‚½‚Íİ’è‚µ‚Ü‚·B
+    /// æœ€å¾Œã«Boothã®æƒ…å ±ã‚’å–å¾—ã—ãŸæ™‚é–“ã‚’å–å¾—ã¾ãŸã¯è¨­å®šã—ã¾ã™ã€‚
     /// </summary>
     private DateTime _lastGetTime;
     #endregion
 
-    #region İ’èƒtƒ@ƒCƒ‹ŠÖ˜A‚Ì•Ï”
+    #region è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«é–¢é€£ã®å¤‰æ•°
     /// <summary>
-    /// 1ƒy[ƒW‚ ‚½‚è‚Ì•\¦”‚Å‚·B
+    /// 1ãƒšãƒ¼ã‚¸ã‚ãŸã‚Šã®è¡¨ç¤ºæ•°ã§ã™ã€‚
     /// </summary>
     private int _itemsPerPage = 30;
 
     /// <summary>
-    /// ƒTƒ€ƒlƒCƒ‹‚ÌƒvƒŒƒrƒ…[ƒXƒP[ƒ‹‚Å‚·B
+    /// ã‚µãƒ ãƒã‚¤ãƒ«ã®ãƒ—ãƒ¬ãƒ“ãƒ¥ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«ã§ã™ã€‚
     /// </summary>
     private float _previewScale = 1.0f;
 
     /// <summary>
-    /// ƒfƒtƒHƒ‹ƒg‚ÌŒ¾Œê‚Å‚·B
+    /// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®è¨€èªã§ã™ã€‚
     /// </summary>
     private int _defaultLanguage = 1;
 
     /// <summary>
-    /// ƒfƒtƒHƒ‹ƒg‚Ì•À‚Ñ‘Ö‚¦‡‚Å‚·B
+    /// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ä¸¦ã³æ›¿ãˆé †ã§ã™ã€‚
     /// </summary>
     private int _defaultSortOrder = 1;
 
     /// <summary>
-    /// ¤•i–¼‚ÌŠ‡ŒÊ‚ğíœ‚·‚é‚©Œˆ‚ß‚é‚±‚Æ‚ªo—ˆ‚Ü‚·B
+    /// å•†å“åã®æ‹¬å¼§ã‚’å‰Šé™¤ã™ã‚‹ã‹æ±ºã‚ã‚‹ã“ã¨ãŒå‡ºæ¥ã¾ã™ã€‚
     /// </summary>
     private bool _removeBrackets = false;
 
     /// <summary>
-    /// ƒ{ƒ^ƒ“‚Ì‚‚³‚Å‚·B
+    /// ãƒœã‚¿ãƒ³ã®é«˜ã•ã§ã™ã€‚
     /// </summary>
     internal int ButtonSize = 64;
 
     /// <summary>
-    /// ƒ_[ƒNƒ‚[ƒh‚©‚Ç‚¤‚©‚ğŒˆ‚ß‚Ü‚·B
+    /// ãƒ€ãƒ¼ã‚¯ãƒ¢ãƒ¼ãƒ‰ã‹ã©ã†ã‹ã‚’æ±ºã‚ã¾ã™ã€‚
     /// </summary>
     internal bool DarkMode = false;
     #endregion
 
-    #region ƒtƒH[ƒ€‚Ì‰Šú‰»
+    #region ãƒ•ã‚©ãƒ¼ãƒ ã®åˆæœŸåŒ–
     /// <summary>
-    /// ƒƒCƒ“ƒtƒH[ƒ€‚ğ‰Šú‰»‚µ‚Ü‚·B
+    /// ãƒ¡ã‚¤ãƒ³ãƒ•ã‚©ãƒ¼ãƒ ã‚’åˆæœŸåŒ–ã—ã¾ã™ã€‚
     /// </summary>
     internal MainForm(LaunchInfo launchInfo, ConfigurationManager configurationManager)
     {
@@ -265,7 +265,7 @@ internal sealed partial class MainForm : Form
             // Render Filter Text
             RedrawFilterName();
 
-            Text = $"VRChat Avatar Explorer {CurrentVersion} by ‚Õ‚±‚é‚Ó";
+            Text = $"VRChat Avatar Explorer {CurrentVersion} by ã·ã“ã‚‹ãµ";
 
             if (_defaultLanguage != 1 && _defaultLanguage > 0 && _defaultLanguage <= LanguageBox.Items.Count)
             {
@@ -295,7 +295,7 @@ internal sealed partial class MainForm : Form
         }
         catch (Exception ex)
         {
-            FormUtils.ShowMessageBox("ƒ\ƒtƒg‚Ì‹N“®’†‚ÉƒGƒ‰[‚ª”­¶‚µ‚Ü‚µ‚½B\n\n" + ex, "ƒGƒ‰[", true);
+            FormUtils.ShowMessageBox("ã‚½ãƒ•ãƒˆã®èµ·å‹•ä¸­ã«ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸã€‚\n\n" + ex, "ã‚¨ãƒ©ãƒ¼", true);
             Environment.Exit(0);
         }
     }
@@ -317,7 +317,7 @@ internal sealed partial class MainForm : Form
     }
 
     /// <summary>
-    /// ƒtƒHƒ“ƒgƒtƒ@ƒCƒ‹‚ğƒ\ƒtƒg‚É’Ç‰Á‚µ‚Ü‚·B
+    /// ãƒ•ã‚©ãƒ³ãƒˆãƒ•ã‚¡ã‚¤ãƒ«ã‚’ã‚½ãƒ•ãƒˆã«è¿½åŠ ã—ã¾ã™ã€‚
     /// </summary>
     private void AddFontFile()
     {
@@ -378,9 +378,9 @@ internal sealed partial class MainForm : Form
     }
     #endregion
 
-    #region ¶‚ÌƒŠƒXƒgŠÖ˜A‚Ìˆ—
+    #region å·¦ã®ãƒªã‚¹ãƒˆé–¢é€£ã®å‡¦ç†
     /// <summary>
-    /// ƒƒCƒ“‰æ–Ê¶‚ÌƒAƒoƒ^[—“‚ğì¬‚µ‚Ü‚·B
+    /// ãƒ¡ã‚¤ãƒ³ç”»é¢å·¦ã®ã‚¢ãƒã‚¿ãƒ¼æ¬„ã‚’ä½œæˆã—ã¾ã™ã€‚
     /// </summary>
     /// <param name="pageReset"></param>
     private void GenerateAvatarList(bool pageReset = true)
@@ -411,7 +411,7 @@ internal sealed partial class MainForm : Form
         {
             var description = ItemUtils.GetItemDescription(item, CurrentLanguage);
 
-            Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, item.ImagePath, item.GetTitle(_removeBrackets), LanguageUtils.Translate("ìÒ: ", CurrentLanguage) + item.AuthorName, true, description, GetFilterListWidth);
+            Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, item.ImagePath, item.GetTitle(_removeBrackets), LanguageUtils.Translate("ä½œè€…: ", CurrentLanguage) + item.AuthorName, true, description, GetFilterListWidth);
             button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
             button.MouseClick += OnMouseClick;
 
@@ -447,14 +447,14 @@ internal sealed partial class MainForm : Form
             if (item.BoothId != -1)
             {
                 createContextMenu.AddItem(
-                    LanguageUtils.Translate("BoothƒŠƒ“ƒN‚ÌƒRƒs[", CurrentLanguage),
+                    LanguageUtils.Translate("Boothãƒªãƒ³ã‚¯ã®ã‚³ãƒ”ãƒ¼", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.CopyIcon),
                     (_, _) => BoothUtils.CopyItemBoothLink(item, CurrentLanguage),
                     Keys.C
                 );
 
                 createContextMenu.AddItem(
-                    LanguageUtils.Translate("BoothƒŠƒ“ƒN‚ğŠJ‚­", CurrentLanguage),
+                    LanguageUtils.Translate("Boothãƒªãƒ³ã‚¯ã‚’é–‹ã", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.CopyIcon),
                     (_, _) => BoothUtils.OpenItenBoothLink(item, CurrentLanguage),
                     Keys.B
@@ -462,14 +462,14 @@ internal sealed partial class MainForm : Form
             }
 
             createContextMenu.AddItem(
-                LanguageUtils.Translate("‚±‚ÌìÒ‚Ì‘¼‚ÌƒAƒCƒeƒ€‚ğ•\¦", CurrentLanguage),
+                LanguageUtils.Translate("ã“ã®ä½œè€…ã®ä»–ã®ã‚¢ã‚¤ãƒ†ãƒ ã‚’è¡¨ç¤º", CurrentLanguage),
                 SharedImages.GetImage(SharedImages.Images.OpenIcon),
                 (_, _) => SearchByAuthorName(item),
                 Keys.A
             );
 
             createContextMenu.AddItem(
-                LanguageUtils.Translate("ƒTƒ€ƒlƒCƒ‹•ÏX", CurrentLanguage),
+                LanguageUtils.Translate("ã‚µãƒ ãƒã‚¤ãƒ«å¤‰æ›´", CurrentLanguage),
                 SharedImages.GetImage(SharedImages.Images.EditIcon),
                 (_, _) =>
                 {
@@ -477,10 +477,10 @@ internal sealed partial class MainForm : Form
 
                     DatabaseUtils.SaveItemsData(Items);
 
-                    // ‚à‚µƒAƒoƒ^[‚Ì—“‚ğ‰E‚ÅŠJ‚¢‚Ä‚¢‚½‚çA‚»‚ÌƒTƒ€ƒlƒCƒ‹‚àXV‚µ‚È‚¢‚Æ‚¢‚¯‚È‚¢‚½‚ßB
+                    // ã‚‚ã—ã‚¢ãƒã‚¿ãƒ¼ã®æ¬„ã‚’å³ã§é–‹ã„ã¦ã„ãŸã‚‰ã€ãã®ã‚µãƒ ãƒã‚¤ãƒ«ã‚‚æ›´æ–°ã—ãªã„ã¨ã„ã‘ãªã„ãŸã‚ã€‚
                     if (_openingWindow == Window.ItemList && !_isSearching) GenerateItems();
 
-                    // ŒŸõ’†‚¾‚ÆAŒŸõ‰æ–Ê‚ğÄ“Ç‚µ‚Ä‚ ‚°‚é
+                    // æ¤œç´¢ä¸­ã ã¨ã€æ¤œç´¢ç”»é¢ã‚’å†èª­è¾¼ã—ã¦ã‚ã’ã‚‹
                     if (_isSearching) SearchItems();
 
                     RenderFilter(false);
@@ -489,7 +489,7 @@ internal sealed partial class MainForm : Form
             );
 
             createContextMenu.AddItem(
-                LanguageUtils.Translate("ƒTƒ€ƒlƒCƒ‹Äæ“¾", CurrentLanguage),
+                LanguageUtils.Translate("ã‚µãƒ ãƒã‚¤ãƒ«å†å–å¾—", CurrentLanguage),
                 SharedImages.GetImage(SharedImages.Images.EditIcon),
                 async (_, _) =>
                 {
@@ -498,10 +498,10 @@ internal sealed partial class MainForm : Form
 
                     DatabaseUtils.SaveItemsData(Items);
 
-                    // ‚à‚µƒAƒoƒ^[‚Ì—“‚ğ‰E‚ÅŠJ‚¢‚Ä‚¢‚½‚çA‚»‚ÌƒTƒ€ƒlƒCƒ‹‚àXV‚µ‚È‚¢‚Æ‚¢‚¯‚È‚¢‚½‚ßB
+                    // ã‚‚ã—ã‚¢ãƒã‚¿ãƒ¼ã®æ¬„ã‚’å³ã§é–‹ã„ã¦ã„ãŸã‚‰ã€ãã®ã‚µãƒ ãƒã‚¤ãƒ«ã‚‚æ›´æ–°ã—ãªã„ã¨ã„ã‘ãªã„ãŸã‚ã€‚
                     if (_openingWindow == Window.ItemList && !_isSearching) GenerateItems();
 
-                    // ŒŸõ’†‚¾‚ÆAŒŸõ‰æ–Ê‚ğÄ“Ç‚µ‚Ä‚ ‚°‚é
+                    // æ¤œç´¢ä¸­ã ã¨ã€æ¤œç´¢ç”»é¢ã‚’å†èª­è¾¼ã—ã¦ã‚ã’ã‚‹
                     if (_isSearching) SearchItems();
 
                     RenderFilter(false);
@@ -510,7 +510,7 @@ internal sealed partial class MainForm : Form
             );
 
             createContextMenu.AddItem(
-                LanguageUtils.Translate("•ÒW", CurrentLanguage),
+                LanguageUtils.Translate("ç·¨é›†", CurrentLanguage),
                 SharedImages.GetImage(SharedImages.Images.EditIcon),
                 (_, _) =>
                 {
@@ -519,25 +519,25 @@ internal sealed partial class MainForm : Form
                     AddItemForm addItem = new(this, item.Type, item.CustomCategory, true, item, null);
                     addItem.ShowDialog();
 
-                    // ‘Î‰ƒAƒoƒ^[‚ÌƒpƒX‚ğ•Ï‚¦‚Ä‚ ‚°‚é
+                    // å¯¾å¿œã‚¢ãƒã‚¿ãƒ¼ã®ãƒ‘ã‚¹ã‚’å¤‰ãˆã¦ã‚ã’ã‚‹
                     DatabaseUtils.ChangeAllItemPaths(Items, prePath, item.ItemPath);
 
                     DatabaseUtils.SaveItemsData(Items);
 
-                    // ‚à‚µƒAƒCƒeƒ€‚Å•ÒW‚³‚ê‚½ƒAƒCƒeƒ€‚ğŠJ‚¢‚Ä‚¢‚½‚çAƒpƒX‚È‚Ç‚Ég—p‚³‚ê‚é•¶š—ñ‚àXV‚µ‚È‚¢‚Æ‚¢‚¯‚È‚¢‚½‚ß
+                    // ã‚‚ã—ã‚¢ã‚¤ãƒ†ãƒ ã§ç·¨é›†ã•ã‚ŒãŸã‚¢ã‚¤ãƒ†ãƒ ã‚’é–‹ã„ã¦ã„ãŸã‚‰ã€ãƒ‘ã‚¹ãªã©ã«ä½¿ç”¨ã•ã‚Œã‚‹æ–‡å­—åˆ—ã‚‚æ›´æ–°ã—ãªã„ã¨ã„ã‘ãªã„ãŸã‚
                     if (CurrentPath.CurrentSelectedAvatarPath == prePath)
                     {
                         CurrentPath.CurrentSelectedAvatar = item.Title;
                         CurrentPath.CurrentSelectedAvatarPath = item.ItemPath;
                     }
 
-                    // ‚à‚µƒAƒoƒ^[‚Ì—“‚ğ‰E‚ÅŠJ‚¢‚Ä‚¢‚½‚çA‚»‚ÌƒAƒCƒeƒ€‚Ìî•ñ‚àXV‚µ‚È‚¢‚Æ‚¢‚¯‚È‚¢‚½‚ß
+                    // ã‚‚ã—ã‚¢ãƒã‚¿ãƒ¼ã®æ¬„ã‚’å³ã§é–‹ã„ã¦ã„ãŸã‚‰ã€ãã®ã‚¢ã‚¤ãƒ†ãƒ ã®æƒ…å ±ã‚‚æ›´æ–°ã—ãªã„ã¨ã„ã‘ãªã„ãŸã‚
                     if (_openingWindow == Window.ItemList && !_isSearching) GenerateItems();
 
-                    // ŒŸõ’†‚¾‚ÆAŒŸõ‰æ–Ê‚ğÄ“Ç‚µ‚Ä‚ ‚°‚é
+                    // æ¤œç´¢ä¸­ã ã¨ã€æ¤œç´¢ç”»é¢ã‚’å†èª­è¾¼ã—ã¦ã‚ã’ã‚‹
                     if (_isSearching) SearchItems();
 
-                    // ŒŸõ‚Ì•¶š—ñ‚ğÁ‚³‚È‚¢‚æ‚¤‚É‚·‚é‚½‚ß‚É_isSearching‚Åƒ`ƒFƒbƒN‚µ‚Ä‚¢‚é
+                    // æ¤œç´¢æ™‚ã®æ–‡å­—åˆ—ã‚’æ¶ˆã•ãªã„ã‚ˆã†ã«ã™ã‚‹ãŸã‚ã«_isSearchingã§ãƒã‚§ãƒƒã‚¯ã—ã¦ã„ã‚‹
                     if (!_isSearching) PathTextBox.Text = GeneratePath();
 
                     RefleshWindow();
@@ -546,7 +546,7 @@ internal sealed partial class MainForm : Form
             );
 
             createContextMenu.AddItem(
-                LanguageUtils.Translate("ƒƒ‚‚Ì’Ç‰Á", CurrentLanguage),
+                LanguageUtils.Translate("ãƒ¡ãƒ¢ã®è¿½åŠ ", CurrentLanguage),
                 SharedImages.GetImage(SharedImages.Images.EditIcon),
                 (_, _) =>
                 {
@@ -560,24 +560,24 @@ internal sealed partial class MainForm : Form
             );
 
             createContextMenu.AddItem(
-                LanguageUtils.Translate("ƒAƒCƒeƒ€ƒtƒHƒ‹ƒ_‚Ì’Ç‰Á", CurrentLanguage),
+                LanguageUtils.Translate("ã‚¢ã‚¤ãƒ†ãƒ ãƒ•ã‚©ãƒ«ãƒ€ã®è¿½åŠ ", CurrentLanguage),
                 SharedImages.GetImage(SharedImages.Images.EditIcon),
-                (_, _) => ItemUtils.AddFolderToItem(item, CurrentLanguage),
+                (_, _) => _ = ItemUtils.AddFolderToItem(item, CurrentLanguage),
                 Keys.A
             );
 
             createContextMenu.AddItem(
-                LanguageUtils.Translate("íœ", CurrentLanguage),
+                LanguageUtils.Translate("å‰Šé™¤", CurrentLanguage),
                 SharedImages.GetImage(SharedImages.Images.TrashIcon),
                 (_, _) =>
                 {
                     var result = FormUtils.ShowConfirmDialog(
-                        LanguageUtils.Translate("–{“–‚Éíœ‚µ‚Ü‚·‚©H", CurrentLanguage) + "\n\n" + item.Title,
-                        LanguageUtils.Translate("Šm”F", CurrentLanguage)
+                        LanguageUtils.Translate("æœ¬å½“ã«å‰Šé™¤ã—ã¾ã™ã‹ï¼Ÿ", CurrentLanguage) + "\n\n" + item.Title,
+                        LanguageUtils.Translate("ç¢ºèª", CurrentLanguage)
                     );
                     if (!result) return;
 
-                    var undo = false; // ‚à‚µíœ‚³‚ê‚éƒAƒCƒeƒ€‚ªŠJ‚©‚ê‚Ä‚¢‚½‚ç
+                    var undo = false; // ã‚‚ã—å‰Šé™¤ã•ã‚Œã‚‹ã‚¢ã‚¤ãƒ†ãƒ ãŒé–‹ã‹ã‚Œã¦ã„ãŸã‚‰
                     if (CurrentPath.CurrentSelectedItem?.ItemPath == item.ItemPath)
                     {
                         CurrentPath.CurrentSelectedItemCategory = null;
@@ -585,14 +585,14 @@ internal sealed partial class MainForm : Form
                         undo = true;
                     }
 
-                    var undo2 = false; // ƒAƒoƒ^[ƒ‚[ƒh‚Å‚à‚µíœ‚³‚ê‚éƒAƒoƒ^[‚©‚ç¡‚Ü‚Å‚ÌƒAƒCƒeƒ€‚ªŠJ‚©‚ê‚Ä‚¢‚½‚ç
+                    var undo2 = false; // ã‚¢ãƒã‚¿ãƒ¼ãƒ¢ãƒ¼ãƒ‰ã§ã‚‚ã—å‰Šé™¤ã•ã‚Œã‚‹ã‚¢ãƒã‚¿ãƒ¼ã‹ã‚‰ä»Šã¾ã§ã®ã‚¢ã‚¤ãƒ†ãƒ ãŒé–‹ã‹ã‚Œã¦ã„ãŸã‚‰
                     if (CurrentPath.CurrentSelectedAvatarPath == item.ItemPath && _leftWindow == LeftWindow.Default)
                     {
                         CurrentPath = new CurrentPath();
                         undo2 = true;
                     }
 
-                    // ƒAƒoƒ^[‚Ì‚Æ‚«‚Í‘Î‰ƒAƒoƒ^[íœA‹¤’Ê‘f‘ÌƒOƒ‹[ƒv‚©‚çíœ—p‚Ìˆ—‚ğÀs‚·‚é
+                    // ã‚¢ãƒã‚¿ãƒ¼ã®ã¨ãã¯å¯¾å¿œã‚¢ãƒã‚¿ãƒ¼å‰Šé™¤ã€å…±é€šç´ ä½“ã‚°ãƒ«ãƒ¼ãƒ—ã‹ã‚‰å‰Šé™¤ç”¨ã®å‡¦ç†ã‚’å®Ÿè¡Œã™ã‚‹
                     if (item.Type == ItemType.Avatar) ItemUtils.DeleteAvatarFromSupported(Items, item, CommonAvatars, CurrentLanguage);
 
                     Items.RemoveAll(i => i.ItemPath == item.ItemPath);
@@ -600,18 +600,18 @@ internal sealed partial class MainForm : Form
                     DatabaseUtils.SaveItemsData(Items);
 
                     FormUtils.ShowMessageBox(
-                        LanguageUtils.Translate("íœ‚ªŠ®—¹‚µ‚Ü‚µ‚½B", CurrentLanguage),
-                        LanguageUtils.Translate("Š®—¹", CurrentLanguage)
+                        LanguageUtils.Translate("å‰Šé™¤ãŒå®Œäº†ã—ã¾ã—ãŸã€‚", CurrentLanguage),
+                        LanguageUtils.Translate("å®Œäº†", CurrentLanguage)
                     );
 
                     RenderFilter(false);
 
                     if (_isSearching)
                     {
-                        // ƒtƒHƒ‹ƒ_[“àŒŸõ‚Ì
+                        // ãƒ•ã‚©ãƒ«ãƒ€ãƒ¼å†…æ¤œç´¢ã®æ™‚
                         if (_openingWindow is Window.ItemFolderCategoryList or Window.ItemFolderItemsList)
                         {
-                            // ‘I‘ğ‚³‚ê‚½ƒAƒoƒ^[‚©‚çŒ»İ‚ÌŠ‚Ü‚Å—ˆ‚Ä‚éê‡
+                            // é¸æŠã•ã‚ŒãŸã‚¢ãƒã‚¿ãƒ¼ã‹ã‚‰ç¾åœ¨ã®æ‰€ã¾ã§æ¥ã¦ã‚‹å ´åˆ
                             if (undo2)
                             {
                                 SearchBox.Text = string.Empty;
@@ -623,7 +623,7 @@ internal sealed partial class MainForm : Form
                                 return;
                             }
 
-                            // ƒAƒCƒeƒ€‚Æ‚µ‚Ä‘I‘ğ‚³‚ê‚Ä‚¢‚éê‡
+                            // ã‚¢ã‚¤ãƒ†ãƒ ã¨ã—ã¦é¸æŠã•ã‚Œã¦ã„ã‚‹å ´åˆ
                             if (undo)
                             {
                                 SearchBox.Text = string.Empty;
@@ -641,7 +641,7 @@ internal sealed partial class MainForm : Form
                     }
                     else
                     {
-                        // ƒAƒoƒ^[‚ª‘I‘ğ‚³‚ê‚½ó‘Ô(CurrentSelectedAvatarPath‚Æ‚µ‚Äİ’è‚³‚ê‚Ä‚¢‚é)
+                        // ã‚¢ãƒã‚¿ãƒ¼ãŒé¸æŠã•ã‚ŒãŸçŠ¶æ…‹(CurrentSelectedAvatarPathã¨ã—ã¦è¨­å®šã•ã‚Œã¦ã„ã‚‹æ™‚)
                         if (undo2)
                         {
                             ResetAvatarExplorer(true);
@@ -649,7 +649,7 @@ internal sealed partial class MainForm : Form
                             return;
                         }
 
-                        // ƒtƒHƒ‹ƒ_[‚ğŠJ‚¢‚Ä‚¢‚Á‚ÄAƒAƒCƒeƒ€‚ª‘I‘ğ‚³‚ê‚½ó‘Ô(CurrentSelectedItem‚Æ‚µ‚Äİ’è‚³‚ê‚Ä‚¢‚é)
+                        // ãƒ•ã‚©ãƒ«ãƒ€ãƒ¼ã‚’é–‹ã„ã¦ã„ã£ã¦ã€ã‚¢ã‚¤ãƒ†ãƒ ãŒé¸æŠã•ã‚ŒãŸçŠ¶æ…‹(CurrentSelectedItemã¨ã—ã¦è¨­å®šã•ã‚Œã¦ã„ã‚‹æ™‚)
                         if (undo)
                         {
                             GenerateItems();
@@ -657,14 +657,14 @@ internal sealed partial class MainForm : Form
                             return;
                         }
 
-                        // ƒAƒCƒeƒ€‰æ–Ê‚ÉŠù‚É‚¢‚é
+                        // ã‚¢ã‚¤ãƒ†ãƒ ç”»é¢ã«æ—¢ã«ã„ã‚‹
                         if (_openingWindow == Window.ItemList)
                         {
                             GenerateItems();
                             return;
                         }
 
-                        // ƒAƒCƒeƒ€‰æ–Ê‚Ì‘O‚É‚¢‚é
+                        // ã‚¢ã‚¤ãƒ†ãƒ ç”»é¢ã®å‰ã«ã„ã‚‹
                         RefleshWindow();
                     }
                 },
@@ -700,7 +700,7 @@ internal sealed partial class MainForm : Form
     }
 
     /// <summary>
-    /// ƒƒCƒ“‰æ–Ê¶‚ÌìÒ—“‚ğì¬‚µ‚Ü‚·B
+    /// ãƒ¡ã‚¤ãƒ³ç”»é¢å·¦ã®ä½œè€…æ¬„ã‚’ä½œæˆã—ã¾ã™ã€‚
     /// </summary>
     /// <param name="pageReset"></param>
     private void GenerateAuthorList(bool pageReset = true)
@@ -723,7 +723,7 @@ internal sealed partial class MainForm : Form
         {
             try
             {
-                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, author.AuthorImagePath, author.AuthorName, Items.Count(item => item.AuthorName == author.AuthorName) + LanguageUtils.Translate("ŒÂ‚Ì€–Ú", CurrentLanguage), true, author.AuthorName, GetFilterListWidth);
+                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, author.AuthorImagePath, author.AuthorName, Items.Count(item => item.AuthorName == author.AuthorName) + LanguageUtils.Translate("å€‹ã®é …ç›®", CurrentLanguage), true, author.AuthorName, GetFilterListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -756,7 +756,7 @@ internal sealed partial class MainForm : Form
                 var createContextMenu = new CreateContextMenu();
 
                 createContextMenu.AddItem(
-                    LanguageUtils.Translate("ƒTƒ€ƒlƒCƒ‹•ÏX", CurrentLanguage),
+                    LanguageUtils.Translate("ã‚µãƒ ãƒã‚¤ãƒ«å¤‰æ›´", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.EditIcon),
                     (_, _) =>
                     {
@@ -803,7 +803,7 @@ internal sealed partial class MainForm : Form
     }
 
     /// <summary>
-    /// ƒƒCƒ“‰æ–Ê¶‚ÌƒJƒeƒSƒŠ[—“‚ğì¬‚µ‚Ü‚·B
+    /// ãƒ¡ã‚¤ãƒ³ç”»é¢å·¦ã®ã‚«ãƒ†ã‚´ãƒªãƒ¼æ¬„ã‚’ä½œæˆã—ã¾ã™ã€‚
     /// </summary>
     private void GenerateCategoryListLeft()
     {
@@ -822,7 +822,7 @@ internal sealed partial class MainForm : Form
                 var items = Items.Where(item => item.Type == itemType);
                 var itemCount = items.Count();
 
-                CustomItemButton button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, ItemUtils.GetCategoryName(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("ŒÂ‚Ì€–Ú", CurrentLanguage), true, string.Empty, GetFilterListWidth);
+                CustomItemButton button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, ItemUtils.GetCategoryName(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("å€‹ã®é …ç›®", CurrentLanguage), true, string.Empty, GetFilterListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -867,7 +867,7 @@ internal sealed partial class MainForm : Form
                 var items = Items.Where(item => item.CustomCategory == customCategory);
                 var itemCount = items.Count();
 
-                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, customCategory, itemCount + LanguageUtils.Translate("ŒÂ‚Ì€–Ú", CurrentLanguage), true, string.Empty, GetFilterListWidth);
+                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, customCategory, itemCount + LanguageUtils.Translate("å€‹ã®é …ç›®", CurrentLanguage), true, string.Empty, GetFilterListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -914,7 +914,7 @@ internal sealed partial class MainForm : Form
     }
 
     /// <summary>
-    /// ¶‚ÌƒtƒBƒ‹ƒ^[‰æ–Ê‚ğ•ÏX‚µ‚Ü‚·
+    /// å·¦ã®ãƒ•ã‚£ãƒ«ã‚¿ãƒ¼ç”»é¢ã‚’å¤‰æ›´ã—ã¾ã™
     /// </summary>
     private void ChangeFilter()
     {
@@ -939,7 +939,7 @@ internal sealed partial class MainForm : Form
     }
 
     /// <summary>
-    /// ¶‚Ì‰æ–Ê‚ğ“Ç‚İ‚İ‚Ü‚·B
+    /// å·¦ã®ç”»é¢ã‚’èª­ã¿è¾¼ã¿ã¾ã™ã€‚
     /// </summary>
     /// <param name="reset"></param>
     private void RenderFilter(bool reset = true)
@@ -951,7 +951,7 @@ internal sealed partial class MainForm : Form
             {
                 FilterList.Visible = false;
                 visibleChanged = true;
-            } 
+            }
         }
         else if (_leftWindowFilter == LeftWindow.Default)
         {
@@ -985,15 +985,15 @@ internal sealed partial class MainForm : Form
     }
 
     /// <summary>
-    /// ƒtƒBƒ‹ƒ^[ƒeƒLƒXƒg‚ğ•`‰æ‚µ‚Ü‚·B
+    /// ãƒ•ã‚£ãƒ«ã‚¿ãƒ¼ãƒ†ã‚­ã‚¹ãƒˆã‚’æç”»ã—ã¾ã™ã€‚
     /// </summary>
     private void RedrawFilterName()
-        => ChangeFilterButton.Text = LanguageUtils.Translate("ƒtƒBƒ‹ƒ^[: {0}", CurrentLanguage, FilterUtils.GetFilterName(_leftWindowFilter, CurrentLanguage));
+        => ChangeFilterButton.Text = LanguageUtils.Translate("ãƒ•ã‚£ãƒ«ã‚¿ãƒ¼: {0}", CurrentLanguage, FilterUtils.GetFilterName(_leftWindowFilter, CurrentLanguage));
     #endregion
 
-    #region ‰E‚ÌƒŠƒXƒgŠÖ˜A‚Ìˆ—
+    #region å³ã®ãƒªã‚¹ãƒˆé–¢é€£ã®å‡¦ç†
     /// <summary>
-    /// ƒƒCƒ“‰æ–Ê‰E‚ÌƒJƒeƒSƒŠ—“‚ğì¬‚µ‚Ü‚·B
+    /// ãƒ¡ã‚¤ãƒ³ç”»é¢å³ã®ã‚«ãƒ†ã‚´ãƒªæ¬„ã‚’ä½œæˆã—ã¾ã™ã€‚
     /// </summary>
     private void GenerateCategoryList()
     {
@@ -1025,7 +1025,7 @@ internal sealed partial class MainForm : Form
 
                 if (itemCount == 0) continue;
 
-                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, ItemUtils.GetCategoryName(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("ŒÂ‚Ì€–Ú", CurrentLanguage), false, string.Empty, GetExplorerListWidth);
+                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, ItemUtils.GetCategoryName(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("å€‹ã®é …ç›®", CurrentLanguage), false, string.Empty, GetExplorerListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -1076,7 +1076,7 @@ internal sealed partial class MainForm : Form
 
                 if (itemCount == 0) continue;
 
-                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, customCategory, itemCount + LanguageUtils.Translate("ŒÂ‚Ì€–Ú", CurrentLanguage), false, string.Empty, GetExplorerListWidth);
+                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, customCategory, itemCount + LanguageUtils.Translate("å€‹ã®é …ç›®", CurrentLanguage), false, string.Empty, GetExplorerListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -1113,7 +1113,7 @@ internal sealed partial class MainForm : Form
     }
 
     /// <summary>
-    /// ƒƒCƒ“‰æ–Ê‰E‚ÌƒAƒCƒeƒ€—“‚ğì¬‚µ‚Ü‚·B
+    /// ãƒ¡ã‚¤ãƒ³ç”»é¢å³ã®ã‚¢ã‚¤ãƒ†ãƒ æ¬„ã‚’ä½œæˆã—ã¾ã™ã€‚
     /// </summary>
     /// <param name="pageReset"></param>
     private void GenerateItems(bool pageReset = true)
@@ -1169,7 +1169,7 @@ internal sealed partial class MainForm : Form
         {
             try
             {
-                var authorText = LanguageUtils.Translate("ìÒ: ", CurrentLanguage) + item.AuthorName;
+                var authorText = LanguageUtils.Translate("ä½œè€…: ", CurrentLanguage) + item.AuthorName;
 
                 var isSupportedOrCommon = ItemUtils.IsSupportedAvatarOrCommon(item, CommonAvatars, CurrentPath.CurrentSelectedAvatarPath);
                 if (isSupportedOrCommon.OnlyCommon && item.SupportedAvatar.Count != 0 && CurrentPath.CurrentSelectedAvatarPath != null && !item.SupportedAvatar.Contains(CurrentPath.CurrentSelectedAvatarPath))
@@ -1177,7 +1177,7 @@ internal sealed partial class MainForm : Form
                     var commonAvatarName = isSupportedOrCommon.CommonAvatarName;
                     if (!string.IsNullOrEmpty(commonAvatarName))
                     {
-                        authorText += "\n" + LanguageUtils.Translate("‹¤’Ê‘f‘Ì: ", CurrentLanguage) + commonAvatarName;
+                        authorText += "\n" + LanguageUtils.Translate("å…±é€šç´ ä½“: ", CurrentLanguage) + commonAvatarName;
                     }
                 }
 
@@ -1203,8 +1203,8 @@ internal sealed partial class MainForm : Form
                     if (!Directory.Exists(item.ItemPath))
                     {
                         var result = FormUtils.ShowConfirmDialog(
-                            LanguageUtils.Translate("ƒtƒHƒ‹ƒ_‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ‚Å‚µ‚½B•ÒW‚µ‚Ü‚·‚©H", CurrentLanguage),
-                            LanguageUtils.Translate("ƒGƒ‰[", CurrentLanguage)
+                            LanguageUtils.Translate("ãƒ•ã‚©ãƒ«ãƒ€ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã§ã—ãŸã€‚ç·¨é›†ã—ã¾ã™ã‹ï¼Ÿ", CurrentLanguage),
+                            LanguageUtils.Translate("ã‚¨ãƒ©ãƒ¼", CurrentLanguage)
                         );
                         if (!result) return;
 
@@ -1216,14 +1216,14 @@ internal sealed partial class MainForm : Form
                         if (!Directory.Exists(item.ItemPath))
                         {
                             FormUtils.ShowMessageBox(
-                                LanguageUtils.Translate("ƒtƒHƒ‹ƒ_‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ‚Å‚µ‚½B", CurrentLanguage),
-                                LanguageUtils.Translate("ƒGƒ‰[", CurrentLanguage),
+                                LanguageUtils.Translate("ãƒ•ã‚©ãƒ«ãƒ€ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã§ã—ãŸã€‚", CurrentLanguage),
+                                LanguageUtils.Translate("ã‚¨ãƒ©ãƒ¼", CurrentLanguage),
                                 true
                             );
                             return;
                         }
 
-                        // ‘Î‰ƒAƒoƒ^[‚ÌƒpƒX‚ğ•Ï‚¦‚Ä‚ ‚°‚é
+                        // å¯¾å¿œã‚¢ãƒã‚¿ãƒ¼ã®ãƒ‘ã‚¹ã‚’å¤‰ãˆã¦ã‚ã’ã‚‹
                         DatabaseUtils.ChangeAllItemPaths(Items, prePath, item.ItemPath);
 
                         DatabaseUtils.SaveItemsData(Items);
@@ -1254,7 +1254,7 @@ internal sealed partial class MainForm : Form
                 if (Directory.Exists(item.ItemPath))
                 {
                     createContextMenu.AddItem(
-                        LanguageUtils.Translate("ƒtƒHƒ‹ƒ_‚ğŠJ‚­", CurrentLanguage),
+                        LanguageUtils.Translate("ãƒ•ã‚©ãƒ«ãƒ€ã‚’é–‹ã", CurrentLanguage),
                         SharedImages.GetImage(SharedImages.Images.OpenIcon),
                         (_, _) => FileSystemUtils.OpenItemFolder(item, CurrentLanguage),
                         Keys.O
@@ -1264,14 +1264,14 @@ internal sealed partial class MainForm : Form
                 if (item.BoothId != -1)
                 {
                     createContextMenu.AddItem(
-                        LanguageUtils.Translate("BoothƒŠƒ“ƒN‚ÌƒRƒs[", CurrentLanguage),
+                        LanguageUtils.Translate("Boothãƒªãƒ³ã‚¯ã®ã‚³ãƒ”ãƒ¼", CurrentLanguage),
                         SharedImages.GetImage(SharedImages.Images.CopyIcon),
                         (_, _) => BoothUtils.CopyItemBoothLink(item, CurrentLanguage),
                         Keys.C
                     );
 
                     createContextMenu.AddItem(
-                        LanguageUtils.Translate("BoothƒŠƒ“ƒN‚ğŠJ‚­", CurrentLanguage),
+                        LanguageUtils.Translate("Boothãƒªãƒ³ã‚¯ã‚’é–‹ã", CurrentLanguage),
                         SharedImages.GetImage(SharedImages.Images.CopyIcon),
                         (_, _) => BoothUtils.OpenItenBoothLink(item, CurrentLanguage),
                         Keys.B
@@ -1279,14 +1279,14 @@ internal sealed partial class MainForm : Form
                 }
 
                 createContextMenu.AddItem(
-                    LanguageUtils.Translate("‚±‚ÌìÒ‚Ì‘¼‚ÌƒAƒCƒeƒ€‚ğ•\¦", CurrentLanguage),
+                    LanguageUtils.Translate("ã“ã®ä½œè€…ã®ä»–ã®ã‚¢ã‚¤ãƒ†ãƒ ã‚’è¡¨ç¤º", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.OpenIcon),
                     (_, _) => SearchByAuthorName(item),
                     Keys.A
                 );
 
                 createContextMenu.AddItem(
-                    LanguageUtils.Translate("ƒTƒ€ƒlƒCƒ‹•ÏX", CurrentLanguage),
+                    LanguageUtils.Translate("ã‚µãƒ ãƒã‚¤ãƒ«å¤‰æ›´", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.EditIcon),
                     (_, _) =>
                     {
@@ -1309,7 +1309,7 @@ internal sealed partial class MainForm : Form
                 );
 
                 createContextMenu.AddItem(
-                    LanguageUtils.Translate("ƒTƒ€ƒlƒCƒ‹Äæ“¾", CurrentLanguage),
+                    LanguageUtils.Translate("ã‚µãƒ ãƒã‚¤ãƒ«å†å–å¾—", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.EditIcon),
                     async (_, _) =>
                     {
@@ -1318,10 +1318,10 @@ internal sealed partial class MainForm : Form
 
                         DatabaseUtils.SaveItemsData(Items);
 
-                        // ‚à‚µƒAƒoƒ^[‚Ì—“‚ğ‰E‚ÅŠJ‚¢‚Ä‚¢‚½‚çA‚»‚ÌƒTƒ€ƒlƒCƒ‹‚àXV‚µ‚È‚¢‚Æ‚¢‚¯‚È‚¢‚½‚ßB
+                        // ã‚‚ã—ã‚¢ãƒã‚¿ãƒ¼ã®æ¬„ã‚’å³ã§é–‹ã„ã¦ã„ãŸã‚‰ã€ãã®ã‚µãƒ ãƒã‚¤ãƒ«ã‚‚æ›´æ–°ã—ãªã„ã¨ã„ã‘ãªã„ãŸã‚ã€‚
                         if (_openingWindow == Window.ItemList && !_isSearching) GenerateItems();
 
-                        // ŒŸõ’†‚¾‚ÆAŒŸõ‰æ–Ê‚ğÄ“Ç‚µ‚Ä‚ ‚°‚é
+                        // æ¤œç´¢ä¸­ã ã¨ã€æ¤œç´¢ç”»é¢ã‚’å†èª­è¾¼ã—ã¦ã‚ã’ã‚‹
                         if (_isSearching) SearchItems();
 
                         RenderFilter(false);
@@ -1330,7 +1330,7 @@ internal sealed partial class MainForm : Form
                 );
 
                 createContextMenu.AddItem(
-                    LanguageUtils.Translate("•ÒW", CurrentLanguage),
+                    LanguageUtils.Translate("ç·¨é›†", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.EditIcon),
                     (_, _) =>
                     {
@@ -1339,7 +1339,7 @@ internal sealed partial class MainForm : Form
                         AddItemForm addItem = new(this, CurrentPath.CurrentSelectedCategory, CurrentPath.CurrentSelectedCustomCategory, true, item, null);
                         addItem.ShowDialog();
 
-                        // ‘Î‰ƒAƒoƒ^[‚ÌƒpƒX‚ğ•Ï‚¦‚Ä‚ ‚°‚é
+                        // å¯¾å¿œã‚¢ãƒã‚¿ãƒ¼ã®ãƒ‘ã‚¹ã‚’å¤‰ãˆã¦ã‚ã’ã‚‹
                         DatabaseUtils.ChangeAllItemPaths(Items, prePath, item.ItemPath);
 
                         DatabaseUtils.SaveItemsData(Items);
@@ -1357,7 +1357,7 @@ internal sealed partial class MainForm : Form
                 );
 
                 createContextMenu.AddItem(
-                    LanguageUtils.Translate("ƒƒ‚‚Ì’Ç‰Á", CurrentLanguage),
+                    LanguageUtils.Translate("ãƒ¡ãƒ¢ã®è¿½åŠ ", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.EditIcon),
                     (_, _) =>
                     {
@@ -1372,13 +1372,13 @@ internal sealed partial class MainForm : Form
                 );
 
                 createContextMenu.AddItem(
-                    LanguageUtils.Translate("ƒAƒCƒeƒ€ƒtƒHƒ‹ƒ_‚Ì’Ç‰Á", CurrentLanguage),
+                    LanguageUtils.Translate("ã‚¢ã‚¤ãƒ†ãƒ ãƒ•ã‚©ãƒ«ãƒ€ã®è¿½åŠ ", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.EditIcon),
-                    (_, _) => ItemUtils.AddFolderToItem(item, CurrentLanguage),
+                    (_, _) => _ = ItemUtils.AddFolderToItem(item, CurrentLanguage),
                     Keys.A
                 );
 
-                var implementedMenu = createContextMenu.AddItem(LanguageUtils.Translate("À‘•/–¢À‘•", CurrentLanguage), SharedImages.GetImage(SharedImages.Images.EditIcon));
+                var implementedMenu = createContextMenu.AddItem(LanguageUtils.Translate("å®Ÿè£…/æœªå®Ÿè£…", CurrentLanguage), SharedImages.GetImage(SharedImages.Images.EditIcon));
                 foreach (var avatar in Items.Where(i => i.Type == ItemType.Avatar))
                 {
                     ToolStripMenuItem avatarToolStripMenuItem = new()
@@ -1423,13 +1423,13 @@ internal sealed partial class MainForm : Form
                 }
 
                 createContextMenu.AddItem(
-                    LanguageUtils.Translate("íœ", CurrentLanguage),
+                    LanguageUtils.Translate("å‰Šé™¤", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.TrashIcon),
                     (_, _) =>
                     {
                         var result = FormUtils.ShowConfirmDialog(
-                            LanguageUtils.Translate("–{“–‚Éíœ‚µ‚Ü‚·‚©H", CurrentLanguage) + "\n\n" + item.Title,
-                            LanguageUtils.Translate("Šm”F", CurrentLanguage)
+                            LanguageUtils.Translate("æœ¬å½“ã«å‰Šé™¤ã—ã¾ã™ã‹ï¼Ÿ", CurrentLanguage) + "\n\n" + item.Title,
+                            LanguageUtils.Translate("ç¢ºèª", CurrentLanguage)
                         );
                         if (!result) return;
 
@@ -1441,7 +1441,7 @@ internal sealed partial class MainForm : Form
                             PathTextBox.Text = GeneratePath();
                         }
 
-                        // ƒAƒoƒ^[‚Ì‚Æ‚«‚Í‘Î‰ƒAƒoƒ^[íœA‹¤’Ê‘f‘ÌƒOƒ‹[ƒv‚©‚çíœ—p‚Ìˆ—‚ğÀs‚·‚é
+                        // ã‚¢ãƒã‚¿ãƒ¼ã®ã¨ãã¯å¯¾å¿œã‚¢ãƒã‚¿ãƒ¼å‰Šé™¤ã€å…±é€šç´ ä½“ã‚°ãƒ«ãƒ¼ãƒ—ã‹ã‚‰å‰Šé™¤ç”¨ã®å‡¦ç†ã‚’å®Ÿè¡Œã™ã‚‹
                         if (item.Type == ItemType.Avatar) ItemUtils.DeleteAvatarFromSupported(Items, item, CommonAvatars, CurrentLanguage);
 
                         Items.RemoveAll(i => i.ItemPath == item.ItemPath);
@@ -1449,8 +1449,8 @@ internal sealed partial class MainForm : Form
                         DatabaseUtils.SaveItemsData(Items);
 
                         FormUtils.ShowMessageBox(
-                            LanguageUtils.Translate("íœ‚ªŠ®—¹‚µ‚Ü‚µ‚½B", CurrentLanguage),
-                            LanguageUtils.Translate("Š®—¹", CurrentLanguage)
+                            LanguageUtils.Translate("å‰Šé™¤ãŒå®Œäº†ã—ã¾ã—ãŸã€‚", CurrentLanguage),
+                            LanguageUtils.Translate("å®Œäº†", CurrentLanguage)
                         );
 
                         if (undo)
@@ -1504,19 +1504,19 @@ internal sealed partial class MainForm : Form
     }
 
     /// <summary>
-    /// ƒƒCƒ“‰æ–Ê‰E‚ÌƒAƒCƒeƒ€“à‚ÌƒtƒHƒ‹ƒ_[ƒJƒeƒSƒŠ—“‚ğì¬‚µ‚Ü‚·B
+    /// ãƒ¡ã‚¤ãƒ³ç”»é¢å³ã®ã‚¢ã‚¤ãƒ†ãƒ å†…ã®ãƒ•ã‚©ãƒ«ãƒ€ãƒ¼ã‚«ãƒ†ã‚´ãƒªæ¬„ã‚’ä½œæˆã—ã¾ã™ã€‚
     /// </summary>
     private void GenerateItemCategoryList()
     {
         _openingWindow = Window.ItemFolderCategoryList;
         var types = new[]
         {
-            "‰ü•Ï—pƒf[ƒ^",
-            "ƒeƒNƒXƒ`ƒƒ",
-            "ƒhƒLƒ…ƒƒ“ƒg",
-            "UnityƒpƒbƒP[ƒW",
-            "ƒ}ƒeƒŠƒAƒ‹",
-            "•s–¾"
+            "æ”¹å¤‰ç”¨ãƒ‡ãƒ¼ã‚¿",
+            "ãƒ†ã‚¯ã‚¹ãƒãƒ£",
+            "ãƒ‰ã‚­ãƒ¥ãƒ¡ãƒ³ãƒˆ",
+            "Unityãƒ‘ãƒƒã‚±ãƒ¼ã‚¸",
+            "ãƒãƒ†ãƒªã‚¢ãƒ«",
+            "ä¸æ˜"
         };
 
         if (CurrentPath.CurrentSelectedItem == null) return;
@@ -1536,7 +1536,7 @@ internal sealed partial class MainForm : Form
                 var itemCount = itemFolderInfo.GetItemCount(itemType);
                 if (itemCount == 0) continue;
 
-                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, LanguageUtils.Translate(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("ŒÂ‚Ì€–Ú", CurrentLanguage), false, string.Empty, GetExplorerListWidth);
+                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, LanguageUtils.Translate(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("å€‹ã®é …ç›®", CurrentLanguage), false, string.Empty, GetExplorerListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -1572,7 +1572,7 @@ internal sealed partial class MainForm : Form
     }
 
     /// <summary>
-    /// ƒƒCƒ“‰æ–Ê‰E‚ÌƒAƒCƒeƒ€“à‚Ìƒtƒ@ƒCƒ‹—“‚ğì¬‚µ‚Ü‚·B
+    /// ãƒ¡ã‚¤ãƒ³ç”»é¢å³ã®ã‚¢ã‚¤ãƒ†ãƒ å†…ã®ãƒ•ã‚¡ã‚¤ãƒ«æ¬„ã‚’ä½œæˆã—ã¾ã™ã€‚
     /// </summary>
     /// <param name="pageReset"></param>
     private void GenerateItemFiles(bool pageReset = true)
@@ -1596,7 +1596,7 @@ internal sealed partial class MainForm : Form
             try
             {
                 var imagePath = file.FileExtension is ".png" or ".jpg" ? file.FilePath : string.Empty;
-                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, imagePath, file.FileName, file.FileExtension.Replace(".", string.Empty) + LanguageUtils.Translate("ƒtƒ@ƒCƒ‹", CurrentLanguage), false, LanguageUtils.Translate("ŠJ‚­ƒtƒ@ƒCƒ‹‚ÌƒpƒX: ", CurrentLanguage) + file.FilePath, GetExplorerListWidth);
+                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, imagePath, file.FileName, file.FileExtension.Replace(".", string.Empty) + LanguageUtils.Translate("ãƒ•ã‚¡ã‚¤ãƒ«", CurrentLanguage), false, LanguageUtils.Translate("é–‹ããƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ‘ã‚¹: ", CurrentLanguage) + file.FilePath, GetExplorerListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -1631,14 +1631,14 @@ internal sealed partial class MainForm : Form
                 var createContextMenu = new CreateContextMenu();
 
                 createContextMenu.AddItem(
-                    LanguageUtils.Translate("ŠJ‚­", CurrentLanguage),
+                    LanguageUtils.Translate("é–‹ã", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.CopyIcon),
                     (_, _) => FileSystemUtils.OpenItemFile(file, true, CurrentLanguage),
                     Keys.O
                 );
 
                 createContextMenu.AddItem(
-                    LanguageUtils.Translate("ƒtƒ@ƒCƒ‹‚ÌƒpƒX‚ğŠJ‚­", CurrentLanguage),
+                    LanguageUtils.Translate("ãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ‘ã‚¹ã‚’é–‹ã", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.CopyIcon),
                     (_, _) => FileSystemUtils.OpenItemFile(file, false, CurrentLanguage),
                     Keys.P
@@ -1678,7 +1678,7 @@ internal sealed partial class MainForm : Form
     }
     #endregion
 
-    #region ƒ{ƒ^ƒ“‚Ìˆ—
+    #region ãƒœã‚¿ãƒ³ã®å‡¦ç†
     private void ChangeFilterButton_Click(object sender, EventArgs e)
     {
         ChangeFilter();
@@ -1699,8 +1699,8 @@ internal sealed partial class MainForm : Form
             if (_lastGetTime.AddSeconds(5) > currentTime)
             {
                 FormUtils.ShowMessageBox(
-                    LanguageUtils.Translate("î•ñæ“¾‚ÌŠÔŠu‚ª’Z‚·‚¬‚Ü‚·B‘O‰ñ‚Ìæ“¾‚©‚ç5•bˆÈã‹ó‚¯‚Ä‚­‚¾‚³‚¢", CurrentLanguage),
-                    LanguageUtils.Translate("ƒGƒ‰[", CurrentLanguage),
+                    LanguageUtils.Translate("æƒ…å ±å–å¾—ã®é–“éš”ãŒçŸ­ã™ãã¾ã™ã€‚å‰å›ã®å–å¾—ã‹ã‚‰5ç§’ä»¥ä¸Šç©ºã‘ã¦ãã ã•ã„", CurrentLanguage),
+                    LanguageUtils.Translate("ã‚¨ãƒ©ãƒ¼", CurrentLanguage),
                     true
                 );
                 return false;
@@ -1721,27 +1721,27 @@ internal sealed partial class MainForm : Form
                     item.UpdatedDate = DateUtils.GetUnixTime();
 
                     FormUtils.ShowMessageBox(
-                        LanguageUtils.Translate("ƒTƒ€ƒlƒCƒ‹‰æ‘œ‚ÌXV‚É¬Œ÷‚µ‚Ü‚µ‚½B", CurrentLanguage),
-                        LanguageUtils.Translate("Š®—¹", CurrentLanguage)
+                        LanguageUtils.Translate("ã‚µãƒ ãƒã‚¤ãƒ«ç”»åƒã®æ›´æ–°ã«æˆåŠŸã—ã¾ã—ãŸã€‚", CurrentLanguage),
+                        LanguageUtils.Translate("å®Œäº†", CurrentLanguage)
                     );
                     return true;
                 }
                 catch (Exception ex)
                 {
                     FormUtils.ShowMessageBox(
-                        LanguageUtils.Translate("ƒTƒ€ƒlƒCƒ‹‚Ìƒ_ƒEƒ“ƒ[ƒh‚É¸”s‚µ‚Ü‚µ‚½BÚ×‚ÍErrorLog.txt‚ğ‚²——‚­‚¾‚³‚¢B", CurrentLanguage),
-                        LanguageUtils.Translate("ƒGƒ‰[", CurrentLanguage),
+                        LanguageUtils.Translate("ã‚µãƒ ãƒã‚¤ãƒ«ã®ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã«å¤±æ•—ã—ã¾ã—ãŸã€‚è©³ç´°ã¯ErrorLog.txtã‚’ã”è¦§ãã ã•ã„ã€‚", CurrentLanguage),
+                        LanguageUtils.Translate("ã‚¨ãƒ©ãƒ¼", CurrentLanguage),
                         true
                     );
-                    LogUtils.ErrorLogger("ƒTƒ€ƒlƒCƒ‹‚Ìƒ_ƒEƒ“ƒ[ƒh‚É¸”s‚µ‚Ü‚µ‚½B", ex);
+                    LogUtils.ErrorLogger("ã‚µãƒ ãƒã‚¤ãƒ«ã®ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã«å¤±æ•—ã—ã¾ã—ãŸã€‚", ex);
                     return false;
                 }
             }
             else
             {
                 FormUtils.ShowMessageBox(
-                    LanguageUtils.Translate("ƒTƒ€ƒlƒCƒ‹‰æ‘œURL‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ‚Å‚µ‚½B", CurrentLanguage),
-                    LanguageUtils.Translate("ƒGƒ‰[", CurrentLanguage),
+                    LanguageUtils.Translate("ã‚µãƒ ãƒã‚¤ãƒ«ç”»åƒURLãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã§ã—ãŸã€‚", CurrentLanguage),
+                    LanguageUtils.Translate("ã‚¨ãƒ©ãƒ¼", CurrentLanguage),
                     true
                 );
 
@@ -1751,8 +1751,8 @@ internal sealed partial class MainForm : Form
         else
         {
             FormUtils.ShowMessageBox(
-                LanguageUtils.Translate("¤•iURL‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ‚Å‚µ‚½B", CurrentLanguage),
-                LanguageUtils.Translate("ƒGƒ‰[", CurrentLanguage),
+                LanguageUtils.Translate("å•†å“URLãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã§ã—ãŸã€‚", CurrentLanguage),
+                LanguageUtils.Translate("ã‚¨ãƒ©ãƒ¼", CurrentLanguage),
                 true
             );
 
@@ -1782,9 +1782,9 @@ internal sealed partial class MainForm : Form
     }
     #endregion
 
-    #region ŒŸõŠÖ˜A‚Ìˆ—
+    #region æ¤œç´¢é–¢é€£ã®å‡¦ç†
     /// <summary>
-    /// ŒŸõƒ{ƒbƒNƒX‚É“ü—Í‚³‚ê‚½•¶š—ñ‚ğŒ³‚ÉƒAƒCƒeƒ€‚ğŒŸõ‚µ‚Ü‚·B
+    /// æ¤œç´¢ãƒœãƒƒã‚¯ã‚¹ã«å…¥åŠ›ã•ã‚ŒãŸæ–‡å­—åˆ—ã‚’å…ƒã«ã‚¢ã‚¤ãƒ†ãƒ ã‚’æ¤œç´¢ã—ã¾ã™ã€‚
     /// </summary>
     /// <param name="searchFilter"></param>
     /// <param name="pageReset"></param>
@@ -1836,7 +1836,7 @@ internal sealed partial class MainForm : Form
             })
             .AsEnumerable();
 
-        SearchResultLabel.Text = LanguageUtils.Translate("ŒŸõŒ‹‰Ê: {0}Œ (‘S{1}Œ)", CurrentLanguage, filteredItems.Count().ToString(), Items.Count.ToString());
+        SearchResultLabel.Text = LanguageUtils.Translate("æ¤œç´¢çµæœ: {0}ä»¶ (å…¨{1}ä»¶)", CurrentLanguage, filteredItems.Count().ToString(), Items.Count.ToString());
 
         if (!filteredItems.Any()) return;
 
@@ -1853,7 +1853,7 @@ internal sealed partial class MainForm : Form
             {
                 var description = ItemUtils.GetItemDescription(item, CurrentLanguage);
 
-                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, item.ImagePath, item.GetTitle(_removeBrackets), LanguageUtils.Translate("ìÒ: ", CurrentLanguage) + item.AuthorName, false, description, GetExplorerListWidth);
+                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, item.ImagePath, item.GetTitle(_removeBrackets), LanguageUtils.Translate("ä½œè€…: ", CurrentLanguage) + item.AuthorName, false, description, GetExplorerListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -1864,8 +1864,8 @@ internal sealed partial class MainForm : Form
                     if (!Directory.Exists(item.ItemPath))
                     {
                         bool result = FormUtils.ShowConfirmDialog(
-                            LanguageUtils.Translate("ƒtƒHƒ‹ƒ_‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ‚Å‚µ‚½B•ÒW‚µ‚Ü‚·‚©H", CurrentLanguage),
-                            LanguageUtils.Translate("ƒGƒ‰[", CurrentLanguage)
+                            LanguageUtils.Translate("ãƒ•ã‚©ãƒ«ãƒ€ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã§ã—ãŸã€‚ç·¨é›†ã—ã¾ã™ã‹ï¼Ÿ", CurrentLanguage),
+                            LanguageUtils.Translate("ã‚¨ãƒ©ãƒ¼", CurrentLanguage)
                         );
                         if (!result) return;
 
@@ -1877,14 +1877,14 @@ internal sealed partial class MainForm : Form
                         if (!Directory.Exists(item.ItemPath))
                         {
                             FormUtils.ShowMessageBox(
-                                LanguageUtils.Translate("ƒtƒHƒ‹ƒ_‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ‚Å‚µ‚½B", CurrentLanguage),
-                                LanguageUtils.Translate("ƒGƒ‰[", CurrentLanguage),
+                                LanguageUtils.Translate("ãƒ•ã‚©ãƒ«ãƒ€ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã§ã—ãŸã€‚", CurrentLanguage),
+                                LanguageUtils.Translate("ã‚¨ãƒ©ãƒ¼", CurrentLanguage),
                                 true
                             );
                             return;
                         }
 
-                        // ‘Î‰ƒAƒoƒ^[‚ÌƒpƒX‚ğ•Ï‚¦‚Ä‚ ‚°‚é
+                        // å¯¾å¿œã‚¢ãƒã‚¿ãƒ¼ã®ãƒ‘ã‚¹ã‚’å¤‰ãˆã¦ã‚ã’ã‚‹
                         DatabaseUtils.ChangeAllItemPaths(Items, prePath, item.ItemPath);
 
                         DatabaseUtils.SaveItemsData(Items);
@@ -1917,7 +1917,7 @@ internal sealed partial class MainForm : Form
                 if (Directory.Exists(item.ItemPath))
                 {
                     createContextMenu.AddItem(
-                        LanguageUtils.Translate("ƒtƒHƒ‹ƒ_‚ğŠJ‚­", CurrentLanguage),
+                        LanguageUtils.Translate("ãƒ•ã‚©ãƒ«ãƒ€ã‚’é–‹ã", CurrentLanguage),
                         SharedImages.GetImage(SharedImages.Images.OpenIcon),
                         (_, _) => FileSystemUtils.OpenItemFolder(item, CurrentLanguage),
                         Keys.O
@@ -1927,14 +1927,14 @@ internal sealed partial class MainForm : Form
                 if (item.BoothId != -1)
                 {
                     createContextMenu.AddItem(
-                        LanguageUtils.Translate("BoothƒŠƒ“ƒN‚ÌƒRƒs[", CurrentLanguage),
+                        LanguageUtils.Translate("Boothãƒªãƒ³ã‚¯ã®ã‚³ãƒ”ãƒ¼", CurrentLanguage),
                         SharedImages.GetImage(SharedImages.Images.CopyIcon),
                         (_, _) => BoothUtils.CopyItemBoothLink(item, CurrentLanguage),
                         Keys.C
                     );
 
                     createContextMenu.AddItem(
-                        LanguageUtils.Translate("BoothƒŠƒ“ƒN‚ğŠJ‚­", CurrentLanguage),
+                        LanguageUtils.Translate("Boothãƒªãƒ³ã‚¯ã‚’é–‹ã", CurrentLanguage),
                         SharedImages.GetImage(SharedImages.Images.CopyIcon),
                         (_, _) => BoothUtils.OpenItenBoothLink(item, CurrentLanguage),
                         Keys.B
@@ -1942,14 +1942,14 @@ internal sealed partial class MainForm : Form
                 }
 
                 createContextMenu.AddItem(
-                    LanguageUtils.Translate("‚±‚ÌìÒ‚Ì‘¼‚ÌƒAƒCƒeƒ€‚ğ•\¦", CurrentLanguage),
+                    LanguageUtils.Translate("ã“ã®ä½œè€…ã®ä»–ã®ã‚¢ã‚¤ãƒ†ãƒ ã‚’è¡¨ç¤º", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.OpenIcon),
                     (_, _) => SearchByAuthorName(item),
                     Keys.A
                 );
 
                 createContextMenu.AddItem(
-                    LanguageUtils.Translate("ƒTƒ€ƒlƒCƒ‹•ÏX", CurrentLanguage),
+                    LanguageUtils.Translate("ã‚µãƒ ãƒã‚¤ãƒ«å¤‰æ›´", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.EditIcon),
                     (_, _) =>
                     {
@@ -1964,7 +1964,7 @@ internal sealed partial class MainForm : Form
                 );
 
                 createContextMenu.AddItem(
-                    LanguageUtils.Translate("ƒTƒ€ƒlƒCƒ‹Äæ“¾", CurrentLanguage),
+                    LanguageUtils.Translate("ã‚µãƒ ãƒã‚¤ãƒ«å†å–å¾—", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.EditIcon),
                     async (_, _) =>
                     {
@@ -1973,10 +1973,10 @@ internal sealed partial class MainForm : Form
 
                         DatabaseUtils.SaveItemsData(Items);
 
-                        // ‚à‚µƒAƒoƒ^[‚Ì—“‚ğ‰E‚ÅŠJ‚¢‚Ä‚¢‚½‚çA‚»‚ÌƒTƒ€ƒlƒCƒ‹‚àXV‚µ‚È‚¢‚Æ‚¢‚¯‚È‚¢‚½‚ßB
+                        // ã‚‚ã—ã‚¢ãƒã‚¿ãƒ¼ã®æ¬„ã‚’å³ã§é–‹ã„ã¦ã„ãŸã‚‰ã€ãã®ã‚µãƒ ãƒã‚¤ãƒ«ã‚‚æ›´æ–°ã—ãªã„ã¨ã„ã‘ãªã„ãŸã‚ã€‚
                         if (_openingWindow == Window.ItemList && !_isSearching) GenerateItems();
 
-                        // ŒŸõ’†‚¾‚ÆAŒŸõ‰æ–Ê‚ğÄ“Ç‚µ‚Ä‚ ‚°‚é
+                        // æ¤œç´¢ä¸­ã ã¨ã€æ¤œç´¢ç”»é¢ã‚’å†èª­è¾¼ã—ã¦ã‚ã’ã‚‹
                         if (_isSearching) SearchItems();
 
                         RenderFilter(false);
@@ -1985,7 +1985,7 @@ internal sealed partial class MainForm : Form
                 );
 
                 createContextMenu.AddItem(
-                    LanguageUtils.Translate("•ÒW", CurrentLanguage),
+                    LanguageUtils.Translate("ç·¨é›†", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.EditIcon),
                     (_, _) =>
                     {
@@ -1994,7 +1994,7 @@ internal sealed partial class MainForm : Form
                         AddItemForm addItem = new(this, item.Type, item.CustomCategory, true, item, null);
                         addItem.ShowDialog();
 
-                        // ‘Î‰ƒAƒoƒ^[‚ÌƒpƒX‚ğ•Ï‚¦‚Ä‚ ‚°‚é
+                        // å¯¾å¿œã‚¢ãƒã‚¿ãƒ¼ã®ãƒ‘ã‚¹ã‚’å¤‰ãˆã¦ã‚ã’ã‚‹
                         DatabaseUtils.ChangeAllItemPaths(Items, prePath, item.ItemPath);
 
                         DatabaseUtils.SaveItemsData(Items);
@@ -2012,7 +2012,7 @@ internal sealed partial class MainForm : Form
                 );
 
                 createContextMenu.AddItem(
-                    LanguageUtils.Translate("ƒƒ‚‚Ì’Ç‰Á", CurrentLanguage),
+                    LanguageUtils.Translate("ãƒ¡ãƒ¢ã®è¿½åŠ ", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.EditIcon),
                     (_, _) =>
                     {
@@ -2027,13 +2027,13 @@ internal sealed partial class MainForm : Form
                 );
 
                 createContextMenu.AddItem(
-                    LanguageUtils.Translate("ƒAƒCƒeƒ€ƒtƒHƒ‹ƒ_‚Ì’Ç‰Á", CurrentLanguage),
+                    LanguageUtils.Translate("ã‚¢ã‚¤ãƒ†ãƒ ãƒ•ã‚©ãƒ«ãƒ€ã®è¿½åŠ ", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.EditIcon),
-                    (_, _) => ItemUtils.AddFolderToItem(item, CurrentLanguage),
+                    (_, _) => _ = ItemUtils.AddFolderToItem(item, CurrentLanguage),
                     Keys.A
                 );
 
-                var implementedMenu = createContextMenu.AddItem(LanguageUtils.Translate("À‘•/–¢À‘•", CurrentLanguage), SharedImages.GetImage(SharedImages.Images.EditIcon));
+                var implementedMenu = createContextMenu.AddItem(LanguageUtils.Translate("å®Ÿè£…/æœªå®Ÿè£…", CurrentLanguage), SharedImages.GetImage(SharedImages.Images.EditIcon));
                 foreach (var avatar in Items.Where(i => i.Type == ItemType.Avatar))
                 {
                     ToolStripMenuItem avatarToolStripMenuItem = new()
@@ -2078,17 +2078,17 @@ internal sealed partial class MainForm : Form
                 }
 
                 createContextMenu.AddItem(
-                    LanguageUtils.Translate("íœ", CurrentLanguage),
+                    LanguageUtils.Translate("å‰Šé™¤", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.TrashIcon),
                     (_, _) =>
                     {
                         bool result = FormUtils.ShowConfirmDialog(
-                            LanguageUtils.Translate("–{“–‚Éíœ‚µ‚Ü‚·‚©H", CurrentLanguage) + "\n\n" + item.Title,
-                            LanguageUtils.Translate("Šm”F", CurrentLanguage)
+                            LanguageUtils.Translate("æœ¬å½“ã«å‰Šé™¤ã—ã¾ã™ã‹ï¼Ÿ", CurrentLanguage) + "\n\n" + item.Title,
+                            LanguageUtils.Translate("ç¢ºèª", CurrentLanguage)
                         );
                         if (!result) return;
 
-                        // ƒAƒoƒ^[‚Ì‚Æ‚«‚Í‘Î‰ƒAƒoƒ^[íœA‹¤’Ê‘f‘ÌƒOƒ‹[ƒv‚©‚çíœ—p‚Ìˆ—‚ğÀs‚·‚é
+                        // ã‚¢ãƒã‚¿ãƒ¼ã®ã¨ãã¯å¯¾å¿œã‚¢ãƒã‚¿ãƒ¼å‰Šé™¤ã€å…±é€šç´ ä½“ã‚°ãƒ«ãƒ¼ãƒ—ã‹ã‚‰å‰Šé™¤ç”¨ã®å‡¦ç†ã‚’å®Ÿè¡Œã™ã‚‹
                         if (item.Type == ItemType.Avatar) ItemUtils.DeleteAvatarFromSupported(Items, item, CommonAvatars, CurrentLanguage);
 
                         Items.RemoveAll(i => i.ItemPath == item.ItemPath);
@@ -2096,8 +2096,8 @@ internal sealed partial class MainForm : Form
                         DatabaseUtils.SaveItemsData(Items);
 
                         FormUtils.ShowMessageBox(
-                            LanguageUtils.Translate("íœ‚ªŠ®—¹‚µ‚Ü‚µ‚½B", CurrentLanguage),
-                            LanguageUtils.Translate("Š®—¹", CurrentLanguage)
+                            LanguageUtils.Translate("å‰Šé™¤ãŒå®Œäº†ã—ã¾ã—ãŸã€‚", CurrentLanguage),
+                            LanguageUtils.Translate("å®Œäº†", CurrentLanguage)
                         );
 
                         GenerateFilteredItem(searchFilter, false);
@@ -2140,7 +2140,7 @@ internal sealed partial class MainForm : Form
     }
 
     /// <summary>
-    /// ŒŸõƒ{ƒbƒNƒX‚É“ü—Í‚³‚ê‚½•¶š—ñ‚ğŒ³‚ÉƒAƒCƒeƒ€ƒtƒHƒ‹ƒ_[“à‚ğŒŸõ‚µ‚Ü‚·B
+    /// æ¤œç´¢ãƒœãƒƒã‚¯ã‚¹ã«å…¥åŠ›ã•ã‚ŒãŸæ–‡å­—åˆ—ã‚’å…ƒã«ã‚¢ã‚¤ãƒ†ãƒ ãƒ•ã‚©ãƒ«ãƒ€ãƒ¼å†…ã‚’æ¤œç´¢ã—ã¾ã™ã€‚
     /// </summary>
     /// <param name="searchWords"></param>
     /// <param name="pageReset"></param>
@@ -2161,7 +2161,7 @@ internal sealed partial class MainForm : Form
             .OrderByDescending(file => searchWords.SearchWords.Count(word => file.FileName.Contains(word, StringComparison.CurrentCultureIgnoreCase)))
             .AsEnumerable();
 
-        SearchResultLabel.Text = LanguageUtils.Translate("ƒtƒHƒ‹ƒ_[“àŒŸõŒ‹‰Ê: {0}Œ (‘S{1}Œ)", CurrentLanguage, filteredFileData.Count().ToString(), fileDatas.Count().ToString());
+        SearchResultLabel.Text = LanguageUtils.Translate("ãƒ•ã‚©ãƒ«ãƒ€ãƒ¼å†…æ¤œç´¢çµæœ: {0}ä»¶ (å…¨{1}ä»¶)", CurrentLanguage, filteredFileData.Count().ToString(), fileDatas.Count().ToString());
 
         if (!filteredFileData.Any()) return;
 
@@ -2177,7 +2177,7 @@ internal sealed partial class MainForm : Form
             try
             {
                 var imagePath = file.FileExtension is ".png" or ".jpg" ? file.FilePath : string.Empty;
-                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, imagePath, file.FileName, file.FileExtension.Replace(".", string.Empty) + LanguageUtils.Translate("ƒtƒ@ƒCƒ‹", CurrentLanguage), false, LanguageUtils.Translate("ŠJ‚­ƒtƒ@ƒCƒ‹‚ÌƒpƒX: ", CurrentLanguage) + file.FilePath, GetExplorerListWidth);
+                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, imagePath, file.FileName, file.FileExtension.Replace(".", string.Empty) + LanguageUtils.Translate("ãƒ•ã‚¡ã‚¤ãƒ«", CurrentLanguage), false, LanguageUtils.Translate("é–‹ããƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ‘ã‚¹: ", CurrentLanguage) + file.FilePath, GetExplorerListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -2198,14 +2198,14 @@ internal sealed partial class MainForm : Form
                 var createContextMenu = new CreateContextMenu();
 
                 createContextMenu.AddItem(
-                    LanguageUtils.Translate("ŠJ‚­", CurrentLanguage),
+                    LanguageUtils.Translate("é–‹ã", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.CopyIcon),
                     (_, _) => FileSystemUtils.OpenItemFile(file, true, CurrentLanguage),
                     Keys.O
                 );
 
                 createContextMenu.AddItem(
-                    LanguageUtils.Translate("ƒtƒ@ƒCƒ‹‚ÌƒpƒX‚ğŠJ‚­", CurrentLanguage),
+                    LanguageUtils.Translate("ãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ‘ã‚¹ã‚’é–‹ã", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.CopyIcon),
                     (_, _) => FileSystemUtils.OpenItemFile(file, false, CurrentLanguage),
                     Keys.P
@@ -2245,9 +2245,9 @@ internal sealed partial class MainForm : Form
     }
     #endregion
 
-    #region ƒAƒCƒeƒ€’Ç‰ÁŠÖ˜A‚Ìˆ—
+    #region ã‚¢ã‚¤ãƒ†ãƒ è¿½åŠ é–¢é€£ã®å‡¦ç†
     /// <summary>
-    /// ƒAƒCƒeƒ€’Ç‰Áƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½Û‚Ìˆ—‚ğs‚¢‚Ü‚·B
+    /// ã‚¢ã‚¤ãƒ†ãƒ è¿½åŠ ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚ŒãŸéš›ã®å‡¦ç†ã‚’è¡Œã„ã¾ã™ã€‚
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
@@ -2262,9 +2262,9 @@ internal sealed partial class MainForm : Form
     }
     #endregion
 
-    #region ƒpƒXŠÖ˜A‚Ìˆ—
+    #region ãƒ‘ã‚¹é–¢é€£ã®å‡¦ç†
     /// <summary>
-    /// Œ»İ‚ÌƒpƒX‚ğ¶¬‚µ‚Ü‚·B
+    /// ç¾åœ¨ã®ãƒ‘ã‚¹ã‚’ç”Ÿæˆã—ã¾ã™ã€‚
     /// </summary>
     /// <returns></returns>
     private string GeneratePath()
@@ -2275,27 +2275,27 @@ internal sealed partial class MainForm : Form
         {
             case LeftWindow.Author:
                 {
-                    pathParts.Add(LanguageUtils.Translate("ìÒ", CurrentLanguage));
+                    pathParts.Add(LanguageUtils.Translate("ä½œè€…", CurrentLanguage));
 
                     var author = CurrentPath.CurrentSelectedAuthor;
                     if (author == null)
-                        return LanguageUtils.Translate("‚±‚±‚É‚ÍŒ»İ‚ÌƒpƒX‚ª•\¦‚³‚ê‚Ü‚·", CurrentLanguage);
+                        return LanguageUtils.Translate("ã“ã“ã«ã¯ç¾åœ¨ã®ãƒ‘ã‚¹ãŒè¡¨ç¤ºã•ã‚Œã¾ã™", CurrentLanguage);
 
                     pathParts.Add(author.AuthorName);
                     break;
                 }
             case LeftWindow.Category:
                 {
-                    pathParts.Add(LanguageUtils.Translate("ƒJƒeƒSƒŠ•Ê", CurrentLanguage));
+                    pathParts.Add(LanguageUtils.Translate("ã‚«ãƒ†ã‚´ãƒªåˆ¥", CurrentLanguage));
                     break;
                 }
             case LeftWindow.Default:
                 {
-                    pathParts.Add(LanguageUtils.Translate("ƒAƒoƒ^[", CurrentLanguage));
+                    pathParts.Add(LanguageUtils.Translate("ã‚¢ãƒã‚¿ãƒ¼", CurrentLanguage));
 
                     var avatar = CurrentPath.CurrentSelectedAvatar;
                     if (avatar == null)
-                        return LanguageUtils.Translate("‚±‚±‚É‚ÍŒ»İ‚ÌƒpƒX‚ª•\¦‚³‚ê‚Ü‚·", CurrentLanguage);
+                        return LanguageUtils.Translate("ã“ã“ã«ã¯ç¾åœ¨ã®ãƒ‘ã‚¹ãŒè¡¨ç¤ºã•ã‚Œã¾ã™", CurrentLanguage);
 
                     pathParts.Add(avatar);
                     break;
@@ -2307,7 +2307,7 @@ internal sealed partial class MainForm : Form
         }
 
         if (CurrentPath.CurrentSelectedCategory == ItemType.Unknown)
-            return pathParts.Count > 1 ? AEUtils.GenerateSeparatedPath(pathParts.ToArray()) : LanguageUtils.Translate("‚±‚±‚É‚ÍŒ»İ‚ÌƒpƒX‚ª•\¦‚³‚ê‚Ü‚·", CurrentLanguage);
+            return pathParts.Count > 1 ? AEUtils.GenerateSeparatedPath(pathParts.ToArray()) : LanguageUtils.Translate("ã“ã“ã«ã¯ç¾åœ¨ã®ãƒ‘ã‚¹ãŒè¡¨ç¤ºã•ã‚Œã¾ã™", CurrentLanguage);
 
         var categoryName = ItemUtils.GetCategoryName(
             CurrentPath.CurrentSelectedCategory,
@@ -2328,7 +2328,7 @@ internal sealed partial class MainForm : Form
     }
 
     /// <summary>
-    /// ‘I‘ğ‚³‚ê‚½ƒAƒCƒeƒ€‚©‚çƒpƒX‚ğ¶¬‚µ‚Ü‚·B
+    /// é¸æŠã•ã‚ŒãŸã‚¢ã‚¤ãƒ†ãƒ ã‹ã‚‰ãƒ‘ã‚¹ã‚’ç”Ÿæˆã—ã¾ã™ã€‚
     /// </summary>
     /// <param name="item"></param>
     private void GeneratePathFromItem(Item item)
@@ -2349,15 +2349,15 @@ internal sealed partial class MainForm : Form
     }
     #endregion
 
-    #region –ß‚éƒ{ƒ^ƒ“‚Ìˆ—
+    #region æˆ»ã‚‹ãƒœã‚¿ãƒ³ã®å‡¦ç†
     /// <summary>
-    /// –ß‚éƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½Û‚Ìˆ—‚ğs‚¢‚Ü‚·B
+    /// æˆ»ã‚‹ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚ŒãŸéš›ã®å‡¦ç†ã‚’è¡Œã„ã¾ã™ã€‚
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void UndoButton_Click(object? sender, EventArgs? e)
     {
-        // ŒŸõ’†‚¾‚Á‚½ê‡‚Í‘O‚Ì‰æ–Ê‚Ü‚Å‚Æ‚è‚ ‚¦‚¸–ß‚µ‚Ä‚ ‚°‚é
+        // æ¤œç´¢ä¸­ã ã£ãŸå ´åˆã¯å‰ã®ç”»é¢ã¾ã§ã¨ã‚Šã‚ãˆãšæˆ»ã—ã¦ã‚ã’ã‚‹
         if (_isSearching)
         {
             SearchBox.Text = string.Empty;
@@ -2403,7 +2403,7 @@ internal sealed partial class MainForm : Form
 
         if (CurrentPath.IsEmpty())
         {
-            // ƒGƒ‰[‰¹‚ğÄ¶
+            // ã‚¨ãƒ©ãƒ¼éŸ³ã‚’å†ç”Ÿ
             SystemSounds.Hand.Play();
             return;
         }
@@ -2461,7 +2461,7 @@ internal sealed partial class MainForm : Form
     }
 
     /// <summary>
-    /// ƒRƒ“ƒgƒ[ƒ‹ã‚ÅƒTƒCƒhƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½Û‚Ìˆ—‚ğs‚¢‚Ü‚·B
+    /// ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ä¸Šã§ã‚µã‚¤ãƒ‰ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚ŒãŸéš›ã®å‡¦ç†ã‚’è¡Œã„ã¾ã™ã€‚
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
@@ -2472,9 +2472,9 @@ internal sealed partial class MainForm : Form
     }
     #endregion
 
-    #region ŒŸõƒ{ƒbƒNƒX‚Ìˆ—
+    #region æ¤œç´¢ãƒœãƒƒã‚¯ã‚¹ã®å‡¦ç†
     /// <summary>
-    /// ŒŸõƒ{ƒbƒNƒX‚ÅŒŸõ‘ÎÛƒL[‚ª‰Ÿ‚³‚ê‚½Û‚Ìˆ—‚ğs‚¢‚Ü‚·B
+    /// æ¤œç´¢ãƒœãƒƒã‚¯ã‚¹ã§æ¤œç´¢å¯¾è±¡ã‚­ãƒ¼ãŒæŠ¼ã•ã‚ŒãŸéš›ã®å‡¦ç†ã‚’è¡Œã„ã¾ã™ã€‚
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
@@ -2487,7 +2487,7 @@ internal sealed partial class MainForm : Form
     }
 
     /// <summary>
-    /// ŒŸõƒ{ƒbƒNƒX“à‚ÌƒeƒLƒXƒg‚ğŒ³‚ÉŒŸõˆ—‚ğs‚¢‚Ü‚·B
+    /// æ¤œç´¢ãƒœãƒƒã‚¯ã‚¹å†…ã®ãƒ†ã‚­ã‚¹ãƒˆã‚’å…ƒã«æ¤œç´¢å‡¦ç†ã‚’è¡Œã„ã¾ã™ã€‚
     /// </summary>
     private void SearchItems()
     {
@@ -2539,15 +2539,15 @@ internal sealed partial class MainForm : Form
 
         var filters = new (string label, string[] values)[]
         {
-            ("ìÒ", searchFilter.Author),
-            ("ƒ^ƒCƒgƒ‹", searchFilter.Title),
+            ("ä½œè€…", searchFilter.Author),
+            ("ã‚¿ã‚¤ãƒˆãƒ«", searchFilter.Title),
             ("BoothID", searchFilter.BoothId),
-            ("ƒAƒoƒ^[", searchFilter.Avatar),
-            ("ƒJƒeƒSƒŠ", searchFilter.Category),
-            ("ƒƒ‚", searchFilter.ItemMemo),
-            ("ƒtƒHƒ‹ƒ_–¼", searchFilter.FolderName),
-            ("ƒtƒ@ƒCƒ‹–¼", searchFilter.FileName),
-            ("À‘•ƒAƒoƒ^[", searchFilter.ImplementedAvatars)
+            ("ã‚¢ãƒã‚¿ãƒ¼", searchFilter.Avatar),
+            ("ã‚«ãƒ†ã‚´ãƒª", searchFilter.Category),
+            ("ãƒ¡ãƒ¢", searchFilter.ItemMemo),
+            ("ãƒ•ã‚©ãƒ«ãƒ€å", searchFilter.FolderName),
+            ("ãƒ•ã‚¡ã‚¤ãƒ«å", searchFilter.FileName),
+            ("å®Ÿè£…ã‚¢ãƒã‚¿ãƒ¼", searchFilter.ImplementedAvatars)
         };
 
         foreach (var (label, values) in filters)
@@ -2561,7 +2561,7 @@ internal sealed partial class MainForm : Form
 
         if (searchFilter.BrokenItems)
         {
-            string translatedLabel = LanguageUtils.Translate("ƒpƒX‚ª‰ó‚ê‚Ä‚¢‚éƒAƒCƒeƒ€", CurrentLanguage);
+            string translatedLabel = LanguageUtils.Translate("ãƒ‘ã‚¹ãŒå£Šã‚Œã¦ã„ã‚‹ã‚¢ã‚¤ãƒ†ãƒ ", CurrentLanguage);
             pathTextList.Add(translatedLabel);
         }
 
@@ -2570,13 +2570,13 @@ internal sealed partial class MainForm : Form
             pathTextList.Add(string.Join(", ", searchFilter.SearchWords));
         }
 
-        PathTextBox.Text = LanguageUtils.Translate("ŒŸõ’†... - ", CurrentLanguage) + string.Join(" / ", pathTextList);
+        PathTextBox.Text = LanguageUtils.Translate("æ¤œç´¢ä¸­... - ", CurrentLanguage) + string.Join(" / ", pathTextList);
     }
     #endregion
 
-    #region ƒŠƒZƒbƒgŠÖ˜A‚Ìˆ—
+    #region ãƒªã‚»ãƒƒãƒˆé–¢é€£ã®å‡¦ç†
     /// <summary>
-    /// ƒƒCƒ“‰æ–Ê‰E‚Ì‰æ–Ê‚ğƒŠƒZƒbƒg‚µ‚Ü‚·B
+    /// ãƒ¡ã‚¤ãƒ³ç”»é¢å³ã®ç”»é¢ã‚’ãƒªã‚»ãƒƒãƒˆã—ã¾ã™ã€‚
     /// </summary>
     /// <param name="startLabelVisible"></param>
     private void ResetAvatarExplorer(bool startLabelVisible = false)
@@ -2610,7 +2610,7 @@ internal sealed partial class MainForm : Form
     }
 
     /// <summary>
-    /// ƒƒCƒ“‰æ–Ê¶‚Ì‰æ–Ê‚ğƒŠƒZƒbƒg‚µ‚Ü‚·B
+    /// ãƒ¡ã‚¤ãƒ³ç”»é¢å·¦ã®ç”»é¢ã‚’ãƒªã‚»ãƒƒãƒˆã—ã¾ã™ã€‚
     /// </summary>
     /// <param name="panel"></param>
     private static void ResetAvatarPage(Panel panel)
@@ -2631,7 +2631,7 @@ internal sealed partial class MainForm : Form
     }
 
     /// <summary>
-    /// ƒƒCƒ“‰æ–Ê‚Ì‘S‚Ä‚Ì‰æ–Ê‚ğ“Ç‚İ‚İ’¼‚µ‚Ü‚·B
+    /// ãƒ¡ã‚¤ãƒ³ç”»é¢ã®å…¨ã¦ã®ç”»é¢ã‚’èª­ã¿è¾¼ã¿ç›´ã—ã¾ã™ã€‚
     /// </summary>
     /// <param name="reloadLeft"></param>
     private void RefleshWindow(bool reloadLeft = true)
@@ -2668,9 +2668,9 @@ internal sealed partial class MainForm : Form
     }
     #endregion
 
-    #region ƒhƒ‰ƒbƒOƒAƒ“ƒhƒhƒƒbƒvŠÖ˜A‚Ìˆ—
+    #region ãƒ‰ãƒ©ãƒƒã‚°ã‚¢ãƒ³ãƒ‰ãƒ‰ãƒ­ãƒƒãƒ—é–¢é€£ã®å‡¦ç†
     /// <summary>
-    /// ƒƒCƒ“‰æ–Ê‰E‚Ì—“‚Éƒhƒ‰ƒbƒO‚³‚ê‚½Û‚Ìˆ—‚ğs‚¢‚Ü‚·B
+    /// ãƒ¡ã‚¤ãƒ³ç”»é¢å³ã®æ¬„ã«ãƒ‰ãƒ©ãƒƒã‚°ã•ã‚ŒãŸéš›ã®å‡¦ç†ã‚’è¡Œã„ã¾ã™ã€‚
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
@@ -2698,7 +2698,7 @@ internal sealed partial class MainForm : Form
     }
 
     /// <summary>
-    /// ƒƒCƒ“‰æ–Ê¶‚Ì—“‚Éƒhƒ‰ƒbƒO‚³‚ê‚½Û‚Ìˆ—‚ğs‚¢‚Ü‚·B
+    /// ãƒ¡ã‚¤ãƒ³ç”»é¢å·¦ã®æ¬„ã«ãƒ‰ãƒ©ãƒƒã‚°ã•ã‚ŒãŸéš›ã®å‡¦ç†ã‚’è¡Œã„ã¾ã™ã€‚
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
@@ -2726,9 +2726,9 @@ internal sealed partial class MainForm : Form
     }
     #endregion
 
-    #region ‰æ–Ê‰º•”‚Ìƒ{ƒ^ƒ“ŠÖ˜A‚Ìˆ—
+    #region ç”»é¢ä¸‹éƒ¨ã®ãƒœã‚¿ãƒ³é–¢é€£ã®å‡¦ç†
     /// <summary>
-    /// CSVƒGƒNƒXƒ|[ƒgƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½Û‚Ìˆ—‚ğs‚¢‚Ü‚·B
+    /// CSVã‚¨ã‚¯ã‚¹ãƒãƒ¼ãƒˆãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚ŒãŸéš›ã®å‡¦ç†ã‚’è¡Œã„ã¾ã™ã€‚
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
@@ -2756,16 +2756,16 @@ internal sealed partial class MainForm : Form
             if (index > 60)
             {
                 FormUtils.ShowMessageBox(
-                    LanguageUtils.Translate("ƒGƒNƒXƒ|[ƒg‚É¸”s‚µ‚Ü‚µ‚½", CurrentLanguage),
-                    LanguageUtils.Translate("ƒGƒ‰[", CurrentLanguage),
+                    LanguageUtils.Translate("ã‚¨ã‚¯ã‚¹ãƒãƒ¼ãƒˆã«å¤±æ•—ã—ã¾ã—ãŸ", CurrentLanguage),
+                    LanguageUtils.Translate("ã‚¨ãƒ©ãƒ¼", CurrentLanguage),
                     true
                 );
                 return;
             }
 
             var commonAvatarResult = FormUtils.ShowConfirmDialog(
-                LanguageUtils.Translate("‘Î‰ƒAƒoƒ^[‚Ì—“‚É‹¤’Ê‘f‘ÌƒOƒ‹[ƒv‚ÌƒAƒoƒ^[‚à’Ç‰Á‚µ‚Ü‚·‚©H", CurrentLanguage),
-                LanguageUtils.Translate("Šm”F", CurrentLanguage)
+                LanguageUtils.Translate("å¯¾å¿œã‚¢ãƒã‚¿ãƒ¼ã®æ¬„ã«å…±é€šç´ ä½“ã‚°ãƒ«ãƒ¼ãƒ—ã®ã‚¢ãƒã‚¿ãƒ¼ã‚‚è¿½åŠ ã—ã¾ã™ã‹ï¼Ÿ", CurrentLanguage),
+                LanguageUtils.Translate("ç¢ºèª", CurrentLanguage)
             );
 
             using var sw = new StreamWriter("./Output/" + fileName, false, Encoding.UTF8);
@@ -2826,25 +2826,25 @@ internal sealed partial class MainForm : Form
             }
 
             FormUtils.ShowMessageBox(
-                LanguageUtils.Translate("OutputƒtƒHƒ‹ƒ_‚ÉƒGƒNƒXƒ|[ƒg‚ªŠ®—¹‚µ‚Ü‚µ‚½I\nƒtƒ@ƒCƒ‹–¼: ", CurrentLanguage) + fileName,
-                LanguageUtils.Translate("Š®—¹", CurrentLanguage)
+                LanguageUtils.Translate("Outputãƒ•ã‚©ãƒ«ãƒ€ã«ã‚¨ã‚¯ã‚¹ãƒãƒ¼ãƒˆãŒå®Œäº†ã—ã¾ã—ãŸï¼\nãƒ•ã‚¡ã‚¤ãƒ«å: ", CurrentLanguage) + fileName,
+                LanguageUtils.Translate("å®Œäº†", CurrentLanguage)
             );
             ExportButton.Enabled = true;
         }
         catch (Exception ex)
         {
             FormUtils.ShowMessageBox(
-                LanguageUtils.Translate("ƒGƒNƒXƒ|[ƒg‚É¸”s‚µ‚Ü‚µ‚½", CurrentLanguage),
-                LanguageUtils.Translate("ƒGƒ‰[", CurrentLanguage),
+                LanguageUtils.Translate("ã‚¨ã‚¯ã‚¹ãƒãƒ¼ãƒˆã«å¤±æ•—ã—ã¾ã—ãŸ", CurrentLanguage),
+                LanguageUtils.Translate("ã‚¨ãƒ©ãƒ¼", CurrentLanguage),
                 true
             );
-            LogUtils.ErrorLogger("ƒGƒNƒXƒ|[ƒg‚É¸”s‚µ‚Ü‚µ‚½B", ex);
+            LogUtils.ErrorLogger("ã‚¨ã‚¯ã‚¹ãƒãƒ¼ãƒˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚", ex);
             ExportButton.Enabled = true;
         }
     }
 
     /// <summary>
-    /// ƒoƒbƒNƒAƒbƒvƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½Û‚Ìˆ—‚ğs‚¢‚Ü‚·B
+    /// ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚ŒãŸéš›ã®å‡¦ç†ã‚’è¡Œã„ã¾ã™ã€‚
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
@@ -2872,8 +2872,8 @@ internal sealed partial class MainForm : Form
             if (index > 60)
             {
                 FormUtils.ShowMessageBox(
-                    LanguageUtils.Translate("ƒoƒbƒNƒAƒbƒv‚É¸”s‚µ‚Ü‚µ‚½", CurrentLanguage),
-                    LanguageUtils.Translate("ƒGƒ‰[", CurrentLanguage),
+                    LanguageUtils.Translate("ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ã«å¤±æ•—ã—ã¾ã—ãŸ", CurrentLanguage),
+                    LanguageUtils.Translate("ã‚¨ãƒ©ãƒ¼", CurrentLanguage),
                     true
                 );
                 return;
@@ -2882,25 +2882,25 @@ internal sealed partial class MainForm : Form
             ZipFile.CreateFromDirectory("./Datas", "./Backup/" + fileName);
 
             FormUtils.ShowMessageBox(
-                LanguageUtils.Translate("BackupƒtƒHƒ‹ƒ_‚ÉƒoƒbƒNƒAƒbƒv‚ªŠ®—¹‚µ‚Ü‚µ‚½I\n\n•œŒ³‚µ‚½‚¢ê‡‚ÍA\"ƒf[ƒ^‚ğ“Ç‚İ‚Ş\"ƒ{ƒ^ƒ“‚ÅŒ»İì¬‚³‚ê‚½ƒtƒ@ƒCƒ‹‚ğ“WŠJ‚µ‚½‚à‚Ì‚ğ‘I‘ğ‚µ‚Ä‚­‚¾‚³‚¢B\n\nƒtƒ@ƒCƒ‹–¼: ", CurrentLanguage) + fileName,
-                LanguageUtils.Translate("Š®—¹", CurrentLanguage)
+                LanguageUtils.Translate("Backupãƒ•ã‚©ãƒ«ãƒ€ã«ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ãŒå®Œäº†ã—ã¾ã—ãŸï¼\n\nå¾©å…ƒã—ãŸã„å ´åˆã¯ã€\"ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã‚€\"ãƒœã‚¿ãƒ³ã§ç¾åœ¨ä½œæˆã•ã‚ŒãŸãƒ•ã‚¡ã‚¤ãƒ«ã‚’å±•é–‹ã—ãŸã‚‚ã®ã‚’é¸æŠã—ã¦ãã ã•ã„ã€‚\n\nãƒ•ã‚¡ã‚¤ãƒ«å: ", CurrentLanguage) + fileName,
+                LanguageUtils.Translate("å®Œäº†", CurrentLanguage)
             );
             MakeBackupButton.Enabled = true;
         }
         catch (Exception ex)
         {
             FormUtils.ShowMessageBox(
-                LanguageUtils.Translate("ƒoƒbƒNƒAƒbƒv‚É¸”s‚µ‚Ü‚µ‚½", CurrentLanguage),
-                LanguageUtils.Translate("ƒGƒ‰[", CurrentLanguage),
+                LanguageUtils.Translate("ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ã«å¤±æ•—ã—ã¾ã—ãŸ", CurrentLanguage),
+                LanguageUtils.Translate("ã‚¨ãƒ©ãƒ¼", CurrentLanguage),
                 true
             );
-            LogUtils.ErrorLogger("ƒoƒbƒNƒAƒbƒv‚É¸”s‚µ‚Ü‚µ‚½B", ex);
+            LogUtils.ErrorLogger("ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ã«å¤±æ•—ã—ã¾ã—ãŸã€‚", ex);
             MakeBackupButton.Enabled = true;
         }
     }
 
     /// <summary>
-    /// Œ¾Œê•ÏXƒ{ƒbƒNƒX‚Ì‘I‘ğó‹µ‚ªXV‚³‚ê‚½Û‚Ìˆ—‚ğs‚¢‚Ü‚·B
+    /// è¨€èªå¤‰æ›´ãƒœãƒƒã‚¯ã‚¹ã®é¸æŠçŠ¶æ³ãŒæ›´æ–°ã•ã‚ŒãŸéš›ã®å‡¦ç†ã‚’è¡Œã„ã¾ã™ã€‚
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
@@ -2926,7 +2926,7 @@ internal sealed partial class MainForm : Form
 
         RedrawFilterName();
 
-        string[] sortingItems = ["ƒ^ƒCƒgƒ‹", "ìÒ", "“o˜^“ú", "XV“ú", "À‘•Ï‚İ", "–¢À‘•"];
+        string[] sortingItems = ["ã‚¿ã‚¤ãƒˆãƒ«", "ä½œè€…", "ç™»éŒ²æ—¥æ™‚", "æ›´æ–°æ—¥æ™‚", "å®Ÿè£…æ¸ˆã¿", "æœªå®Ÿè£…"];
         var selected = SortingBox.SelectedIndex;
         SortingBox.Items.Clear();
         SortingBox.Items.AddRange(sortingItems.Select(item => LanguageUtils.Translate(item, CurrentLanguage)).ToArray());
@@ -2947,28 +2947,28 @@ internal sealed partial class MainForm : Form
     }
 
     /// <summary>
-    /// •À‚Ñ‘Ö‚¦‡‚Ì‘I‘ğó‹µ‚ªXV‚³‚ê‚½Û‚Ìˆ—‚ğs‚¢‚Ü‚·B
+    /// ä¸¦ã³æ›¿ãˆé †ã®é¸æŠçŠ¶æ³ãŒæ›´æ–°ã•ã‚ŒãŸéš›ã®å‡¦ç†ã‚’è¡Œã„ã¾ã™ã€‚
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void SortingBox_SelectedIndexChanged(object sender, EventArgs e) => RefleshWindow();
 
     /// <summary>
-    /// ƒf[ƒ^‚ğ“Ç‚İ‚Şƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½Û‚Ìˆ—‚ğs‚¢‚Ü‚·B
+    /// ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã‚€ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚ŒãŸéš›ã®å‡¦ç†ã‚’è¡Œã„ã¾ã™ã€‚
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void LoadData_Click(object sender, EventArgs e) => LoadDataFromFolder();
 
     /// <summary>
-    /// ƒtƒHƒ‹ƒ_‘I‘ğƒ_ƒCƒAƒƒO‚ğ•\¦‚µA‘I‘ğ‚³‚ê‚½ƒtƒHƒ‹ƒ_‚©‚çƒf[ƒ^‚ğ“Ç‚İ‚İ‚Ü‚·B
+    /// ãƒ•ã‚©ãƒ«ãƒ€é¸æŠãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’è¡¨ç¤ºã—ã€é¸æŠã•ã‚ŒãŸãƒ•ã‚©ãƒ«ãƒ€ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã¿ã¾ã™ã€‚
     /// </summary>
     private async void LoadDataFromFolder()
     {
-        // ©“®ƒoƒbƒNƒAƒbƒvƒtƒHƒ‹ƒ_‚©‚ç•œŒ³‚·‚é‚©•·‚­
+        // è‡ªå‹•ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ãƒ•ã‚©ãƒ«ãƒ€ã‹ã‚‰å¾©å…ƒã™ã‚‹ã‹èã
         var result = FormUtils.ShowConfirmDialog(
-            LanguageUtils.Translate("©“®ƒoƒbƒNƒAƒbƒvƒtƒHƒ‹ƒ_‚©‚ç•œŒ³‚µ‚Ü‚·‚©H", CurrentLanguage),
-            LanguageUtils.Translate("Šm”F", CurrentLanguage)
+            LanguageUtils.Translate("è‡ªå‹•ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ãƒ•ã‚©ãƒ«ãƒ€ã‹ã‚‰å¾©å…ƒã—ã¾ã™ã‹ï¼Ÿ", CurrentLanguage),
+            LanguageUtils.Translate("ç¢ºèª", CurrentLanguage)
         );
 
         if (result)
@@ -2980,12 +2980,12 @@ internal sealed partial class MainForm : Form
 
             if (string.IsNullOrEmpty(backupPath)) return;
 
-            // ƒoƒbƒNƒAƒbƒvƒtƒHƒ‹ƒ_‚ª‘¶İ‚µ‚È‚¢ê‡
+            // ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ãƒ•ã‚©ãƒ«ãƒ€ãŒå­˜åœ¨ã—ãªã„å ´åˆ
             if (!Directory.Exists(backupPath))
             {
                 FormUtils.ShowMessageBox(
-                    LanguageUtils.Translate("ƒoƒbƒNƒAƒbƒvƒtƒHƒ‹ƒ_‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ‚Å‚µ‚½B", CurrentLanguage),
-                    LanguageUtils.Translate("ƒGƒ‰[", CurrentLanguage),
+                    LanguageUtils.Translate("ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ãƒ•ã‚©ãƒ«ãƒ€ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã§ã—ãŸã€‚", CurrentLanguage),
+                    LanguageUtils.Translate("ã‚¨ãƒ©ãƒ¼", CurrentLanguage),
                     true
                 );
                 return;
@@ -2997,8 +2997,8 @@ internal sealed partial class MainForm : Form
                 if (!File.Exists(filePath))
                 {
                     FormUtils.ShowMessageBox(
-                        LanguageUtils.Translate("ƒAƒCƒeƒ€ƒtƒ@ƒCƒ‹‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ‚Å‚µ‚½B", CurrentLanguage),
-                        LanguageUtils.Translate("ƒGƒ‰[", CurrentLanguage),
+                        LanguageUtils.Translate("ã‚¢ã‚¤ãƒ†ãƒ ãƒ•ã‚¡ã‚¤ãƒ«ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã§ã—ãŸã€‚", CurrentLanguage),
+                        LanguageUtils.Translate("ã‚¨ãƒ©ãƒ¼", CurrentLanguage),
                         true
                     );
                 }
@@ -3012,8 +3012,8 @@ internal sealed partial class MainForm : Form
                 if (!File.Exists(filePath2))
                 {
                     FormUtils.ShowMessageBox(
-                        LanguageUtils.Translate("‹¤’Ê‘f‘Ìƒtƒ@ƒCƒ‹‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ‚Å‚µ‚½B", CurrentLanguage),
-                        LanguageUtils.Translate("ƒGƒ‰[", CurrentLanguage),
+                        LanguageUtils.Translate("å…±é€šç´ ä½“ãƒ•ã‚¡ã‚¤ãƒ«ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã§ã—ãŸã€‚", CurrentLanguage),
+                        LanguageUtils.Translate("ã‚¨ãƒ©ãƒ¼", CurrentLanguage),
                         true
                     );
                 }
@@ -3024,16 +3024,16 @@ internal sealed partial class MainForm : Form
                 }
 
                 FormUtils.ShowMessageBox(
-                    LanguageUtils.Translate("•œŒ³‚ªŠ®—¹‚µ‚Ü‚µ‚½B", CurrentLanguage),
-                    LanguageUtils.Translate("Š®—¹", CurrentLanguage)
+                    LanguageUtils.Translate("å¾©å…ƒãŒå®Œäº†ã—ã¾ã—ãŸã€‚", CurrentLanguage),
+                    LanguageUtils.Translate("å®Œäº†", CurrentLanguage)
                 );
             }
             catch (Exception ex)
             {
-                LogUtils.ErrorLogger("ƒf[ƒ^‚Ì“Ç‚İ‚İ‚É¸”s‚µ‚Ü‚µ‚½B", ex);
+                LogUtils.ErrorLogger("ãƒ‡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿ã«å¤±æ•—ã—ã¾ã—ãŸã€‚", ex);
                 FormUtils.ShowMessageBox(
-                    LanguageUtils.Translate("ƒf[ƒ^‚Ì“Ç‚İ‚İ‚É¸”s‚µ‚Ü‚µ‚½BÚ×‚ÍErrorLog.txt‚ğ‚²——‚­‚¾‚³‚¢B", CurrentLanguage),
-                    LanguageUtils.Translate("ƒGƒ‰[", CurrentLanguage),
+                    LanguageUtils.Translate("ãƒ‡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿ã«å¤±æ•—ã—ã¾ã—ãŸã€‚è©³ç´°ã¯ErrorLog.txtã‚’ã”è¦§ãã ã•ã„ã€‚", CurrentLanguage),
+                    LanguageUtils.Translate("ã‚¨ãƒ©ãƒ¼", CurrentLanguage),
                     true
                 );
             }
@@ -3043,7 +3043,7 @@ internal sealed partial class MainForm : Form
             FolderBrowserDialog fbd = new()
             {
                 UseDescriptionForTitle = true,
-                Description = LanguageUtils.Translate("ˆÈ‘O‚Ìƒo[ƒWƒ‡ƒ“‚ÌDatasƒtƒHƒ‹ƒ_A‚à‚µ‚­‚Í“WŠJ‚µ‚½ƒoƒbƒNƒAƒbƒvƒtƒHƒ‹ƒ_‚ğ‘I‘ğ‚µ‚Ä‚­‚¾‚³‚¢", CurrentLanguage),
+                Description = LanguageUtils.Translate("ä»¥å‰ã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã®Datasãƒ•ã‚©ãƒ«ãƒ€ã€ã‚‚ã—ãã¯å±•é–‹ã—ãŸãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ãƒ•ã‚©ãƒ«ãƒ€ã‚’é¸æŠã—ã¦ãã ã•ã„", CurrentLanguage),
                 ShowNewFolderButton = false
             };
             if (fbd.ShowDialog() != DialogResult.OK) return;
@@ -3059,8 +3059,8 @@ internal sealed partial class MainForm : Form
                 if (!File.Exists(filePath))
                 {
                     FormUtils.ShowMessageBox(
-                        LanguageUtils.Translate("ƒAƒCƒeƒ€ƒtƒ@ƒCƒ‹‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ‚Å‚µ‚½B", CurrentLanguage),
-                        LanguageUtils.Translate("ƒGƒ‰[", CurrentLanguage),
+                        LanguageUtils.Translate("ã‚¢ã‚¤ãƒ†ãƒ ãƒ•ã‚¡ã‚¤ãƒ«ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã§ã—ãŸã€‚", CurrentLanguage),
+                        LanguageUtils.Translate("ã‚¨ãƒ©ãƒ¼", CurrentLanguage),
                         true
                     );
                 }
@@ -3074,8 +3074,8 @@ internal sealed partial class MainForm : Form
                 if (!File.Exists(filePath2))
                 {
                     FormUtils.ShowMessageBox(
-                        LanguageUtils.Translate("‹¤’Ê‘f‘Ìƒtƒ@ƒCƒ‹‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ‚Å‚µ‚½B", CurrentLanguage),
-                        LanguageUtils.Translate("ƒGƒ‰[", CurrentLanguage),
+                        LanguageUtils.Translate("å…±é€šç´ ä½“ãƒ•ã‚¡ã‚¤ãƒ«ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã§ã—ãŸã€‚", CurrentLanguage),
+                        LanguageUtils.Translate("ã‚¨ãƒ©ãƒ¼", CurrentLanguage),
                         true
                     );
                 }
@@ -3086,8 +3086,8 @@ internal sealed partial class MainForm : Form
                 }
 
                 var result2 = FormUtils.ShowConfirmDialog(
-                    LanguageUtils.Translate("ThumbnailƒtƒHƒ‹ƒ_AAuthorImageƒtƒHƒ‹ƒ_AItemsƒtƒHƒ‹ƒ_‚àƒRƒs[‚µ‚Ü‚·‚©H", CurrentLanguage),
-                    LanguageUtils.Translate("Šm”F", CurrentLanguage)
+                    LanguageUtils.Translate("Thumbnailãƒ•ã‚©ãƒ«ãƒ€ã€AuthorImageãƒ•ã‚©ãƒ«ãƒ€ã€Itemsãƒ•ã‚©ãƒ«ãƒ€ã‚‚ã‚³ãƒ”ãƒ¼ã—ã¾ã™ã‹ï¼Ÿ", CurrentLanguage),
+                    LanguageUtils.Translate("ç¢ºèª", CurrentLanguage)
                 );
 
                 if (!result2)
@@ -3101,8 +3101,8 @@ internal sealed partial class MainForm : Form
                     PathTextBox.Text = GeneratePath();
 
                     FormUtils.ShowMessageBox(
-                        LanguageUtils.Translate("ƒRƒs[‚ªŠ®—¹‚µ‚Ü‚µ‚½B", CurrentLanguage),
-                        LanguageUtils.Translate("Š®—¹", CurrentLanguage)
+                        LanguageUtils.Translate("ã‚³ãƒ”ãƒ¼ãŒå®Œäº†ã—ã¾ã—ãŸã€‚", CurrentLanguage),
+                        LanguageUtils.Translate("å®Œäº†", CurrentLanguage)
                     );
                     return;
                 }
@@ -3121,11 +3121,11 @@ internal sealed partial class MainForm : Form
                 {
                     try
                     {
-                        await FileSystemUtils.CopyDirectoryWithProgress(thumbnailPath, "./Datas/Thumbnail", CurrentLanguage, LanguageUtils.Translate("ƒf[ƒ^‚ÌˆÚs’†", CurrentLanguage) + " (Thumbnail)", true);
+                        await FileSystemUtils.CopyDirectoryWithProgress(thumbnailPath, "./Datas/Thumbnail", CurrentLanguage, LanguageUtils.Translate("ãƒ‡ãƒ¼ã‚¿ã®ç§»è¡Œä¸­", CurrentLanguage) + " (Thumbnail)", true);
                     }
                     catch (Exception ex)
                     {
-                        LogUtils.ErrorLogger("ƒTƒ€ƒlƒCƒ‹‚ÌƒRƒs[‚É¸”s‚µ‚Ü‚µ‚½B", ex);
+                        LogUtils.ErrorLogger("ã‚µãƒ ãƒã‚¤ãƒ«ã®ã‚³ãƒ”ãƒ¼ã«å¤±æ•—ã—ã¾ã—ãŸã€‚", ex);
                         thumbnailResult = false;
                     }
                 }
@@ -3134,11 +3134,11 @@ internal sealed partial class MainForm : Form
                 {
                     try
                     {
-                        await FileSystemUtils.CopyDirectoryWithProgress(authorImagePath, "./Datas/AuthorImage", CurrentLanguage, LanguageUtils.Translate("ƒf[ƒ^‚ÌˆÚs’†", CurrentLanguage) + " (Author Image)", true);
+                        await FileSystemUtils.CopyDirectoryWithProgress(authorImagePath, "./Datas/AuthorImage", CurrentLanguage, LanguageUtils.Translate("ãƒ‡ãƒ¼ã‚¿ã®ç§»è¡Œä¸­", CurrentLanguage) + " (Author Image)", true);
                     }
                     catch (Exception ex)
                     {
-                        LogUtils.ErrorLogger("ìÒ‰æ‘œ‚ÌƒRƒs[‚É¸”s‚µ‚Ü‚µ‚½B", ex);
+                        LogUtils.ErrorLogger("ä½œè€…ç”»åƒã®ã‚³ãƒ”ãƒ¼ã«å¤±æ•—ã—ã¾ã—ãŸã€‚", ex);
                         authorImageResult = false;
                     }
                 }
@@ -3148,38 +3148,38 @@ internal sealed partial class MainForm : Form
                     try
                     {
                         Enabled = false;
-                        await FileSystemUtils.CopyDirectoryWithProgress(itemsPath, "./Datas/Items", CurrentLanguage, LanguageUtils.Translate("ƒf[ƒ^‚ÌˆÚs’†", CurrentLanguage) + " (Items)", true);
+                        await FileSystemUtils.CopyDirectoryWithProgress(itemsPath, "./Datas/Items", CurrentLanguage, LanguageUtils.Translate("ãƒ‡ãƒ¼ã‚¿ã®ç§»è¡Œä¸­", CurrentLanguage) + " (Items)", true);
                     }
                     catch (Exception ex)
                     {
-                        LogUtils.ErrorLogger("Items‚ÌƒRƒs[‚É¸”s‚µ‚Ü‚µ‚½B", ex);
+                        LogUtils.ErrorLogger("Itemsã®ã‚³ãƒ”ãƒ¼ã«å¤±æ•—ã—ã¾ã—ãŸã€‚", ex);
                         itemsResult = false;
                     }
                 }
 
-                var thumbilResultText = thumbnailResult ? string.Empty : "\n" + LanguageUtils.Translate("ƒTƒ€ƒlƒCƒ‹‚ÌƒRƒs[‚Éˆê•”¸”s‚µ‚Ä‚¢‚Ü‚·B", CurrentLanguage);
-                var authorImageResultText = authorImageResult ? string.Empty : "\n" + LanguageUtils.Translate("ìÒ‰æ‘œ‚ÌƒRƒs[‚Éˆê•”¸”s‚µ‚Ä‚¢‚Ü‚·B", CurrentLanguage);
-                var itemsResultText = itemsResult ? string.Empty : "\n" + LanguageUtils.Translate("Items‚ÌƒRƒs[‚Éˆê•”¸”s‚µ‚Ä‚¢‚Ü‚·B", CurrentLanguage);
+                var thumbilResultText = thumbnailResult ? string.Empty : "\n" + LanguageUtils.Translate("ã‚µãƒ ãƒã‚¤ãƒ«ã®ã‚³ãƒ”ãƒ¼ã«ä¸€éƒ¨å¤±æ•—ã—ã¦ã„ã¾ã™ã€‚", CurrentLanguage);
+                var authorImageResultText = authorImageResult ? string.Empty : "\n" + LanguageUtils.Translate("ä½œè€…ç”»åƒã®ã‚³ãƒ”ãƒ¼ã«ä¸€éƒ¨å¤±æ•—ã—ã¦ã„ã¾ã™ã€‚", CurrentLanguage);
+                var itemsResultText = itemsResult ? string.Empty : "\n" + LanguageUtils.Translate("Itemsã®ã‚³ãƒ”ãƒ¼ã«ä¸€éƒ¨å¤±æ•—ã—ã¦ã„ã¾ã™ã€‚", CurrentLanguage);
 
-                var resultMessage = LanguageUtils.Translate("ƒRƒs[‚ªŠ®—¹‚µ‚Ü‚µ‚½B", CurrentLanguage);
+                var resultMessage = LanguageUtils.Translate("ã‚³ãƒ”ãƒ¼ãŒå®Œäº†ã—ã¾ã—ãŸã€‚", CurrentLanguage);
                 if (!thumbnailResult || !authorImageResult || !itemsResult)
                 {
-                    resultMessage += "\n\n" + LanguageUtils.Translate("ƒRƒs[¸”sˆê——: ", CurrentLanguage) +
+                    resultMessage += "\n\n" + LanguageUtils.Translate("ã‚³ãƒ”ãƒ¼å¤±æ•—ä¸€è¦§: ", CurrentLanguage) +
                     thumbilResultText + authorImageResultText + itemsResultText;
                 }
 
                 FormUtils.ShowMessageBox(
                     resultMessage,
-                    LanguageUtils.Translate("Š®—¹", CurrentLanguage)
+                    LanguageUtils.Translate("å®Œäº†", CurrentLanguage)
                 );
             }
             catch (Exception ex)
             {
                 FormUtils.ShowMessageBox(
-                    LanguageUtils.Translate("ƒf[ƒ^‚Ì“Ç‚İ‚İ‚É¸”s‚µ‚Ü‚µ‚½BÚ×‚ÍErrorLog.txt‚ğ‚²——‚­‚¾‚³‚¢B", CurrentLanguage),
-                    LanguageUtils.Translate("ƒGƒ‰[", CurrentLanguage)
+                    LanguageUtils.Translate("ãƒ‡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿ã«å¤±æ•—ã—ã¾ã—ãŸã€‚è©³ç´°ã¯ErrorLog.txtã‚’ã”è¦§ãã ã•ã„ã€‚", CurrentLanguage),
+                    LanguageUtils.Translate("ã‚¨ãƒ©ãƒ¼", CurrentLanguage)
                 );
-                LogUtils.ErrorLogger("ƒf[ƒ^‚Ì“Ç‚İ‚İ‚É¸”s‚µ‚Ü‚µ‚½B", ex);
+                LogUtils.ErrorLogger("ãƒ‡ãƒ¼ã‚¿ã®èª­ã¿è¾¼ã¿ã«å¤±æ•—ã—ã¾ã—ãŸã€‚", ex);
             }
             finally
             {
@@ -3202,7 +3202,7 @@ internal sealed partial class MainForm : Form
     }
 
     /// <summary>
-    /// ‹¤’Ê‘f‘ÌŠÇ—ƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½Û‚Ìˆ—‚ğs‚¢‚Ü‚·B
+    /// å…±é€šç´ ä½“ç®¡ç†ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚ŒãŸéš›ã®å‡¦ç†ã‚’è¡Œã„ã¾ã™ã€‚
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
@@ -3216,9 +3216,9 @@ internal sealed partial class MainForm : Form
     }
     #endregion
 
-    #region ƒŠƒTƒCƒYŠÖ˜A‚Ìˆ—
+    #region ãƒªã‚µã‚¤ã‚ºé–¢é€£ã®å‡¦ç†
     /// <summary>
-    /// ƒtƒH[ƒ€‚ÌƒRƒ“ƒgƒ[ƒ‹‚ÌƒtƒHƒ“ƒg‚ğ•ÏX‚µ‚Ü‚·B
+    /// ãƒ•ã‚©ãƒ¼ãƒ ã®ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã®ãƒ•ã‚©ãƒ³ãƒˆã‚’å¤‰æ›´ã—ã¾ã™ã€‚
     /// </summary>
     /// <param name="control"></param>
     private void ChangeControlFont(Control control)
@@ -3236,7 +3236,7 @@ internal sealed partial class MainForm : Form
     }
 
     /// <summary>
-    /// ƒtƒH[ƒ€‚ÌƒŠƒTƒCƒY‚ÉƒRƒ“ƒgƒ[ƒ‹‚ÌƒTƒCƒY‚âˆÊ’u‚ğ•ÏX‚µ‚Ü‚·B
+    /// ãƒ•ã‚©ãƒ¼ãƒ ã®ãƒªã‚µã‚¤ã‚ºæ™‚ã«ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã®ã‚µã‚¤ã‚ºã‚„ä½ç½®ã‚’å¤‰æ›´ã—ã¾ã™ã€‚
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
@@ -3247,7 +3247,7 @@ internal sealed partial class MainForm : Form
     }
 
     /// <summary>
-    /// ƒRƒ“ƒgƒ[ƒ‹‚ÌƒTƒCƒY‚âˆÊ’u‚ğ•ÏX‚µ‚Ü‚·B
+    /// ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã®ã‚µã‚¤ã‚ºã‚„ä½ç½®ã‚’å¤‰æ›´ã—ã¾ã™ã€‚
     /// </summary>
     private void ResizeControl()
     {
@@ -3262,7 +3262,7 @@ internal sealed partial class MainForm : Form
 
         foreach (Control control in allControls)
         {
-            // ƒTƒCƒY‚ÌƒXƒP[ƒŠƒ“ƒO
+            // ã‚µã‚¤ã‚ºã®ã‚¹ã‚±ãƒ¼ãƒªãƒ³ã‚°
             if (!_defaultControlSize.TryGetValue(control.Name, out var defaultSize))
             {
                 defaultSize = new ControlScale()
@@ -3326,7 +3326,7 @@ internal sealed partial class MainForm : Form
     }
 
     /// <summary>
-    /// ƒ‰ƒxƒ‹‚ÌˆÊ’u‚ğ’²®‚µ‚Ü‚·B
+    /// ãƒ©ãƒ™ãƒ«ã®ä½ç½®ã‚’èª¿æ•´ã—ã¾ã™ã€‚
     /// </summary>
     private void AdjustLabelPosition()
     {
@@ -3356,7 +3356,7 @@ internal sealed partial class MainForm : Form
     }
 
     /// <summary>
-    /// ƒƒCƒ“ƒtƒH[ƒ€“à‚Ìƒ{ƒ^ƒ“ƒTƒCƒY‚ğ•ÏX‚µ‚Ü‚·B
+    /// ãƒ¡ã‚¤ãƒ³ãƒ•ã‚©ãƒ¼ãƒ å†…ã®ãƒœã‚¿ãƒ³ã‚µã‚¤ã‚ºã‚’å¤‰æ›´ã—ã¾ã™ã€‚
     /// </summary>
     private void ScaleItemButtons()
     {
@@ -3429,9 +3429,9 @@ internal sealed partial class MainForm : Form
     }
     #endregion
 
-    #region ƒoƒbƒNƒAƒbƒvŠÖ˜A‚Ìˆ—
+    #region ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—é–¢é€£ã®å‡¦ç†
     /// <summary>
-    /// ƒtƒ@ƒCƒ‹‚Ì©“®ƒoƒbƒNƒAƒbƒv‚ğs‚¢‚Ü‚·B
+    /// ãƒ•ã‚¡ã‚¤ãƒ«ã®è‡ªå‹•ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ã‚’è¡Œã„ã¾ã™ã€‚
     /// </summary>
     private void AutoBackup()
     {
@@ -3446,7 +3446,7 @@ internal sealed partial class MainForm : Form
     }
 
     /// <summary>
-    /// ÅIƒoƒbƒNƒAƒbƒv‚ğƒtƒH[ƒ€ƒ^ƒCƒgƒ‹‚É•\¦‚µ‚Ü‚·B
+    /// æœ€çµ‚ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—æ™‚åˆ»ã‚’ãƒ•ã‚©ãƒ¼ãƒ ã‚¿ã‚¤ãƒˆãƒ«ã«è¡¨ç¤ºã—ã¾ã™ã€‚
     /// </summary>
     private void BackupTimeTitle()
     {
@@ -3459,15 +3459,15 @@ internal sealed partial class MainForm : Form
         {
             if (_lastBackupTime == DateTime.MinValue)
             {
-                if (_lastBackupError) Text = CurrentVersionFormText + " - " + LanguageUtils.Translate("ƒoƒbƒNƒAƒbƒvƒGƒ‰[", CurrentLanguage);
+                if (_lastBackupError) Text = CurrentVersionFormText + " - " + LanguageUtils.Translate("ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ã‚¨ãƒ©ãƒ¼", CurrentLanguage);
                 return;
             }
 
             var timeSpan = DateTime.Now - _lastBackupTime;
             var minutes = timeSpan.Minutes;
-            Text = CurrentVersionFormText + $" - {LanguageUtils.Translate("ÅI©“®ƒoƒbƒNƒAƒbƒv: ", CurrentLanguage) + minutes + LanguageUtils.Translate("•ª‘O", CurrentLanguage)}";
+            Text = CurrentVersionFormText + $" - {LanguageUtils.Translate("æœ€çµ‚è‡ªå‹•ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—: ", CurrentLanguage) + minutes + LanguageUtils.Translate("åˆ†å‰", CurrentLanguage)}";
 
-            if (_lastBackupError) Text += " - " + LanguageUtils.Translate("ƒoƒbƒNƒAƒbƒvƒGƒ‰[", CurrentLanguage);
+            if (_lastBackupError) Text += " - " + LanguageUtils.Translate("ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ã‚¨ãƒ©ãƒ¼", CurrentLanguage);
         };
 
         timer.Start();
@@ -3481,7 +3481,7 @@ internal sealed partial class MainForm : Form
     };
 
     /// <summary>
-    /// ƒtƒ@ƒCƒ‹‚ÌƒoƒbƒNƒAƒbƒv‚ğs‚¢‚Ü‚·B
+    /// ãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ã‚’è¡Œã„ã¾ã™ã€‚
     /// </summary>
     private void BackupFile()
     {
@@ -3494,14 +3494,14 @@ internal sealed partial class MainForm : Form
         catch (Exception ex)
         {
             _lastBackupError = true;
-            LogUtils.ErrorLogger("©“®ƒoƒbƒNƒAƒbƒv‚É¸”s‚µ‚Ü‚µ‚½B", ex);
+            LogUtils.ErrorLogger("è‡ªå‹•ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ã«å¤±æ•—ã—ã¾ã—ãŸã€‚", ex);
         }
     }
     #endregion
 
-    #region ƒtƒHƒ‹ƒ_[‚ª•Â‚¶‚ç‚ê‚éÛ‚Ìˆ—
+    #region ãƒ•ã‚©ãƒ«ãƒ€ãƒ¼ãŒé–‰ã˜ã‚‰ã‚Œã‚‹éš›ã®å‡¦ç†
     /// <summary>
-    /// ƒtƒH[ƒ€‚ª•Â‚¶‚ç‚ê‚éÛ‚Éƒf[ƒ^‚ğ•Û‘¶‚µAˆêƒtƒHƒ‹ƒ_‚ğíœ‚µ‚Ü‚·B
+    /// ãƒ•ã‚©ãƒ¼ãƒ ãŒé–‰ã˜ã‚‰ã‚Œã‚‹éš›ã«ãƒ‡ãƒ¼ã‚¿ã‚’ä¿å­˜ã—ã€ä¸€æ™‚ãƒ•ã‚©ãƒ«ãƒ€ã‚’å‰Šé™¤ã—ã¾ã™ã€‚
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
@@ -3514,7 +3514,7 @@ internal sealed partial class MainForm : Form
         }
         catch (Exception ex)
         {
-            LogUtils.ErrorLogger("ˆêƒtƒHƒ‹ƒ_‚Ìíœ‚É¸”s‚µ‚Ü‚µ‚½B", ex);
+            LogUtils.ErrorLogger("ä¸€æ™‚ãƒ•ã‚©ãƒ«ãƒ€ã®å‰Šé™¤ã«å¤±æ•—ã—ã¾ã—ãŸã€‚", ex);
         }
     }
     #endregion

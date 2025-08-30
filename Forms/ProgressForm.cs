@@ -1,4 +1,4 @@
-﻿namespace Avatar_Explorer.Forms;
+namespace Avatar_Explorer.Forms;
 
 internal sealed class ProgressForm : Form
 {

@@ -1,4 +1,4 @@
-﻿namespace Avatar_Explorer.Models;
+namespace Avatar_Explorer.Models;
 
 /// <summary>
 /// アプリケーションの起動情報を表します。

@@ -1,4 +1,4 @@
-﻿using Avatar_Explorer.Models;
+using Avatar_Explorer.Models;
 using Avatar_Explorer.Models.Booth;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -112,15 +112,12 @@ internal static partial class BoothUtils
             _ => ItemType.Unknown
         };
 
-        foreach (var mapping in TITLE_MAPPINGS)
-        {
-            if (mapping.Key.Any(title.Contains))
-            {
-                return mapping.Value;
-            }
-        }
+        var matchedType = TITLE_MAPPINGS
+            .Where(mapping => mapping.Key.Any(title.Contains))
+            .Select(mapping => mapping.Value)
+            .FirstOrDefault();
 
-        return suggestType;
+        return matchedType != ItemType.Unknown && matchedType != default ? matchedType : suggestType;
     }
 
 
