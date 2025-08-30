@@ -278,9 +278,9 @@ internal sealed partial class MainForm : Form
             }
 
             // Check if the software is launched with a URL
-            if (launchInfo.launchedWithUrl && launchInfo.assetDirs.Length != 0 && !string.IsNullOrEmpty(launchInfo.assetId))
+            if (launchInfo.LaunchedWithUrl && launchInfo.AssetDirs.Length != 0 && !string.IsNullOrEmpty(launchInfo.AssetId))
             {
-                AddItemForm addItem = new(this, ItemType.Avatar, null, false, null, launchInfo.assetDirs, launchInfo.assetId);
+                AddItemForm addItem = new(this, ItemType.Avatar, null, false, null, launchInfo.AssetDirs, launchInfo.AssetId);
                 addItem.ShowDialog();
 
                 DatabaseUtils.SaveItemsData(Items);
@@ -2407,7 +2407,7 @@ internal sealed partial class MainForm : Form
         SearchResultLabel.Text = string.Empty;
         _isSearching = false;
 
-        if (CurrentPath.IsEmpty())
+        if (CurrentPath.IsEmpty)
         {
             // エラー音を再生
             SystemSounds.Hand.Play();

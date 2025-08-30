@@ -8,54 +8,52 @@ internal class CurrentPath
     /// <summary>
     /// 現在選択されているアバターの名前を取得または設定します。
     /// </summary>
-    internal string? CurrentSelectedAvatar;
+    internal string? CurrentSelectedAvatar { get; set; }
 
     /// <summary>
     /// 現在選択されているアバターのパスを取得または設定します。
     /// </summary>
-    internal string? CurrentSelectedAvatarPath;
+    internal string? CurrentSelectedAvatarPath { get; set; }
 
     /// <summary>
     /// 現在選択されている作者を取得または設定します。
     /// </summary>
-    internal Author? CurrentSelectedAuthor;
+    internal Author? CurrentSelectedAuthor { get; set; }
 
     /// <summary>
     /// 現在選択されているカテゴリを取得または設定します。
     /// </summary>
-    internal ItemType CurrentSelectedCategory = ItemType.Unknown;
+    internal ItemType CurrentSelectedCategory { get; set; } = ItemType.Unknown;
 
     /// <summary>
     /// 現在選択されているカスタムカテゴリを取得または設定します。
     /// </summary>
-    internal string CurrentSelectedCustomCategory = string.Empty;
+    internal string CurrentSelectedCustomCategory { get; set; } = string.Empty;
 
     /// <summary>
     /// 現在選択されているアイテムを取得または設定します。
     /// </summary>
-    internal Item? CurrentSelectedItem;
+    internal Item? CurrentSelectedItem { get; set; }
 
     /// <summary>
     /// 現在選択されているアイテム内のカテゴリを取得または設定します。
     /// </summary>
-    internal string? CurrentSelectedItemCategory;
+    internal string? CurrentSelectedItemCategory { get; set; }
 
     /// <summary>
     /// 現在選択されているアイテムフォルダ情報を取得または設定します。
     /// </summary>
-    internal ItemFolderInfo CurrentSelectedItemFolderInfo = new();
+    internal ItemFolderInfo CurrentSelectedItemFolderInfo { get; set; } = new();
 
     /// <summary>
     /// パス全体が空かどうかを取得します。
     /// </summary>
     /// <returns></returns>
-    internal bool IsEmpty()
-    {
-        return CurrentSelectedAvatar == null &&
-               CurrentSelectedAvatarPath == null &&
-               CurrentSelectedAuthor == null &&
-               CurrentSelectedCategory == ItemType.Unknown &&
-               CurrentSelectedItem == null &&
-               CurrentSelectedItemCategory == null;
-    }
+    internal bool IsEmpty =>
+        CurrentSelectedAvatar == null &&
+        CurrentSelectedAvatarPath == null &&
+        CurrentSelectedAuthor == null &&
+        CurrentSelectedCategory == ItemType.Unknown &&
+        CurrentSelectedItem == null &&
+        CurrentSelectedItemCategory == null;
 }

@@ -267,9 +267,9 @@ internal static partial class AEUtils
 
         return new LaunchInfo
         {
-            launchedWithUrl = true,
-            assetDirs = dir,
-            assetId = id
+            LaunchedWithUrl = true,
+            AssetDirs = dir,
+            AssetId = id
         };
     }
 
