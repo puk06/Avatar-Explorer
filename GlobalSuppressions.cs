@@ -21,3 +21,4 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Style", "IDE0301:コレクションの初期化を簡略化します", Justification = "<保留中>", Scope = "member", Target = "~M:Avatar_Explorer.Forms.MainForm.ExportButton_Click(System.Object,System.EventArgs)")]
 [assembly: SuppressMessage("Style", "IDE0305:コレクションの初期化を簡略化します", Justification = "<保留中>", Scope = "member", Target = "~M:Avatar_Explorer.Forms.MainForm.ExportButton_Click(System.Object,System.EventArgs)")]
 [assembly: SuppressMessage("Style", "IDE0305:コレクションの初期化を簡略化します", Justification = "<保留中>", Scope = "member", Target = "~M:Avatar_Explorer.Forms.MainForm.LanguageBox_SelectedIndexChanged(System.Object,System.EventArgs)")]
+[assembly: SuppressMessage("Style", "IDE0057:範囲演算子を使用", Justification = "<保留中>", Scope = "member", Target = "~M:Avatar_Explorer.Utils.DateUtils.GetDate(System.String)~System.DateTime")]
