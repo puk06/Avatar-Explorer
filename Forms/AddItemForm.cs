@@ -81,8 +81,7 @@ internal sealed partial class AddItemForm : Form
     {
         var invalidItems = invalidPaths.Select(file => "- " + Path.GetFileName(file)).ToArray();
         FormUtils.ShowMessageBox(
-            LanguageUtils.Translate("以下のアイテムは対応していない、もしくは存在しないため追加されません", _mainForm.CurrentLanguage) +
-            $" {invalidPaths.Length}/{totalPaths}\n\n" + string.Join("\n", invalidItems),
+            LanguageUtils.Translate("以下のアイテムは対応していない、もしくは存在しないため追加されません {0}", _mainForm.CurrentLanguage, $"{invalidPaths.Length}/{totalPaths}\n\n") + string.Join("\n", invalidItems),
             LanguageUtils.Translate("エラー", _mainForm.CurrentLanguage),
             true
         );

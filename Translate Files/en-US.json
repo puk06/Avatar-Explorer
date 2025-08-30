@@ -146,7 +146,7 @@
   "情報取得の間隔が短すぎます。前回の取得から5秒以上空けてください": "Interval between information retrieval is too short. Please wait more than 5 seconds since the last retrieval.",
   "フォルダ名": "Folder Name",
   "ファイル名": "File Name",
-  "以下のアイテムは対応していない、もしくは存在しないため追加されません": "Following items are not supported or do not exist, so they will not be added",
+  "以下のアイテムは対応していない、もしくは存在しないため追加されません {0}": "Following items are not supported or do not exist, so they will not be added {0}",
   "追加可能なフォルダ、またはファイルがありません": "There are no folders or files that can be added.",
   "アイテムフォルダを選択してください": "Please select the item folder.",
   "マテリアルフォルダを選択してください": "Please select the material folder.",

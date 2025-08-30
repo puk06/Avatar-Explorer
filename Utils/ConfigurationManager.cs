@@ -6,6 +6,8 @@ internal class ConfigurationManager
 {
     private static readonly Dictionary<string, string> _data = new();
 
+    private const string _configulationDescription = "# このファイルはAvatar Explorerの起動時に読み込まれる設定ファイルです。書き換えた際はAvatar Explorerを再起動してください。";
+
     private readonly Dictionary<string, string> _defaultKeys = new()
     {
         { "ItemsPerPage", "30" },
@@ -30,7 +32,6 @@ internal class ConfigurationManager
         { "ButtonSize", "# ボタンのサイズ(高さ)を変更できます。変更されるのはボタンの画像サイズです。デフォルトは64です。範囲: 1 - 500" },
         { "DarkMode", "# ソフトのダークモードを有効にします。trueで有効、falseで無効です。" }
     };
-    private const string _configulationDescription = "# このファイルはAvatar Explorerの起動時に読み込まれる設定ファイルです。書き換えた際はAvatar Explorerを再起動してください。";
 
     internal string? this[string key]
     {
