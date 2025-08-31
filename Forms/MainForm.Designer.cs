@@ -217,6 +217,7 @@ namespace Avatar_Explorer.Forms
             ExplorerList.Name = "ExplorerList";
             ExplorerList.Size = new Size(891, 562);
             ExplorerList.TabIndex = 18;
+            ExplorerList.AllowDrop = true;
             // 
             // FilterList
             // 
@@ -225,6 +226,7 @@ namespace Avatar_Explorer.Forms
             FilterList.Name = "FilterList";
             FilterList.Size = new Size(325, 562);
             FilterList.TabIndex = 19;
+            FilterList.AllowDrop = true;
             // 
             // ChangeFilterButton
             // 
