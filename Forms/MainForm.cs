@@ -325,13 +325,11 @@ internal sealed partial class MainForm : Form
         FilterList.DragDrop += FilterList_DragDrop;
         FilterList.MouseWheel += AEUtils.OnScroll;
         FilterList.Scroll += AEUtils.OnScroll;
-        FilterList.MouseClick += OnMouseClick;
 
         ExplorerList.DragEnter += FormUtils.DragEnter;
         ExplorerList.DragDrop += ExplorerList_DragDrop;
         ExplorerList.MouseWheel += AEUtils.OnScroll;
         ExplorerList.Scroll += AEUtils.OnScroll;
-        ExplorerList.MouseClick += OnMouseClick;
 
         LanguageBox.SelectedIndex = 0;
         SortingBox.SelectedIndex = 0;
