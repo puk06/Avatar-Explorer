@@ -99,7 +99,7 @@ namespace Avatar_Explorer.Forms
             SearchBox.Name = "SearchBox";
             SearchBox.Size = new Size(270, 27);
             SearchBox.TabIndex = 7;
-            SearchBox.KeyDown += SearchBox_KeyDown;
+            SearchBox.TextChanged += SearchBox_TextChanged;
             // 
             // label1
             // 

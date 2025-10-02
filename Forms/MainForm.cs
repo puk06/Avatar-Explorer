@@ -14,7 +14,7 @@ internal sealed partial class MainForm : Form
     /// <summary>
     /// ソフトの現在のバージョン
     /// </summary>
-    private const string CurrentVersion = "v1.1.6";
+    private const string CurrentVersion = "v1.1.7";
 
     /// <summary>
     /// デフォルトのフォームテキスト
@@ -180,6 +180,14 @@ internal sealed partial class MainForm : Form
     /// 最後にBoothの情報を取得した時間を取得または設定します。
     /// </summary>
     private DateTime _lastGetTime;
+
+    /// <summary>
+    /// 検索ボックスのテキストが最後に変更されてから、何秒後に検索を実行するかを管理します。
+    /// </summary>
+    private readonly Timer _searchboxTimer = new()
+    {
+        Interval = 300
+    };
     #endregion
 
     #region 設定ファイル関連の変数
@@ -247,6 +255,11 @@ internal sealed partial class MainForm : Form
             {
                 _resizeTimer.Stop();
                 BeginInvoke(() => ResizeControl());
+            };
+            _searchboxTimer.Tick += (s, ev) =>
+            {
+                _searchboxTimer.Stop();
+                BeginInvoke(() => SearchItems());
             };
             _initialized = true;
 
@@ -2480,16 +2493,14 @@ internal sealed partial class MainForm : Form
 
     #region 検索ボックスの処理
     /// <summary>
-    /// 検索ボックスで検索対象キーが押された際の処理を行います。
+    /// 検索ボックスでテキストが変わった際の処理を行います。
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void SearchBox_KeyDown(object sender, KeyEventArgs e)
+    private void SearchBox_TextChanged(object sender, EventArgs e)
     {
-        if (e.KeyCode is Keys.Enter or Keys.Space)
-        {
-            SearchItems();
-        }
+        _searchboxTimer.Stop();
+        _searchboxTimer.Start();
     }
 
     /// <summary>

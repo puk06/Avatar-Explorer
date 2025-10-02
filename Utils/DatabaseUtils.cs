@@ -459,13 +459,13 @@ internal static class DatabaseUtils
     /// <returns></returns>
     internal static bool GetSearchResult(List<Item> items, Item item, SearchFilter searchFilter, string CurrentLanguage)
     {
-        if (searchFilter.Author.Length != 0 && !searchFilter.Author.Contains(item.AuthorName))
+        if (searchFilter.Author.Length != 0 && !searchFilter.Author.Any(author => item.AuthorName.Contains(author, StringComparison.CurrentCultureIgnoreCase)))
             return false;
 
-        if (searchFilter.Title.Length != 0 && !searchFilter.Title.Contains(item.Title))
+        if (searchFilter.Title.Length != 0 && !searchFilter.Title.Any(title => item.Title.Contains(title, StringComparison.CurrentCultureIgnoreCase)))
             return false;
 
-        if (searchFilter.BoothId.Length != 0 && !searchFilter.BoothId.Contains(item.BoothId.ToString()))
+        if (searchFilter.BoothId.Length != 0 && !searchFilter.BoothId.Any(id => item.BoothId.ToString() == id))
             return false;
 
         if (searchFilter.Avatar.Length != 0 && !searchFilter.Avatar.Any(avatar =>
@@ -490,10 +490,7 @@ internal static class DatabaseUtils
             return false;
         }
 
-        if (searchFilter.ItemMemo.Length != 0 && !searchFilter.ItemMemo.Any(memo =>
-        {
-            return item.ItemMemo.Contains(memo, StringComparison.CurrentCultureIgnoreCase);
-        }))
+        if (searchFilter.ItemMemo.Length != 0 && !searchFilter.ItemMemo.Any(memo => item.ItemMemo.Contains(memo, StringComparison.CurrentCultureIgnoreCase)))
         {
             return false;
         }
