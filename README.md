@@ -22,11 +22,11 @@ git push origin feature/your-feature
 5. プルリクエストを作って終わり！
 
 ## ライセンス
-CopyIcon: Radhe Icon
-EditIcon: Pixel perfect
-FileIcon, TrashIcon: Freepik
-FolderIcon: juicy_fish
-OpenIcon: Amazona Adorada
+- CopyIcon: Radhe Icon
+- EditIcon: Pixel perfect
+- FileIcon, TrashIcon: Freepik
+- FolderIcon: juicy_fish
+- OpenIcon: Amazona Adorada
 
 アイコンなどはすべてFlaticon様( https://www.flaticon.com )のものを使用しています。
 
