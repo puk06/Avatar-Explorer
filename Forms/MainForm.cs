@@ -14,7 +14,7 @@ internal sealed partial class MainForm : Form
     /// <summary>
     /// ソフトの現在のバージョン
     /// </summary>
-    private const string CurrentVersion = "v1.1.7";
+    private const string CurrentVersion = "v1.1.8";
 
     /// <summary>
     /// デフォルトのフォームテキスト
@@ -225,6 +225,11 @@ internal sealed partial class MainForm : Form
     /// ダークモードかどうかを決めます。
     /// </summary>
     internal bool DarkMode = false;
+
+    /// <summary>
+    /// ZIPファイルインポート時、自動で元ファイルを削除するかどうかを決めます。
+    /// </summary>
+    internal bool RemoveOriginal = false;
     #endregion
 
     #region フォームの初期化
@@ -376,6 +381,7 @@ internal sealed partial class MainForm : Form
         bool removeBrackets = configuration["RemoveBrackets"] == "true";
         int buttonSize = int.TryParse(configuration["ButtonSize"], out var bs) ? Math.Clamp(bs, 1, 500) : 64;
         bool darkMode = configuration["DarkMode"] == "true";
+        bool removeOriginal = configuration["RemoveOriginal"] == "true";
 
         _itemsPerPage = itemsPerPage;
         _previewScale = previewScale;
@@ -386,6 +392,7 @@ internal sealed partial class MainForm : Form
         _removeBrackets = removeBrackets;
         ButtonSize = buttonSize;
         DarkMode = darkMode;
+        RemoveOriginal = removeOriginal;
     }
 
     private void SetDarkMode()

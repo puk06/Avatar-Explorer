@@ -51,8 +51,9 @@ internal static class FileSystemUtils
     /// </summary>
     /// <param name="zipPath"></param>
     /// <param name="extractPath"></param>
+    /// <param name="removeOriginal"></param>
     /// <returns></returns>
-    internal static string ExtractZip(string zipPath, string extractPath)
+    internal static string ExtractZip(string zipPath, string extractPath, bool removeOriginal)
     {
         var extractFolder = Path.Combine(extractPath, Path.GetFileNameWithoutExtension(zipPath));
         if (!Directory.Exists(extractFolder))
@@ -70,21 +71,35 @@ internal static class FileSystemUtils
             Directory.CreateDirectory(extractFolder);
         }
 
-        using var archive = SharpCompress.Archives.Zip.ZipArchive.Open(zipPath);
-        foreach (var entry in archive.Entries)
+        using (var archive = SharpCompress.Archives.Zip.ZipArchive.Open(zipPath))
         {
-            if (entry.IsDirectory)
+            foreach (var entry in archive.Entries)
             {
-                if (entry.Key == null) continue;
-                Directory.CreateDirectory(Path.Combine(extractFolder, entry.Key));
-            }
-            else
-            {
-                entry.WriteToDirectory(extractFolder, new ExtractionOptions()
+                if (entry.IsDirectory)
                 {
-                    ExtractFullPath = true,
-                    Overwrite = true
-                });
+                    if (entry.Key == null) continue;
+                    Directory.CreateDirectory(Path.Combine(extractFolder, entry.Key));
+                }
+                else
+                {
+                    entry.WriteToDirectory(extractFolder, new ExtractionOptions()
+                    {
+                        ExtractFullPath = true,
+                        Overwrite = true
+                    });
+                }
+            }
+        }
+
+        if (removeOriginal)
+        {
+            try
+            {
+                File.Delete(zipPath);
+            }
+            catch
+            {
+                // Ignored
             }
         }
 

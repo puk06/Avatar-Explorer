@@ -555,7 +555,7 @@ internal sealed partial class AddItemForm : Form
         var itemFolderArray = Array.Empty<string>();
         foreach (var itemFolderPath in ItemFolderPaths)
         {
-            var result = ExtractZipWithHandling(itemFolderPath, Path.Combine("Datas", "Items"));
+            var result = ExtractZipWithHandling(itemFolderPath, Path.Combine("Datas", "Items"), _mainForm.RemoveOriginal && MaterialTextBox.Text != itemFolderPath);
             if (result == null) return;
             itemFolderArray = itemFolderArray.Append(result).ToArray();
         }
@@ -574,7 +574,7 @@ internal sealed partial class AddItemForm : Form
 
         _item.ItemPath = parentFolder;
 
-        var materialPath = ExtractZipWithHandling(MaterialTextBox.Text, Path.Combine(_item.ItemPath, "Materials"));
+        var materialPath = ExtractZipWithHandling(MaterialTextBox.Text, Path.Combine(_item.ItemPath, "Materials"), _mainForm.RemoveOriginal);
         if (materialPath == null) return;
 
         _item.MaterialPath = materialPath;
@@ -699,14 +699,15 @@ internal sealed partial class AddItemForm : Form
     /// </summary>
     /// <param name="path"></param>
     /// <param name="destination"></param>
+    /// <param name="removeOriginal"></param>
     /// <returns></returns>
-    private string? ExtractZipWithHandling(string path, string destination)
+    private string? ExtractZipWithHandling(string path, string destination, bool removeOriginal)
     {
         if (!string.IsNullOrEmpty(path) && path.EndsWith(".zip"))
         {
             try
             {
-                return FileSystemUtils.ExtractZip(path, destination);
+                return FileSystemUtils.ExtractZip(path, destination, removeOriginal);
             }
             catch (Exception ex)
             {

@@ -19,7 +19,8 @@ internal class ConfigurationManager
         { "RemoveBrackets", "false" },
         { "ButtonSize", "64" },
         { "DarkMode", "false" },
-        { "UpdateCheck", "true" }
+        { "UpdateCheck", "true" },
+        { "RemoveOriginal", "false" }
     };
     private readonly Dictionary<string, string> _defaultKeysDescriptions = new()
     {
@@ -32,7 +33,8 @@ internal class ConfigurationManager
         { "RemoveBrackets", "# 商品タイトルに含まれる【】のような括弧を非表示にします。表示上のみ影響され、データベースに影響はありません。trueで括弧の非表示、falseで表示です。" },
         { "ButtonSize", "# ボタンのサイズ(高さ)を変更できます。変更されるのはボタンの画像サイズです。デフォルトは64です。範囲: 1 - 500" },
         { "DarkMode", "# ソフトのダークモードを有効にします。trueで有効、falseで無効です。" },
-        { "UpdateCheck", "# ソフト起動時に自動でアップデートチェックを行います。trueで有効、falseで無効です。" }
+        { "UpdateCheck", "# ソフト起動時に自動でアップデートチェックを行います。trueで有効、falseで無効です。" },
+        { "RemoveOriginal", "# ZIPファイルインポート時、オリジナルファイルを自動で削除するかどうかを決めることが出来ます。trueで有効、falseで無効です。" }
     };
 
     internal string? this[string key]
