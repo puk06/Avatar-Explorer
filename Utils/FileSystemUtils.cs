@@ -185,11 +185,11 @@ internal static class FileSystemUtils
             }, cts.Token);
 
             UpdateProgress(100, LanguageUtils.Translate("完了", currentLanguage));
-            cts.Dispose();
         }
         finally
         {
             progressForm.Close();
+            cts.Dispose();
         }
     }
 

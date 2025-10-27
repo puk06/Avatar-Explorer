@@ -5,7 +5,7 @@ namespace Avatar_Explorer.Models;
 /// <summary>
 /// アイテム情報を表します。
 /// </summary>
-public class Item()
+public class Item
 {
     /// <summary>
     /// アイテムのタイトルを取得または設定します。
