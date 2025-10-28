@@ -121,7 +121,6 @@ internal static class SchemeUtils
         );
     }
 
-
     /// <summary>
     /// カスタムスキームを登録します。
     /// </summary>
