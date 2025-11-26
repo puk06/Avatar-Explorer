@@ -93,6 +93,12 @@ public class Item
     public List<string> ImplementedAvatars { get; set; } = new List<string>();
 
     /// <summary>
+    /// SupportedAvatarのエイリアスです。
+    /// </summary>
+    public List<string> SupportedAvatars
+        => SupportedAvatar;
+
+    /// <summary>
     /// タイトルに含まれる括弧をbool値に応じて削除する機能です。
     /// </summary>
     public string GetTitle(bool removeBrackets)

@@ -14,15 +14,15 @@ internal static class ItemUtils
     internal static SupportedOrCommonAvatar IsSupportedAvatarOrCommon(Item item, List<CommonAvatar> commonAvatars, string? path)
     {
         if (string.IsNullOrEmpty(path)) return new SupportedOrCommonAvatar();
-        if (item.SupportedAvatar.Contains(path)) return new SupportedOrCommonAvatar { IsSupported = true };
+        if (item.SupportedAvatars.Contains(path)) return new SupportedOrCommonAvatar { IsSupported = true };
 
         if (item.Type != ItemType.Clothing) return new SupportedOrCommonAvatar();
         var commonAvatarsArray = commonAvatars.Where(x => x.Avatars.Contains(path)).ToArray();
-        var commonAvatarBool = item.SupportedAvatar.Any(supportedAvatar => commonAvatarsArray.Any(x => x.Avatars.Contains(supportedAvatar)));
+        var commonAvatarBool = item.SupportedAvatars.Any(supportedAvatar => commonAvatarsArray.Any(x => x.Avatars.Contains(supportedAvatar)));
 
         if (!commonAvatarBool) return new SupportedOrCommonAvatar();
 
-        var commonAvatar = item.SupportedAvatar
+        var commonAvatar = item.SupportedAvatars
             .Select(supportedAvatar => commonAvatarsArray.FirstOrDefault(x => x.Avatars.Contains(supportedAvatar)))
             .FirstOrDefault(x => x != null);
 
@@ -244,7 +244,7 @@ internal static class ItemUtils
             if (result1)
             {
                 DatabaseUtils.DeleteAvatarFromCommonAvatars(commonAvatars, item.ItemPath);
-                DatabaseUtils.SaveCommonAvatarData(commonAvatars);
+                DatabaseUtils.SaveCommonAvatarsData(commonAvatars);
             }
         }
     }

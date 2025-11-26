@@ -1,5 +1,4 @@
 using Avatar_Explorer.Models;
-using System.Text;
 using System.Text.Json;
 
 namespace Avatar_Explorer.Utils;
@@ -89,7 +88,7 @@ internal static class DatabaseUtils
     /// </summary>
     /// <param name="path"></param>
     /// <returns></returns>
-    internal static List<CommonAvatar> LoadCommonAvatarData(string path = "./Datas/CommonAvatar.json")
+    internal static List<CommonAvatar> LoadCommonAvatarsData(string path = "./Datas/CommonAvatar.json")
     {
         if (!File.Exists(path))
             return [];
@@ -119,7 +118,7 @@ internal static class DatabaseUtils
     /// 共通素体データを保存します。
     /// </summary>
     /// <param name="commonAvatars"></param>
-    internal static void SaveCommonAvatarData(List<CommonAvatar> commonAvatars)
+    internal static void SaveCommonAvatarsData(List<CommonAvatar> commonAvatars)
     {
         try
         {
@@ -157,7 +156,7 @@ internal static class DatabaseUtils
     /// <returns></returns>
     internal static int GetCommonAvatarDatabaseCount(string path)
     {
-        var commonAvatars = LoadCommonAvatarData(path + "/CommonAvatar.json");
+        var commonAvatars = LoadCommonAvatarsData(path + "/CommonAvatar.json");
         return commonAvatars.Count;
     }
 
@@ -214,9 +213,9 @@ internal static class DatabaseUtils
     {
         foreach (var item in items)
         {
-            if (item.SupportedAvatar.Contains(oldPath))
+            if (item.SupportedAvatars.Contains(oldPath))
             {
-                item.SupportedAvatar = item.SupportedAvatar
+                item.SupportedAvatar = item.SupportedAvatars
                     .Select(avatar => avatar == oldPath ? newPath : avatar)
                     .ToList();
             }
@@ -240,9 +239,9 @@ internal static class DatabaseUtils
     {
         foreach (var item in items)
         {
-            if (deleteFromSupported && item.SupportedAvatar.Contains(avatarPath))
+            if (deleteFromSupported && item.SupportedAvatars.Contains(avatarPath))
             {
-                item.SupportedAvatar.RemoveAll(avatar => string.IsNullOrEmpty(avatar) || avatar == avatarPath);
+                item.SupportedAvatars.RemoveAll(avatar => string.IsNullOrEmpty(avatar) || avatar == avatarPath);
             }
 
             if (item.ImplementedAvatars.Contains(avatarPath))
@@ -322,9 +321,9 @@ internal static class DatabaseUtils
         {
             item.ItemPath = FixItemRelativePath(item.ItemPath, currentDirectory);
 
-            for (int i = 0; i < item.SupportedAvatar.Count; i++)
+            for (int i = 0; i < item.SupportedAvatars.Count; i++)
             {
-                item.SupportedAvatar[i] = FixItemRelativePath(item.SupportedAvatar[i], currentDirectory);
+                item.SupportedAvatars[i] = FixItemRelativePath(item.SupportedAvatars[i], currentDirectory);
             }
 
             for (int i = 0; i < item.ImplementedAvatars.Count; i++)
@@ -399,7 +398,7 @@ internal static class DatabaseUtils
         int brokenItemsCount = 0;
         foreach (var itemData in items)
         {
-            if (itemData.SupportedAvatar.Contains(itemData.ItemPath) || itemData.ImplementedAvatars.Contains(itemData.ItemPath))
+            if (itemData.SupportedAvatars.Contains(itemData.ItemPath) || itemData.ImplementedAvatars.Contains(itemData.ItemPath))
             {
                 brokenItemsCount++;
             }
@@ -470,7 +469,7 @@ internal static class DatabaseUtils
 
         if (searchFilter.Avatar.Length != 0 && !searchFilter.Avatar.Any(avatar =>
         {
-            return item.SupportedAvatar.Any(supportedAvatar =>
+            return item.SupportedAvatars.Any(supportedAvatar =>
             {
                 var supportedAvatarName = GetAvatarNameFromPaths(items, supportedAvatar);
                 if (supportedAvatarName == string.Empty) return false;
@@ -528,7 +527,7 @@ internal static class DatabaseUtils
             return false;
         }
 
-        if (searchFilter.BrokenItems && !(item.SupportedAvatar.Contains(item.ItemPath) || item.ImplementedAvatars.Contains(item.ItemPath)))
+        if (searchFilter.BrokenItems && !(item.SupportedAvatars.Contains(item.ItemPath) || item.ImplementedAvatars.Contains(item.ItemPath)))
         {
             return false;
         }
@@ -547,13 +546,13 @@ internal static class DatabaseUtils
 
         foreach (var item in items)
         {
-            if (item.SupportedAvatar.Count == 0) continue;
-            foreach (var supportedAvatar in item.SupportedAvatar)
+            if (item.SupportedAvatars.Count == 0) continue;
+            foreach (var supportedAvatar in item.SupportedAvatars)
             {
                 var avatar = avatars.FirstOrDefault(x => x.Title == supportedAvatar);
                 if (avatar == null) continue;
 
-                item.SupportedAvatar = item.SupportedAvatar
+                item.SupportedAvatar = item.SupportedAvatars
                     .Where(x => x != supportedAvatar)
                     .Append(avatar.ItemPath)
                     .ToList();

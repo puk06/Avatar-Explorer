@@ -14,7 +14,7 @@ internal sealed partial class MainForm : Form
     /// <summary>
     /// ソフトの現在のバージョン
     /// </summary>
-    private const string CurrentVersion = "v1.1.8";
+    private const string CurrentVersion = "v1.1.9";
 
     /// <summary>
     /// デフォルトのフォームテキスト
@@ -182,6 +182,11 @@ internal sealed partial class MainForm : Form
     private DateTime _lastGetTime;
 
     /// <summary>
+    /// アイテムページのスクロール位置を記録します。
+    /// </summary>
+    private Point _lastScrollPoint = Point.Empty;
+
+    /// <summary>
     /// 検索ボックスのテキストが最後に変更されてから、何秒後に検索を実行するかを管理します。
     /// </summary>
     private readonly Timer _searchboxTimer = new()
@@ -244,7 +249,7 @@ internal sealed partial class MainForm : Form
             SetConfigulationValue(configurationManager);
 
             Items = DatabaseUtils.LoadItemsData();
-            CommonAvatars = DatabaseUtils.LoadCommonAvatarData();
+            CommonAvatars = DatabaseUtils.LoadCommonAvatarsData();
 
             AddFontFile();
             InitializeComponent();
@@ -436,8 +441,24 @@ internal sealed partial class MainForm : Form
         foreach (Item item in items.Skip(_currentPageAvatar * _itemsPerPage).Take(_itemsPerPage))
         {
             var description = ItemUtils.GetItemDescription(item, CurrentLanguage);
+            var authorText = LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName;
 
-            Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, item.ImagePath, item.GetTitle(_removeBrackets), LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName, true, description, GetFilterListWidth);
+            if (!string.IsNullOrEmpty(item.ItemMemo))
+            {
+                var itemMemos = item.ItemMemo.Split(Environment.NewLine);
+
+                if (itemMemos.Length > 0)
+                {
+                    authorText += "\n" + LanguageUtils.Translate("メモ: ", CurrentLanguage) + itemMemos[0].ReplaceLineEndings();
+                }
+
+                if (itemMemos.Length >= 2)
+                {
+                    authorText += " ...";
+                }
+            }
+
+            Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, item.ImagePath, item.GetTitle(_removeBrackets), authorText, true, description, GetFilterListWidth);
             button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
             button.MouseClick += OnMouseClick;
 
@@ -1045,7 +1066,7 @@ internal sealed partial class MainForm : Form
                 {
                     itemCount = Items.Count(item =>
                         item.Type == itemType &&
-                        (ItemUtils.IsSupportedAvatarOrCommon(item, CommonAvatars, CurrentPath.CurrentSelectedAvatarPath).IsSupportedOrCommon || item.SupportedAvatar.Count == 0 || CurrentPath.CurrentSelectedAvatar == "*")
+                        (ItemUtils.IsSupportedAvatarOrCommon(item, CommonAvatars, CurrentPath.CurrentSelectedAvatarPath).IsSupportedOrCommon || item.SupportedAvatars.Count == 0 || CurrentPath.CurrentSelectedAvatar == "*")
                     );
                 }
 
@@ -1096,7 +1117,7 @@ internal sealed partial class MainForm : Form
                 {
                     itemCount = Items.Count(item =>
                         item.CustomCategory == customCategory &&
-                        (ItemUtils.IsSupportedAvatarOrCommon(item, CommonAvatars, CurrentPath.CurrentSelectedAvatarPath).IsSupportedOrCommon || item.SupportedAvatar.Count == 0 || CurrentPath.CurrentSelectedAvatar == "*")
+                        (ItemUtils.IsSupportedAvatarOrCommon(item, CommonAvatars, CurrentPath.CurrentSelectedAvatarPath).IsSupportedOrCommon || item.SupportedAvatars.Count == 0 || CurrentPath.CurrentSelectedAvatar == "*")
                     );
                 }
 
@@ -1167,7 +1188,7 @@ internal sealed partial class MainForm : Form
             filteredItems = Items.Where(item =>
                 item.Type == CurrentPath.CurrentSelectedCategory &&
                 (item.Type != ItemType.Custom || item.CustomCategory == CurrentPath.CurrentSelectedCustomCategory) &&
-                (ItemUtils.IsSupportedAvatarOrCommon(item, CommonAvatars, CurrentPath.CurrentSelectedAvatarPath).IsSupportedOrCommon || item.SupportedAvatar.Count == 0 || CurrentPath.CurrentSelectedAvatar == "*")
+                (ItemUtils.IsSupportedAvatarOrCommon(item, CommonAvatars, CurrentPath.CurrentSelectedAvatarPath).IsSupportedOrCommon || item.SupportedAvatars.Count == 0 || CurrentPath.CurrentSelectedAvatar == "*")
             );
         }
 
@@ -1195,19 +1216,33 @@ internal sealed partial class MainForm : Form
         {
             try
             {
+                var description = ItemUtils.GetItemDescription(item, CurrentLanguage);
                 var authorText = LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName;
 
                 var isSupportedOrCommon = ItemUtils.IsSupportedAvatarOrCommon(item, CommonAvatars, CurrentPath.CurrentSelectedAvatarPath);
-                if (isSupportedOrCommon.OnlyCommon && item.SupportedAvatar.Count != 0 && CurrentPath.CurrentSelectedAvatarPath != null && !item.SupportedAvatar.Contains(CurrentPath.CurrentSelectedAvatarPath))
+                if (isSupportedOrCommon.OnlyCommon && item.SupportedAvatars.Count != 0 && CurrentPath.CurrentSelectedAvatarPath != null && !item.SupportedAvatars.Contains(CurrentPath.CurrentSelectedAvatarPath))
                 {
                     var commonAvatarName = isSupportedOrCommon.CommonAvatarName;
                     if (!string.IsNullOrEmpty(commonAvatarName))
                     {
-                        authorText += "\n" + LanguageUtils.Translate("共通素体: ", CurrentLanguage) + commonAvatarName;
+                        authorText += "  |  " + LanguageUtils.Translate("共通素体: ", CurrentLanguage) + commonAvatarName;
                     }
                 }
 
-                var description = ItemUtils.GetItemDescription(item, CurrentLanguage);
+                if (!string.IsNullOrEmpty(item.ItemMemo))
+                {
+                    var itemMemos = item.ItemMemo.Split(Environment.NewLine);
+
+                    if (itemMemos.Length >= 1)
+                    {
+                        authorText += "\n" + LanguageUtils.Translate("メモ: ", CurrentLanguage) + itemMemos[0].ReplaceLineEndings();
+                    }
+
+                    if (itemMemos.Length > 2)
+                    {
+                        authorText +=  " ...";
+                    }
+                }
 
                 Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, item.ImagePath, item.GetTitle(_removeBrackets), authorText, false, description, GetExplorerListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
@@ -1264,6 +1299,7 @@ internal sealed partial class MainForm : Form
                     }
 
                     CurrentPath.CurrentSelectedItem = item;
+                    SaveScrollPoint();
                     GenerateItemCategoryList();
                     PathTextBox.Text = GeneratePath();
                 }
@@ -1825,7 +1861,7 @@ internal sealed partial class MainForm : Form
                 searchFilter.SearchWords.All(word =>
                     item.Title.Contains(word, StringComparison.CurrentCultureIgnoreCase) ||
                     item.AuthorName.Contains(word, StringComparison.CurrentCultureIgnoreCase) ||
-                    item.SupportedAvatar.Any(avatar =>
+                    item.SupportedAvatars.Any(avatar =>
                     {
                         var supportedAvatarName = DatabaseUtils.GetAvatarNameFromPaths(Items, avatar);
                         if (supportedAvatarName == string.Empty) return false;
@@ -1847,7 +1883,7 @@ internal sealed partial class MainForm : Form
                 };
 
                 fieldsToSearch.AddRange(
-                    item.SupportedAvatar
+                    item.SupportedAvatars
                         .Select(avatar => DatabaseUtils.GetAvatarNameFromPaths(Items, avatar))
                         .Where(name => !string.IsNullOrEmpty(name))
                 );
@@ -1878,8 +1914,24 @@ internal sealed partial class MainForm : Form
             try
             {
                 var description = ItemUtils.GetItemDescription(item, CurrentLanguage);
+                var authorText = LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName;
 
-                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, item.ImagePath, item.GetTitle(_removeBrackets), LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName, false, description, GetExplorerListWidth);
+                if (!string.IsNullOrEmpty(item.ItemMemo))
+                {
+                    var itemMemos = item.ItemMemo.Split(Environment.NewLine);
+
+                    if (itemMemos.Length > 0)
+                    {
+                        authorText += "\n" + LanguageUtils.Translate("メモ: ", CurrentLanguage) + itemMemos[0].ReplaceLineEndings();
+                    }
+
+                    if (itemMemos.Length >= 2)
+                    {
+                        authorText += " ...";
+                    }
+                }
+
+                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, item.ImagePath, item.GetTitle(_removeBrackets), authorText, false, description, GetExplorerListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -2359,7 +2411,7 @@ internal sealed partial class MainForm : Form
     /// <param name="item"></param>
     private void GeneratePathFromItem(Item item)
     {
-        var avatarPath = item.SupportedAvatar.FirstOrDefault();
+        var avatarPath = item.SupportedAvatars.FirstOrDefault();
         var avatarName = DatabaseUtils.GetAvatarName(Items, avatarPath);
 
         CurrentPath.CurrentSelectedAvatar = avatarName ?? "*";
@@ -2407,6 +2459,7 @@ internal sealed partial class MainForm : Form
             if (CurrentPath.CurrentSelectedCategory != ItemType.Unknown)
             {
                 GenerateItems();
+                RestoreScrollPoint();
                 PathTextBox.Text = GeneratePath();
                 return;
             }
@@ -2446,6 +2499,7 @@ internal sealed partial class MainForm : Form
         {
             CurrentPath.CurrentSelectedItem = null;
             GenerateItems();
+            RestoreScrollPoint();
             PathTextBox.Text = GeneratePath();
             return;
         }
@@ -2534,6 +2588,7 @@ internal sealed partial class MainForm : Form
             if (CurrentPath.CurrentSelectedCategory != ItemType.Unknown)
             {
                 GenerateItems();
+                RestoreScrollPoint();
                 return;
             }
 
@@ -2546,6 +2601,8 @@ internal sealed partial class MainForm : Form
             ResetAvatarExplorer(true);
             return;
         }
+
+        SaveScrollPoint();
 
         _isSearching = true;
         SearchFilter searchFilter = AEUtils.GetSearchFilter(SearchBox.Text);
@@ -2800,7 +2857,7 @@ internal sealed partial class MainForm : Form
                 List<string> SupportedAvatarNames = new();
                 List<string> SupportedAvatarPaths = new();
 
-                foreach (var avatar in item.SupportedAvatar)
+                foreach (var avatar in item.SupportedAvatars)
                 {
                     var avatarName = DatabaseUtils.GetAvatarName(Items, avatar);
                     if (avatarName == null) continue;
@@ -3043,8 +3100,8 @@ internal sealed partial class MainForm : Form
                 }
                 else
                 {
-                    CommonAvatars = DatabaseUtils.LoadCommonAvatarData(filePath2);
-                    DatabaseUtils.SaveCommonAvatarData(CommonAvatars);
+                    CommonAvatars = DatabaseUtils.LoadCommonAvatarsData(filePath2);
+                    DatabaseUtils.SaveCommonAvatarsData(CommonAvatars);
                 }
 
                 FormUtils.ShowMessageBox(
@@ -3105,8 +3162,8 @@ internal sealed partial class MainForm : Form
                 }
                 else
                 {
-                    CommonAvatars = DatabaseUtils.LoadCommonAvatarData(filePath2);
-                    DatabaseUtils.SaveCommonAvatarData(CommonAvatars);
+                    CommonAvatars = DatabaseUtils.LoadCommonAvatarsData(filePath2);
+                    DatabaseUtils.SaveCommonAvatarsData(CommonAvatars);
                 }
 
                 var result2 = FormUtils.ShowConfirmDialog(
@@ -3236,7 +3293,22 @@ internal sealed partial class MainForm : Form
         manageCommonAvatar.ShowDialog();
         RefleshWindow();
         PathTextBox.Text = GeneratePath();
-        DatabaseUtils.SaveCommonAvatarData(CommonAvatars);
+        DatabaseUtils.SaveCommonAvatarsData(CommonAvatars);
+    }
+    #endregion
+
+    #region スクロール位置の処理
+    private void SaveScrollPoint()
+    {
+        _lastScrollPoint = ExplorerList.AutoScrollPosition;
+    }
+
+    private void RestoreScrollPoint()
+    {
+        if (_lastScrollPoint == Point.Empty) return;
+
+        ExplorerList.AutoScrollPosition = new Point(0, -_lastScrollPoint.Y);
+        AEUtils.OnScroll(ExplorerList, EventArgs.Empty);
     }
     #endregion
 

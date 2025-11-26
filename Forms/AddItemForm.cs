@@ -167,7 +167,7 @@ internal sealed partial class AddItemForm : Form
 
             SetTypeCombobox(item.Type, item.CustomCategory);
 
-            SupportedAvatar = item.SupportedAvatar;
+            SupportedAvatar = item.SupportedAvatars;
             SelectAvatar.Text = LanguageUtils.Translate("選択中: {0}個", _mainForm.CurrentLanguage, SupportedAvatar.Count.ToString());
 
             CustomButton.Enabled = false;
