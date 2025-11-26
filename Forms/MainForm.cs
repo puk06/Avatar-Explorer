@@ -2602,7 +2602,7 @@ internal sealed partial class MainForm : Form
             return;
         }
 
-        SaveScrollPoint();
+        if (!_isSearching) SaveScrollPoint();
 
         _isSearching = true;
         SearchFilter searchFilter = AEUtils.GetSearchFilter(SearchBox.Text);
