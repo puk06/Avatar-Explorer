@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Avatar_Explorer.Utils;
 
 namespace Avatar_Explorer.Models;
@@ -95,6 +96,7 @@ public class Item
     /// <summary>
     /// SupportedAvatarのエイリアスです。
     /// </summary>
+    [JsonIgnore]
     public List<string> SupportedAvatars
         => SupportedAvatar;
 

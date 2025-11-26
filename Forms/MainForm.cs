@@ -14,7 +14,7 @@ internal sealed partial class MainForm : Form
     /// <summary>
     /// ソフトの現在のバージョン
     /// </summary>
-    private const string CurrentVersion = "v1.1.9";
+    private const string CurrentVersion = "v1.1.10";
 
     /// <summary>
     /// デフォルトのフォームテキスト
