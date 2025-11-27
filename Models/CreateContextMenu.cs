@@ -69,4 +69,26 @@ internal class CreateContextMenu
         toolStripMenuItem.Disposed += (_, _) => toolStripMenuItem.Click -= onClick;
         baseToolStripMenuItem.DropDownItems.Add(toolStripMenuItem);
     }
+
+    /// <summary>
+    /// 既にあるメニューに対して、DropDownTextBoxを追加します
+    /// </summary>
+    /// <param name="baseToolStripMenuItem"></param>
+    /// <param name="toolStripTextBox"></param>
+    /// <param name="onKeyDown"></param>
+    internal static void AddDropDownTextBox(ToolStripMenuItem baseToolStripMenuItem, ToolStripTextBox toolStripTextBox, KeyEventHandler onKeyDown)
+    {
+        toolStripTextBox.KeyDown += onKeyDown;
+        toolStripTextBox.Disposed += (_, _) => toolStripTextBox.KeyDown -= onKeyDown;
+        baseToolStripMenuItem.DropDownItems.Add(toolStripTextBox);
+    }
+
+    /// <summary>
+    /// 既にあるメニューに対して、Separatorを追加します
+    /// </summary>
+    /// <param name="baseToolStripMenuItem"></param>
+    internal static void AddSeparator(ToolStripMenuItem baseToolStripMenuItem)
+    {
+        baseToolStripMenuItem.DropDownItems.Add(new ToolStripSeparator());
+    }
 }

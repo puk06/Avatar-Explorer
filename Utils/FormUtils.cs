@@ -10,7 +10,7 @@ internal static class FormUtils
     internal static void ShowParentToolStrip(object? sender, EventArgs e)
     {
         if (sender == null) return;
-        if (((ToolStripMenuItem)sender).GetCurrentParent() is ToolStripDropDownMenu dropDown)
+        if (((ToolStripItem)sender)?.GetCurrentParent() is ToolStripDropDownMenu dropDown)
         {
             var ownerItem = dropDown.OwnerItem;
             if (ownerItem == null) return;

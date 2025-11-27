@@ -94,6 +94,11 @@ public class Item
     public List<string> ImplementedAvatars { get; set; } = new List<string>();
 
     /// <summary>
+    /// アイテムのタグを取得または設定します。
+    /// </summary>
+    public List<string> Tags { get; set; } = new List<string>();
+
+    /// <summary>
     /// SupportedAvatarのエイリアスです。
     /// </summary>
     [JsonIgnore]

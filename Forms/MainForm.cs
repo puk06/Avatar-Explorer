@@ -14,7 +14,7 @@ internal sealed partial class MainForm : Form
     /// <summary>
     /// ソフトの現在のバージョン
     /// </summary>
-    private const string CurrentVersion = "v1.1.10";
+    private const string CurrentVersion = "v1.1.11";
 
     /// <summary>
     /// デフォルトのフォームテキスト
@@ -443,22 +443,7 @@ internal sealed partial class MainForm : Form
             var description = ItemUtils.GetItemDescription(item, CurrentLanguage);
             var authorText = LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName;
 
-            if (!string.IsNullOrEmpty(item.ItemMemo))
-            {
-                var itemMemos = item.ItemMemo.Split(Environment.NewLine);
-
-                if (itemMemos.Length > 0)
-                {
-                    authorText += "\n" + LanguageUtils.Translate("メモ: ", CurrentLanguage) + itemMemos[0].ReplaceLineEndings();
-                }
-
-                if (itemMemos.Length >= 2)
-                {
-                    authorText += " ...";
-                }
-            }
-
-            Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, item.ImagePath, item.GetTitle(_removeBrackets), authorText, true, description, GetFilterListWidth);
+            CustomItemButton button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, item.ImagePath, item.GetTitle(_removeBrackets), authorText, true, description, GetFilterListWidth);
             button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
             button.MouseClick += OnMouseClick;
 
@@ -770,7 +755,7 @@ internal sealed partial class MainForm : Form
         {
             try
             {
-                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, author.AuthorImagePath, author.AuthorName, Items.Count(item => item.AuthorName == author.AuthorName) + LanguageUtils.Translate("個の項目", CurrentLanguage), true, author.AuthorName, GetFilterListWidth);
+                CustomItemButton button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, author.AuthorImagePath, author.AuthorName, Items.Count(item => item.AuthorName == author.AuthorName) + LanguageUtils.Translate("個の項目", CurrentLanguage), true, author.AuthorName, GetFilterListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -914,7 +899,7 @@ internal sealed partial class MainForm : Form
                 var items = Items.Where(item => item.CustomCategory == customCategory);
                 var itemCount = items.Count();
 
-                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, customCategory, itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), true, string.Empty, GetFilterListWidth);
+                CustomItemButton button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, customCategory, itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), true, string.Empty, GetFilterListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -1072,7 +1057,7 @@ internal sealed partial class MainForm : Form
 
                 if (itemCount == 0) continue;
 
-                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, ItemUtils.GetCategoryName(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, string.Empty, GetExplorerListWidth);
+                CustomItemButton button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, ItemUtils.GetCategoryName(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, string.Empty, GetExplorerListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -1123,7 +1108,7 @@ internal sealed partial class MainForm : Form
 
                 if (itemCount == 0) continue;
 
-                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, customCategory, itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, string.Empty, GetExplorerListWidth);
+                CustomItemButton button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, customCategory, itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, string.Empty, GetExplorerListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -1208,6 +1193,8 @@ internal sealed partial class MainForm : Form
         int totalCount = filteredItems.Count();
         _currentPage = Math.Clamp(_currentPage, 0, TabPageUtils.GetTotalPages(totalCount, _itemsPerPage) - 1);
 
+        IEnumerable<string> allTags = Items.SelectMany(i => i.Tags).Distinct();
+
         ExplorerList.SuspendLayout();
         ExplorerList.AutoScroll = false;
 
@@ -1217,34 +1204,19 @@ internal sealed partial class MainForm : Form
             try
             {
                 var description = ItemUtils.GetItemDescription(item, CurrentLanguage);
+
                 var authorText = LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName;
 
                 var isSupportedOrCommon = ItemUtils.IsSupportedAvatarOrCommon(item, CommonAvatars, CurrentPath.CurrentSelectedAvatarPath);
                 if (isSupportedOrCommon.OnlyCommon && item.SupportedAvatars.Count != 0 && CurrentPath.CurrentSelectedAvatarPath != null && !item.SupportedAvatars.Contains(CurrentPath.CurrentSelectedAvatarPath))
                 {
                     var commonAvatarName = isSupportedOrCommon.CommonAvatarName;
-                    if (!string.IsNullOrEmpty(commonAvatarName))
-                    {
-                        authorText += "  |  " + LanguageUtils.Translate("共通素体: ", CurrentLanguage) + commonAvatarName;
-                    }
+                    if (!string.IsNullOrEmpty(commonAvatarName)) authorText += "  |  " + LanguageUtils.Translate("共通素体: ", CurrentLanguage) + commonAvatarName;
                 }
 
-                if (!string.IsNullOrEmpty(item.ItemMemo))
-                {
-                    var itemMemos = item.ItemMemo.Split(Environment.NewLine);
+                if (item.Tags.Count != 0) authorText += "\n" + LanguageUtils.Translate("タグ: ", CurrentLanguage) + string.Join(", ", item.Tags);
 
-                    if (itemMemos.Length >= 1)
-                    {
-                        authorText += "\n" + LanguageUtils.Translate("メモ: ", CurrentLanguage) + itemMemos[0].ReplaceLineEndings();
-                    }
-
-                    if (itemMemos.Length > 2)
-                    {
-                        authorText +=  " ...";
-                    }
-                }
-
-                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, item.ImagePath, item.GetTitle(_removeBrackets), authorText, false, description, GetExplorerListWidth);
+                CustomItemButton button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, item.ImagePath, item.GetTitle(_removeBrackets), authorText, false, description, GetExplorerListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -1484,6 +1456,75 @@ internal sealed partial class MainForm : Form
                     );
                 }
 
+                var tagsMenu = createContextMenu.AddItem(LanguageUtils.Translate("タグ", CurrentLanguage), SharedImages.GetImage(SharedImages.Images.EditIcon));
+
+                CreateContextMenu.AddDropDownTextBox(
+                    tagsMenu,
+                    new ToolStripTextBox(),
+                    (sender, e) =>
+                    {
+                        if (sender is not ToolStripTextBox toolStripTextBox) return;
+
+                        if (e.KeyCode == Keys.Enter && toolStripTextBox.Text.Trim() != "")
+                        {
+                            item.Tags.Add(toolStripTextBox.Text);
+                            DatabaseUtils.SaveItemsData(Items);
+
+                            SaveScrollPoint();
+                            GenerateItems(false);
+                            RestoreScrollPoint();
+                        }
+                    }
+                );
+
+                CreateContextMenu.AddSeparator(tagsMenu);
+
+                foreach (var tag in allTags)
+                {
+                    ToolStripMenuItem tagToolStripMenuItem = new()
+                    {
+                        Text = $"{tag} ({Items.Count(i => i.Tags.Contains(tag))})",
+                        Checked = item.Tags.Contains(tag)
+                    };
+
+                    CreateContextMenu.AddDropDownItem(
+                        tagsMenu,
+                        tagToolStripMenuItem,
+                        (sender, _) =>
+                        {
+                            if (sender is not ToolStripMenuItem toolStripMenuItem) return;
+
+                            if (toolStripMenuItem.Checked)
+                            {
+                                item.Tags.RemoveAll(t => t == tag);
+                                toolStripMenuItem.Checked = false;
+                            }
+                            else
+                            {
+                                item.Tags.Add(tag);
+                                toolStripMenuItem.Checked = true;
+                            }
+
+                            DatabaseUtils.SaveItemsData(Items);
+                            FormUtils.ShowParentToolStrip(toolStripMenuItem, null!);
+                            tagToolStripMenuItem.Text = $"{tag} ({Items.Count(i => i.Tags.Contains(tag))})";
+
+                            var authorText = LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName;
+
+                            var isSupportedOrCommon = ItemUtils.IsSupportedAvatarOrCommon(item, CommonAvatars, CurrentPath.CurrentSelectedAvatarPath);
+                            if (isSupportedOrCommon.OnlyCommon && item.SupportedAvatars.Count != 0 && CurrentPath.CurrentSelectedAvatarPath != null && !item.SupportedAvatars.Contains(CurrentPath.CurrentSelectedAvatarPath))
+                            {
+                                var commonAvatarName = isSupportedOrCommon.CommonAvatarName;
+                                if (!string.IsNullOrEmpty(commonAvatarName)) authorText += "  |  " + LanguageUtils.Translate("共通素体: ", CurrentLanguage) + commonAvatarName;
+                            }
+
+                            if (item.Tags.Count != 0) authorText += "\n" + LanguageUtils.Translate("タグ: ", CurrentLanguage) + string.Join(", ", item.Tags);
+
+                            button.AuthorName = authorText;
+                        }
+                    );
+                }
+
                 createContextMenu.AddItem(
                     LanguageUtils.Translate("削除", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.TrashIcon),
@@ -1598,7 +1639,7 @@ internal sealed partial class MainForm : Form
                 var itemCount = itemFolderInfo.GetItemCount(itemType);
                 if (itemCount == 0) continue;
 
-                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, LanguageUtils.Translate(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, string.Empty, GetExplorerListWidth);
+                CustomItemButton button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, null, LanguageUtils.Translate(itemType, CurrentLanguage), itemCount + LanguageUtils.Translate("個の項目", CurrentLanguage), false, string.Empty, GetExplorerListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -1658,7 +1699,7 @@ internal sealed partial class MainForm : Form
             try
             {
                 var imagePath = file.FileExtension is ".png" or ".jpg" ? file.FilePath : string.Empty;
-                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, imagePath, file.FileName, file.FileExtension.Replace(".", string.Empty) + LanguageUtils.Translate("ファイル", CurrentLanguage), false, LanguageUtils.Translate("開くファイルのパス: ", CurrentLanguage) + file.FilePath, GetExplorerListWidth);
+                CustomItemButton button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, imagePath, file.FileName, file.FileExtension.Replace(".", string.Empty) + LanguageUtils.Translate("ファイル", CurrentLanguage), false, LanguageUtils.Translate("開くファイルのパス: ", CurrentLanguage) + file.FilePath, GetExplorerListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -1861,14 +1902,16 @@ internal sealed partial class MainForm : Form
                 searchFilter.SearchWords.All(word =>
                     item.Title.Contains(word, StringComparison.CurrentCultureIgnoreCase) ||
                     item.AuthorName.Contains(word, StringComparison.CurrentCultureIgnoreCase) ||
-                    item.SupportedAvatars.Any(avatar =>
-                    {
-                        var supportedAvatarName = DatabaseUtils.GetAvatarNameFromPaths(Items, avatar);
-                        if (supportedAvatarName == string.Empty) return false;
-                        return supportedAvatarName.Contains(word, StringComparison.CurrentCultureIgnoreCase);
-                    }) ||
+                    item.SupportedAvatars
+                        .Select(avatar => DatabaseUtils.GetAvatarNameFromPaths(Items, avatar))
+                        .Any(avatar => !string.IsNullOrEmpty(avatar) && avatar.Contains(word, StringComparison.CurrentCultureIgnoreCase)) ||
                     item.BoothId.ToString().Contains(word, StringComparison.CurrentCultureIgnoreCase) ||
-                    item.ItemMemo.Contains(word, StringComparison.CurrentCultureIgnoreCase)
+                    item.ItemMemo.Contains(word, StringComparison.CurrentCultureIgnoreCase) ||
+                    item.ImplementedAvatars
+                        .Select(avatar => DatabaseUtils.GetAvatarNameFromPaths(Items, avatar))
+                        .Any(avatar => !string.IsNullOrEmpty(avatar) && avatar.Contains(word, StringComparison.CurrentCultureIgnoreCase)) ||
+                    item.Tags
+                        .Any(tag => tag.Contains(word, StringComparison.CurrentCultureIgnoreCase))
                 )
             )
             .OrderByDescending(item =>
@@ -1905,6 +1948,8 @@ internal sealed partial class MainForm : Form
         int totalCount = filteredItems.Count();
         _currentPage = Math.Clamp(_currentPage, 0, TabPageUtils.GetTotalPages(totalCount, _itemsPerPage) - 1);
 
+        IEnumerable<string> allTags = Items.SelectMany(i => i.Tags).Distinct();
+
         ExplorerList.SuspendLayout();
         ExplorerList.AutoScroll = false;
 
@@ -1914,24 +1959,11 @@ internal sealed partial class MainForm : Form
             try
             {
                 var description = ItemUtils.GetItemDescription(item, CurrentLanguage);
+
                 var authorText = LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName;
+                if (item.Tags.Count != 0) authorText += "\n" + LanguageUtils.Translate("タグ: ", CurrentLanguage) + string.Join(", ", item.Tags);
 
-                if (!string.IsNullOrEmpty(item.ItemMemo))
-                {
-                    var itemMemos = item.ItemMemo.Split(Environment.NewLine);
-
-                    if (itemMemos.Length > 0)
-                    {
-                        authorText += "\n" + LanguageUtils.Translate("メモ: ", CurrentLanguage) + itemMemos[0].ReplaceLineEndings();
-                    }
-
-                    if (itemMemos.Length >= 2)
-                    {
-                        authorText += " ...";
-                    }
-                }
-
-                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, item.ImagePath, item.GetTitle(_removeBrackets), authorText, false, description, GetExplorerListWidth);
+                CustomItemButton button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, item.ImagePath, item.GetTitle(_removeBrackets), authorText, false, description, GetExplorerListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -2155,6 +2187,67 @@ internal sealed partial class MainForm : Form
                     );
                 }
 
+                var tagsMenu = createContextMenu.AddItem(LanguageUtils.Translate("タグ", CurrentLanguage), SharedImages.GetImage(SharedImages.Images.EditIcon));
+
+                CreateContextMenu.AddDropDownTextBox(
+                    tagsMenu,
+                    new ToolStripTextBox(),
+                    (sender, e) =>
+                    {
+                        if (sender is not ToolStripTextBox toolStripTextBox) return;
+
+                        if (e.KeyCode == Keys.Enter && toolStripTextBox.Text.Trim() != "")
+                        {
+                            item.Tags.Add(toolStripTextBox.Text);
+                            DatabaseUtils.SaveItemsData(Items);
+
+                            SaveScrollPoint();
+                            GenerateFilteredItem(searchFilter, false);
+                            RestoreScrollPoint();
+                        }
+                    }
+                );
+
+                CreateContextMenu.AddSeparator(tagsMenu);
+
+                foreach (var tag in allTags)
+                {
+                    ToolStripMenuItem tagToolStripMenuItem = new()
+                    {
+                        Text = $"{tag} ({Items.Count(i => i.Tags.Contains(tag))})",
+                        Checked = item.Tags.Contains(tag)
+                    };
+
+                    CreateContextMenu.AddDropDownItem(
+                        tagsMenu,
+                        tagToolStripMenuItem,
+                        (sender, _) =>
+                        {
+                            if (sender is not ToolStripMenuItem toolStripMenuItem) return;
+
+                            if (toolStripMenuItem.Checked)
+                            {
+                                item.Tags.RemoveAll(t => t == tag);
+                                toolStripMenuItem.Checked = false;
+                            }
+                            else
+                            {
+                                item.Tags.Add(tag);
+                                toolStripMenuItem.Checked = true;
+                            }
+
+                            DatabaseUtils.SaveItemsData(Items);
+                            FormUtils.ShowParentToolStrip(toolStripMenuItem, null!);
+                            tagToolStripMenuItem.Text = $"{tag} ({Items.Count(i => i.Tags.Contains(tag))})";
+
+                            var authorText = LanguageUtils.Translate("作者: ", CurrentLanguage) + item.AuthorName;
+                            if (item.Tags.Count != 0) authorText += "\n" + LanguageUtils.Translate("タグ: ", CurrentLanguage) + string.Join(", ", item.Tags);
+
+                            button.AuthorName = authorText;
+                        }
+                    );
+                }
+
                 createContextMenu.AddItem(
                     LanguageUtils.Translate("削除", CurrentLanguage),
                     SharedImages.GetImage(SharedImages.Images.TrashIcon),
@@ -2255,7 +2348,7 @@ internal sealed partial class MainForm : Form
             try
             {
                 var imagePath = file.FileExtension is ".png" or ".jpg" ? file.FilePath : string.Empty;
-                Button button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, imagePath, file.FileName, file.FileExtension.Replace(".", string.Empty) + LanguageUtils.Translate("ファイル", CurrentLanguage), false, LanguageUtils.Translate("開くファイルのパス: ", CurrentLanguage) + file.FilePath, GetExplorerListWidth);
+                CustomItemButton button = AEUtils.CreateButton(DarkMode, ButtonSize, _previewScale, imagePath, file.FileName, file.FileExtension.Replace(".", string.Empty) + LanguageUtils.Translate("ファイル", CurrentLanguage), false, LanguageUtils.Translate("開くファイルのパス: ", CurrentLanguage) + file.FilePath, GetExplorerListWidth);
                 button.Location = new Point(0, ((ButtonSize + 6) * index) + 2);
                 button.MouseClick += OnMouseClick;
 
@@ -2618,7 +2711,7 @@ internal sealed partial class MainForm : Form
 
         var pathTextList = new List<string>();
 
-        var filters = new (string label, string[] values)[]
+        var filters = new (string label, List<string> values)[]
         {
             ("作者", searchFilter.Author),
             ("タイトル", searchFilter.Title),
@@ -2628,12 +2721,13 @@ internal sealed partial class MainForm : Form
             ("メモ", searchFilter.ItemMemo),
             ("フォルダ名", searchFilter.FolderName),
             ("ファイル名", searchFilter.FileName),
-            ("実装アバター", searchFilter.ImplementedAvatars)
+            ("実装アバター", searchFilter.ImplementedAvatars),
+            ("タグ", searchFilter.Tags)
         };
 
         foreach (var (label, values) in filters)
         {
-            if (values.Length > 0)
+            if (values.Count > 0)
             {
                 string translatedLabel = LanguageUtils.Translate(label, CurrentLanguage);
                 pathTextList.Add($"{translatedLabel}: {string.Join(", ", values)}");
@@ -2646,7 +2740,13 @@ internal sealed partial class MainForm : Form
             pathTextList.Add(translatedLabel);
         }
 
-        if (searchFilter.SearchWords.Length > 0)
+        if (searchFilter.IsOrSearch)
+        {
+            string translatedLabel = LanguageUtils.Translate("OR検索", CurrentLanguage);
+            pathTextList.Add(translatedLabel);
+        }
+
+        if (searchFilter.SearchWords.Count > 0)
         {
             pathTextList.Add(string.Join(", ", searchFilter.SearchWords));
         }
@@ -2719,7 +2819,9 @@ internal sealed partial class MainForm : Form
     {
         if (_isSearching)
         {
+            SaveScrollPoint();
             SearchItems();
+            RestoreScrollPoint();
             RenderFilter(false);
             return;
         }
@@ -2727,7 +2829,9 @@ internal sealed partial class MainForm : Form
         switch (_openingWindow)
         {
             case Window.ItemList:
+                SaveScrollPoint();
                 GenerateItems(false);
+                RestoreScrollPoint();
                 break;
             case Window.ItemCategoryList:
                 GenerateCategoryList();
@@ -2999,7 +3103,7 @@ internal sealed partial class MainForm : Form
 
         foreach (Control control in Controls)
         {
-            if (control.Name == "LanguageBox" || string.IsNullOrEmpty(control.Text)) continue;
+            if (string.IsNullOrEmpty(control.Name) || string.IsNullOrEmpty(control.Text) || control.Name == "SearchBox" || control.Name == "LanguageBox") continue;
             _controlNames.TryAdd(control.Name, control.Text);
             control.Text = LanguageUtils.Translate(_controlNames[control.Name], CurrentLanguage);
             ChangeControlFont(control);

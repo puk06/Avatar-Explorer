@@ -165,7 +165,7 @@ internal static class ItemUtils
     /// <returns></returns>
     internal static string GetItemDescription(Item item, string CurrentLanguage)
     {
-        var description = item.Title;
+        var description = item.Title + "\n";
 
         if (!string.IsNullOrEmpty(item.CreatedDate))
         {
@@ -179,7 +179,7 @@ internal static class ItemUtils
 
         if (!string.IsNullOrEmpty(item.ItemMemo))
         {
-            description += "\n\n" + LanguageUtils.Translate("メモ: ", CurrentLanguage) + item.ItemMemo;
+            description += $"\n\n- {LanguageUtils.Translate("メモ", CurrentLanguage)} -" + "\n" + item.ItemMemo;
         }
 
         return description;

@@ -189,5 +189,8 @@
   "エラー: タイプが入力されていません": "Error: Type is missing",
   "新しいAvatar Explorerのバージョンが利用可能です！\n\n「はい」をクリックすると商品ページを開きます。\n\n現在のバージョン: {0}\n最新のバージョン: {1}\n\n以下は最新版（{1}）の変更内容です。\n\n": "A new version of Avatar Explorer is available!\n\nClick \"Yes\" to open the product page.\n\nCurrent version: {0}\nLatest version: {1}\n\nHere are the changes in the latest version ({1})\n\n",
   "アップデートのお知らせ": "Update Notification",
-  "リンクを開くことができませんでした。\n{0}": "Could not open the link.\n{0}"
+  "リンクを開くことができませんでした。\n{0}": "Could not open the link.\n{0}",
+  "タグ": "Tag",
+  "タグ: ": "Tag: ",
+  "OR検索": "OR Search"
 }

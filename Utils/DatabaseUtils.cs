@@ -458,81 +458,114 @@ internal static class DatabaseUtils
     /// <returns></returns>
     internal static bool GetSearchResult(List<Item> items, Item item, SearchFilter searchFilter, string CurrentLanguage)
     {
-        if (searchFilter.Author.Length != 0 && !searchFilter.Author.Any(author => item.AuthorName.Contains(author, StringComparison.CurrentCultureIgnoreCase)))
+        if (
+                !MatchesFilter(
+                    new[] { item.AuthorName }, searchFilter.Author,
+                    searchFilter.IsOrSearch,
+                    (target, filter) => target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
+                )
+            )
             return false;
 
-        if (searchFilter.Title.Length != 0 && !searchFilter.Title.Any(title => item.Title.Contains(title, StringComparison.CurrentCultureIgnoreCase)))
+        if (
+                !MatchesFilter(
+                    new[] { item.Title }, searchFilter.Title,
+                    searchFilter.IsOrSearch,
+                    (target, filter) => target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
+                )
+            )
             return false;
 
-        if (searchFilter.BoothId.Length != 0 && !searchFilter.BoothId.Any(id => item.BoothId.ToString() == id))
+        if (
+                !MatchesFilter(
+                    new[] { item.BoothId.ToString() }, searchFilter.BoothId,
+                    searchFilter.IsOrSearch,
+                    (target, filter) => target == filter
+                )
+            )
             return false;
 
-        if (searchFilter.Avatar.Length != 0 && !searchFilter.Avatar.Any(avatar =>
-        {
-            return item.SupportedAvatars.Any(supportedAvatar =>
-            {
-                var supportedAvatarName = GetAvatarNameFromPaths(items, supportedAvatar);
-                if (supportedAvatarName == string.Empty) return false;
-                return supportedAvatarName.Contains(avatar, StringComparison.CurrentCultureIgnoreCase);
-            });
-        }))
-        {
+        if (
+                !MatchesFilter(
+                    item.SupportedAvatars.Select(a => GetAvatarNameFromPaths(items, a)), searchFilter.Avatar,
+                    searchFilter.IsOrSearch,
+                    (target, filter) => !string.IsNullOrEmpty(target) && target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
+                )
+            )
             return false;
-        }
 
-        if (searchFilter.Category.Length != 0 && !searchFilter.Category.Any(category =>
-        {
-            var translatedCategory = ItemUtils.GetCategoryName(item.Type, CurrentLanguage);
-            return translatedCategory.Contains(category) || item.CustomCategory.Contains(category);
-        }))
-        {
+        if (
+                !MatchesFilter(
+                    new[] { ItemUtils.GetCategoryName(item.Type, CurrentLanguage) }, searchFilter.Category,
+                    searchFilter.IsOrSearch,
+                    (target, filter) => target.Contains(filter) || item.CustomCategory.Contains(filter)
+                )
+            )
             return false;
-        }
 
-        if (searchFilter.ItemMemo.Length != 0 && !searchFilter.ItemMemo.Any(memo => item.ItemMemo.Contains(memo, StringComparison.CurrentCultureIgnoreCase)))
-        {
+        if (
+                !MatchesFilter(
+                    new[] { item.ItemMemo }, searchFilter.ItemMemo,
+                    searchFilter.IsOrSearch,
+                    (target, filter) => target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
+                )
+            )
             return false;
-        }
 
-        if (searchFilter.FolderName.Length != 0 && !searchFilter.FolderName.Any(folderName =>
-        {
-            return Path.GetFileName(item.ItemPath).Contains(folderName, StringComparison.CurrentCultureIgnoreCase) ||
-                    Path.GetFileName(item.MaterialPath).Contains(folderName, StringComparison.CurrentCultureIgnoreCase);
-        }))
-        {
+        if (
+                !MatchesFilter(
+                    new[] { Path.GetFileName(item.ItemPath), Path.GetFileName(item.MaterialPath) }, searchFilter.FolderName,
+                    searchFilter.IsOrSearch,
+                    (target, filter) => target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
+                )
+            )
             return false;
-        }
 
-        if (searchFilter.FileName.Length != 0 && !searchFilter.FileName.Any(fileName =>
-        {
-            return ItemUtils.GetItemFolderInfo(item.ItemPath, item.MaterialPath).GetAllItem()
-                .Any(file =>
-                    file.FileName.Contains(fileName, StringComparison.CurrentCultureIgnoreCase) ||
-                    file.FileExtension.Contains(fileName, StringComparison.CurrentCultureIgnoreCase));
-        }))
-        {
+        if (
+                !MatchesFilter(
+                    ItemUtils.GetItemFolderInfo(item.ItemPath, item.MaterialPath).GetAllItem().Select(f => f.FileName + f.FileExtension), searchFilter.FileName,
+                    searchFilter.IsOrSearch,
+                    (target, filter) => target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
+                )
+            )
             return false;
-        }
 
-        if (searchFilter.ImplementedAvatars.Length != 0 && !searchFilter.ImplementedAvatars.Any(avatar =>
-        {
-            return item.ImplementedAvatars.Any(implementedAvatar =>
-            {
-                var implementedAvatarName = GetAvatarNameFromPaths(items, implementedAvatar);
-                if (implementedAvatarName == string.Empty) return false;
-                return implementedAvatarName.Contains(avatar, StringComparison.CurrentCultureIgnoreCase);
-            });
-        }))
-        {
+        if (
+                !MatchesFilter(
+                    item.ImplementedAvatars.Select(a => GetAvatarNameFromPaths(items, a)), searchFilter.ImplementedAvatars,
+                    searchFilter.IsOrSearch,
+                    (target, filter) => !string.IsNullOrEmpty(target) && target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
+                )
+            )
             return false;
-        }
+
+        if (
+                !MatchesFilter(
+                    item.Tags, searchFilter.Tags,
+                    searchFilter.IsOrSearch,
+                    (target, filter) => target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
+                )
+            )
+            return false;
 
         if (searchFilter.BrokenItems && !(item.SupportedAvatars.Contains(item.ItemPath) || item.ImplementedAvatars.Contains(item.ItemPath)))
-        {
             return false;
-        }
 
         return true;
+    }
+
+    private static bool MatchesFilter<T>(IEnumerable<T> targets, IEnumerable<T> filters, bool isOrSearch, Func<T, T, bool> comparer)
+    {
+        if (!filters.Any()) return true;
+
+        if (isOrSearch)
+        {
+            return filters.Any(filter => targets.Any(target => comparer(target, filter)));
+        }
+        else
+        {
+            return filters.All(filter => targets.Any(target => comparer(target, filter)));
+        }
     }
 
     /// <summary>

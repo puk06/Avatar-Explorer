@@ -264,6 +264,7 @@ namespace Avatar_Explorer.Forms
             Controls.Add(PathTextBox);
             Controls.Add(UndoButton);
             Name = "MainForm";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "Avatar Explorer";
             FormClosing += Main_FormClosing;
             Resize += Main_Resize;

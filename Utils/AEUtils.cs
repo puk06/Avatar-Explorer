@@ -12,7 +12,7 @@ namespace Avatar_Explorer.Utils;
 
 internal static partial class AEUtils
 {
-    [GeneratedRegex(@"(?<key>Author|Title|Booth|Avatar|Category|Memo|Folder|File|Implemented|BrokenItems)=(?:""(?<value>.*?)""|(?<value>[^\s]+))|(?<word>[^\s]+)")]
+    [GeneratedRegex(@"(?<key>Author|Title|Booth|Avatar|Category|Memo|Folder|File|Implemented|Tag|OR|BrokenItems)=(?:""(?<value>.*?)""|(?<value>[^\s]+))|(?<word>[^\s]+)")]
     private static partial Regex SearchFilterRegex();
 
     [GeneratedRegex(@"\u3010[^\u3011]+\u3011")]
@@ -251,7 +251,6 @@ internal static partial class AEUtils
         return button;
     }
 
-
     /// <summary>
     /// 起動時の引数から起動情報を取得します。
     /// </summary>
@@ -294,31 +293,37 @@ internal static partial class AEUtils
                 switch (key)
                 {
                     case "Author":
-                        searchFilter.Author = searchFilter.Author.Append(value).ToArray();
+                        searchFilter.Author.Add(value);
                         break;
                     case "Title":
-                        searchFilter.Title = searchFilter.Title.Append(value).ToArray();
+                        searchFilter.Title.Add(value);
                         break;
                     case "Booth":
-                        searchFilter.BoothId = searchFilter.BoothId.Append(value).ToArray();
+                        searchFilter.BoothId.Add(value);
                         break;
                     case "Avatar":
-                        searchFilter.Avatar = searchFilter.Avatar.Append(value).ToArray();
+                        searchFilter.Avatar.Add(value);
                         break;
                     case "Category":
-                        searchFilter.Category = searchFilter.Category.Append(value).ToArray();
+                        searchFilter.Category.Add(value);
                         break;
                     case "Memo":
-                        searchFilter.ItemMemo = searchFilter.ItemMemo.Append(value).ToArray();
+                        searchFilter.ItemMemo.Add(value);
                         break;
                     case "Folder":
-                        searchFilter.FolderName = searchFilter.FolderName.Append(value).ToArray();
+                        searchFilter.FolderName.Add(value);
                         break;
                     case "File":
-                        searchFilter.FileName = searchFilter.FileName.Append(value).ToArray();
+                        searchFilter.FileName.Add(value);
                         break;
                     case "Implemented":
-                        searchFilter.ImplementedAvatars = searchFilter.ImplementedAvatars.Append(value).ToArray();
+                        searchFilter.ImplementedAvatars.Add(value);
+                        break;
+                    case "Tag":
+                        searchFilter.Tags.Add(value);
+                        break;
+                    case "OR":
+                        searchFilter.IsOrSearch = value.Equals("true", StringComparison.CurrentCultureIgnoreCase);
                         break;
                     case "BrokenItems":
                         searchFilter.BrokenItems = value.Equals("true", StringComparison.CurrentCultureIgnoreCase);
@@ -327,7 +332,7 @@ internal static partial class AEUtils
             }
             else if (match.Groups["word"].Success)
             {
-                searchFilter.SearchWords = searchFilter.SearchWords.Append(match.Groups["word"].Value).ToArray();
+                searchFilter.SearchWords.Add(match.Groups["word"].Value);
             }
         }
 
