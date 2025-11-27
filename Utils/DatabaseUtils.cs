@@ -460,7 +460,7 @@ internal static class DatabaseUtils
     {
         if (
                 !MatchesFilter(
-                    new[] { item.AuthorName }, searchFilter.Author,
+                    new[] { item.AuthorName }, searchFilter.Authors,
                     searchFilter.IsOrSearch,
                     (target, filter) => target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
                 )
@@ -469,7 +469,7 @@ internal static class DatabaseUtils
 
         if (
                 !MatchesFilter(
-                    new[] { item.Title }, searchFilter.Title,
+                    new[] { item.Title }, searchFilter.Titles,
                     searchFilter.IsOrSearch,
                     (target, filter) => target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
                 )
@@ -478,7 +478,7 @@ internal static class DatabaseUtils
 
         if (
                 !MatchesFilter(
-                    new[] { item.BoothId.ToString() }, searchFilter.BoothId,
+                    new[] { item.BoothId.ToString() }, searchFilter.BoothIds,
                     searchFilter.IsOrSearch,
                     (target, filter) => target == filter
                 )
@@ -487,7 +487,7 @@ internal static class DatabaseUtils
 
         if (
                 !MatchesFilter(
-                    item.SupportedAvatars.Select(a => GetAvatarNameFromPaths(items, a)), searchFilter.Avatar,
+                    item.SupportedAvatars.Select(a => GetAvatarNameFromPaths(items, a)), searchFilter.SupportedAvatars,
                     searchFilter.IsOrSearch,
                     (target, filter) => !string.IsNullOrEmpty(target) && target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
                 )
@@ -496,7 +496,7 @@ internal static class DatabaseUtils
 
         if (
                 !MatchesFilter(
-                    new[] { ItemUtils.GetCategoryName(item.Type, CurrentLanguage) }, searchFilter.Category,
+                    new[] { ItemUtils.GetCategoryName(item.Type, CurrentLanguage) }, searchFilter.Categories,
                     searchFilter.IsOrSearch,
                     (target, filter) => target.Contains(filter) || item.CustomCategory.Contains(filter)
                 )
@@ -505,7 +505,7 @@ internal static class DatabaseUtils
 
         if (
                 !MatchesFilter(
-                    new[] { item.ItemMemo }, searchFilter.ItemMemo,
+                    new[] { item.ItemMemo }, searchFilter.ItemMemos,
                     searchFilter.IsOrSearch,
                     (target, filter) => target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
                 )
@@ -514,7 +514,7 @@ internal static class DatabaseUtils
 
         if (
                 !MatchesFilter(
-                    new[] { Path.GetFileName(item.ItemPath), Path.GetFileName(item.MaterialPath) }, searchFilter.FolderName,
+                    new[] { Path.GetFileName(item.ItemPath), Path.GetFileName(item.MaterialPath) }, searchFilter.FolderNames,
                     searchFilter.IsOrSearch,
                     (target, filter) => target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
                 )
@@ -523,7 +523,7 @@ internal static class DatabaseUtils
 
         if (
                 !MatchesFilter(
-                    ItemUtils.GetItemFolderInfo(item.ItemPath, item.MaterialPath).GetAllItem().Select(f => f.FileName + f.FileExtension), searchFilter.FileName,
+                    ItemUtils.GetItemFolderInfo(item.ItemPath, item.MaterialPath).GetAllItem().Select(f => f.FileName + f.FileExtension), searchFilter.FileNames,
                     searchFilter.IsOrSearch,
                     (target, filter) => target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
                 )

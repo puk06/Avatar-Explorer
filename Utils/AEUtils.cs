@@ -293,28 +293,28 @@ internal static partial class AEUtils
                 switch (key)
                 {
                     case "Author":
-                        searchFilter.Author.Add(value);
+                        searchFilter.Authors.Add(value);
                         break;
                     case "Title":
-                        searchFilter.Title.Add(value);
+                        searchFilter.Titles.Add(value);
                         break;
                     case "Booth":
-                        searchFilter.BoothId.Add(value);
+                        searchFilter.BoothIds.Add(value);
                         break;
                     case "Avatar":
-                        searchFilter.Avatar.Add(value);
+                        searchFilter.SupportedAvatars.Add(value);
                         break;
                     case "Category":
-                        searchFilter.Category.Add(value);
+                        searchFilter.Categories.Add(value);
                         break;
                     case "Memo":
-                        searchFilter.ItemMemo.Add(value);
+                        searchFilter.ItemMemos.Add(value);
                         break;
                     case "Folder":
-                        searchFilter.FolderName.Add(value);
+                        searchFilter.FolderNames.Add(value);
                         break;
                     case "File":
-                        searchFilter.FileName.Add(value);
+                        searchFilter.FileNames.Add(value);
                         break;
                     case "Implemented":
                         searchFilter.ImplementedAvatars.Add(value);

@@ -2719,14 +2719,14 @@ internal sealed partial class MainForm : Form
 
         var filters = new (string label, List<string> values)[]
         {
-            ("作者", searchFilter.Author),
-            ("タイトル", searchFilter.Title),
-            ("BoothID", searchFilter.BoothId),
-            ("アバター", searchFilter.Avatar),
-            ("カテゴリ", searchFilter.Category),
-            ("メモ", searchFilter.ItemMemo),
-            ("フォルダ名", searchFilter.FolderName),
-            ("ファイル名", searchFilter.FileName),
+            ("作者", searchFilter.Authors),
+            ("タイトル", searchFilter.Titles),
+            ("BoothID", searchFilter.BoothIds),
+            ("アバター", searchFilter.SupportedAvatars),
+            ("カテゴリ", searchFilter.Categories),
+            ("メモ", searchFilter.ItemMemos),
+            ("フォルダ名", searchFilter.FolderNames),
+            ("ファイル名", searchFilter.FileNames),
             ("実装アバター", searchFilter.ImplementedAvatars),
             ("タグ", searchFilter.Tags)
         };
