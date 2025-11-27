@@ -23,6 +23,7 @@ internal sealed partial class ManageCommonAvatarsForm : Form
     {
         _mainForm = mainform;
         _commonAvatars = _mainForm.CommonAvatars;
+
         InitializeComponent();
         AdditionalInitialize();
         if (_mainForm.DarkMode) SetDarkMode();
@@ -83,15 +84,16 @@ internal sealed partial class ManageCommonAvatarsForm : Form
     private void GenerateAvatarList()
     {
         AvatarList.Controls.Clear();
-        var items = _mainForm.Items.Where(item => item.Type == ItemType.Avatar).ToList();
-        if (items.Count == 0) return;
-        items = items.OrderBy(item => item.Title).ToList();
+        var items = _mainForm.Items
+            .Where(item => item.Type == ItemType.Avatar)
+            .OrderBy(item => item.Title);
+        if (!items.Any()) return;
 
         AvatarList.SuspendLayout();
         AvatarList.AutoScroll = false;
 
         var index = 0;
-        foreach (Item item in _mainForm.Items.Where(item => item.Type == ItemType.Avatar))
+        foreach (Item item in items)
         {
             Button button = CreateAvatarButton(_mainForm.DarkMode, _mainForm.ButtonSize, item, _mainForm.CurrentLanguage);
             button.Location = new Point(0, ((_mainForm.ButtonSize + 6) * index) + 2);
@@ -172,7 +174,7 @@ internal sealed partial class ManageCommonAvatarsForm : Form
             LanguageUtils.Translate("本当に削除しますか？", _mainForm.CurrentLanguage),
             LanguageUtils.Translate("確認", _mainForm.CurrentLanguage)
         );
-        if (result) return;
+        if (!result) return;
 
         _commonAvatars.RemoveAll(_commonAvatar => _commonAvatar.Name == commonAvatar.Name);
         _mainForm.CommonAvatars = _commonAvatars;

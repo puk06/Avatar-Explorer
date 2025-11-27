@@ -74,9 +74,10 @@ internal sealed partial class SelectSupportedAvatarForm : Form
     {
         AvatarList.Controls.Clear();
 
-        var items = _mainForm.Items.Where(item => item.Type == ItemType.Avatar).ToList();
-        if (items.Count == 0) return;
-        items = items.OrderBy(item => item.Title).ToList();
+        var items = _mainForm.Items
+            .Where(item => item.Type == ItemType.Avatar)
+            .OrderBy(item => item.Title);
+        if (!items.Any()) return;
 
         AvatarList.SuspendLayout();
         AvatarList.AutoScroll = false;
@@ -85,9 +86,11 @@ internal sealed partial class SelectSupportedAvatarForm : Form
         foreach (Item item in items)
         {
             if (item.ItemPath == _addItem.ItemPath) continue;
-            Button button = CreateAvatarButton(_mainForm.DarkMode, _mainForm.ButtonSize, item, _mainForm.CurrentLanguage);
+
+            CustomItemButton button = CreateAvatarButton(_mainForm.DarkMode, _mainForm.ButtonSize, item, _mainForm.CurrentLanguage);
             button.Location = new Point(0, ((_mainForm.ButtonSize + 6) * index) + 2);
             button.BackColor = _addItem.SupportedAvatar.Contains(item.ItemPath) ? DarkModeUtils.GetSelectedButtonColor(_mainForm.DarkMode) : DarkModeUtils.GetNormalButtonColor(_mainForm.DarkMode);
+            
             AvatarList.Controls.Add(button);
             index++;
         }
