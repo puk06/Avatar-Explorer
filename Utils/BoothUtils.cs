@@ -31,7 +31,7 @@ internal static partial class BoothUtils
     private static partial Regex BoothAuthorURLRegex();
 
     /// <summary>
-    ///　Boothのアイテム情報を取得します。
+    /// Boothのアイテム情報を取得します。
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>

@@ -175,7 +175,7 @@ internal static class DatabaseUtils
     }
 
     /// <summary>
-    ///　指定されたパスからアバター名を取得します。なければnullを返します。
+    /// 指定されたパスからアバター名を取得します。なければnullを返します。
     /// </summary>
     /// <param name="items"></param>
     /// <param name="path"></param>
@@ -191,7 +191,7 @@ internal static class DatabaseUtils
     }
 
     /// <summary>
-    ///　指定されたパスからアバター名を取得します。なければ空文字を返します。
+    /// 指定されたパスからアバター名を取得します。なければ空文字を返します。
     /// </summary>
     /// <param name="items"></param>
     /// <param name="path"></param>

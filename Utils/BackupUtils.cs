@@ -3,7 +3,7 @@ namespace Avatar_Explorer.Utils;
 internal static class BackupUtils
 {
     /// <summary>
-    ///　指定されたファイルをバックアップします。
+    /// 指定されたファイルをバックアップします。
     /// </summary>
     /// <param name="paths"></param>
     internal static void Backup(string[] paths)
