@@ -1896,23 +1896,29 @@ internal sealed partial class MainForm : Form
         if (pageReset) _currentPage = 0;
         ResetAvatarExplorer();
 
+        bool getWordSearchResult(Item item, string word)
+        {
+            return
+                item.Title.Contains(word, StringComparison.CurrentCultureIgnoreCase) ||
+                item.AuthorName.Contains(word, StringComparison.CurrentCultureIgnoreCase) ||
+                item.SupportedAvatars
+                    .Select(avatar => DatabaseUtils.GetAvatarNameFromPaths(Items, avatar))
+                    .Any(avatar => !string.IsNullOrEmpty(avatar) && avatar.Contains(word, StringComparison.CurrentCultureIgnoreCase)) ||
+                item.BoothId.ToString().Contains(word, StringComparison.CurrentCultureIgnoreCase) ||
+                item.ItemMemo.Contains(word, StringComparison.CurrentCultureIgnoreCase) ||
+                item.ImplementedAvatars
+                    .Select(avatar => DatabaseUtils.GetAvatarNameFromPaths(Items, avatar))
+                    .Any(avatar => !string.IsNullOrEmpty(avatar) && avatar.Contains(word, StringComparison.CurrentCultureIgnoreCase)) ||
+                item.Tags
+                    .Any(tag => tag.Contains(word, StringComparison.CurrentCultureIgnoreCase));
+        }
+
         var filteredItems = Items
             .Where(item => DatabaseUtils.GetSearchResult(Items, item, searchFilter, CurrentLanguage))
             .Where(item =>
-                searchFilter.SearchWords.All(word =>
-                    item.Title.Contains(word, StringComparison.CurrentCultureIgnoreCase) ||
-                    item.AuthorName.Contains(word, StringComparison.CurrentCultureIgnoreCase) ||
-                    item.SupportedAvatars
-                        .Select(avatar => DatabaseUtils.GetAvatarNameFromPaths(Items, avatar))
-                        .Any(avatar => !string.IsNullOrEmpty(avatar) && avatar.Contains(word, StringComparison.CurrentCultureIgnoreCase)) ||
-                    item.BoothId.ToString().Contains(word, StringComparison.CurrentCultureIgnoreCase) ||
-                    item.ItemMemo.Contains(word, StringComparison.CurrentCultureIgnoreCase) ||
-                    item.ImplementedAvatars
-                        .Select(avatar => DatabaseUtils.GetAvatarNameFromPaths(Items, avatar))
-                        .Any(avatar => !string.IsNullOrEmpty(avatar) && avatar.Contains(word, StringComparison.CurrentCultureIgnoreCase)) ||
-                    item.Tags
-                        .Any(tag => tag.Contains(word, StringComparison.CurrentCultureIgnoreCase))
-                )
+                searchFilter.IsOrSearch
+                    ? searchFilter.SearchWords.Any(word => getWordSearchResult(item, word))
+                    : searchFilter.SearchWords.All(word => getWordSearchResult(item, word))
             )
             .OrderByDescending(item =>
             {
