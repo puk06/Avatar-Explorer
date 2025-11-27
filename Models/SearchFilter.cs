@@ -51,6 +51,11 @@ internal class SearchFilter
     internal List<string> ImplementedAvatars { get; set; } = new List<string>();
 
     /// <summary>
+    /// 検索する未実装のアバターを取得または設定します。
+    /// </summary>
+    internal List<string> NotImplementedAvatars { get; set; } = new List<string>();
+
+    /// <summary>
     /// 検索するタグを取得または設定します。
     /// </summary>
     internal List<string> Tags { get; set; } = new List<string>();

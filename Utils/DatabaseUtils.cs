@@ -530,14 +530,26 @@ internal static class DatabaseUtils
             )
             return false;
 
+        var implementedAvatarNames = item.ImplementedAvatars.Select(a => GetAvatarNameFromPaths(items, a));
+
         if (
                 !MatchesFilter(
-                    item.ImplementedAvatars.Select(a => GetAvatarNameFromPaths(items, a)), searchFilter.ImplementedAvatars,
+                    implementedAvatarNames, searchFilter.ImplementedAvatars,
                     searchFilter.IsOrSearch,
                     (target, filter) => !string.IsNullOrEmpty(target) && target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
                 )
             )
             return false;
+
+        if (searchFilter.NotImplementedAvatars.Count > 0)
+        {
+            bool match = searchFilter.IsOrSearch
+                ? searchFilter.NotImplementedAvatars.Any(filter => !implementedAvatarNames.Any(name => name.Contains(filter, StringComparison.CurrentCultureIgnoreCase)))
+                : searchFilter.NotImplementedAvatars.All(filter => !implementedAvatarNames.Any(name => name.Contains(filter, StringComparison.CurrentCultureIgnoreCase)));
+
+            if (!match)
+                return false;
+        }
 
         if (
                 !MatchesFilter(

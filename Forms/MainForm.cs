@@ -2733,6 +2733,7 @@ internal sealed partial class MainForm : Form
             ("フォルダ名", searchFilter.FolderNames),
             ("ファイル名", searchFilter.FileNames),
             ("実装アバター", searchFilter.ImplementedAvatars),
+            ("未実装アバター", searchFilter.NotImplementedAvatars),
             ("タグ", searchFilter.Tags)
         };
 
