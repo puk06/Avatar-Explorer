@@ -1916,10 +1916,15 @@ internal sealed partial class MainForm : Form
         var filteredItems = Items
             .Where(item => DatabaseUtils.GetSearchResult(Items, item, searchFilter, CurrentLanguage))
             .Where(item =>
-                searchFilter.IsOrSearch
-                    ? searchFilter.SearchWords.Any(word => getWordSearchResult(item, word))
-                    : searchFilter.SearchWords.All(word => getWordSearchResult(item, word))
-            )
+            {
+                if (searchFilter.SearchWords.Count == 0)
+                    return true;
+
+                if (searchFilter.IsOrSearch)
+                    return searchFilter.SearchWords.Any(word => getWordSearchResult(item, word));
+
+                return searchFilter.SearchWords.All(word => getWordSearchResult(item, word));
+            })
             .OrderByDescending(item =>
             {
                 var matchCount = 0;
