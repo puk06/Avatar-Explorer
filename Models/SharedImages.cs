@@ -101,11 +101,11 @@ internal static class SharedImages
     /// <returns></returns>
     internal static bool IsSharedImage(Image image)
     {
-        return image == FileImage
-               || image == FolderImage
-               || image == CopyImage
-               || image == TrashImage
-               || image == EditImage
-               || image == OpenImage;
+        return image == FileImage ||
+            image == FolderImage ||
+            image == CopyImage ||
+            image == TrashImage ||
+            image == EditImage ||
+            image == OpenImage;
     }
 }

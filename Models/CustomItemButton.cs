@@ -4,7 +4,7 @@ namespace Avatar_Explorer.Models;
 
 internal class CustomItemButton : Button
 {
-    private readonly int _buttonHeight = 64;
+    private readonly int _buttonHeight;
     private readonly PictureBox _pictureBox;
     private readonly Label _title;
     private readonly Label _authorName;

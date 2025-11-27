@@ -2460,8 +2460,7 @@ internal sealed partial class MainForm : Form
                     pathParts.Add(LanguageUtils.Translate("作者", CurrentLanguage));
 
                     var author = CurrentPath.CurrentSelectedAuthor;
-                    if (author == null)
-                        return LanguageUtils.Translate("ここには現在のパスが表示されます", CurrentLanguage);
+                    if (author == null) return LanguageUtils.Translate("ここには現在のパスが表示されます", CurrentLanguage);
 
                     pathParts.Add(author.AuthorName);
                     break;
@@ -2476,8 +2475,7 @@ internal sealed partial class MainForm : Form
                     pathParts.Add(LanguageUtils.Translate("アバター", CurrentLanguage));
 
                     var avatar = CurrentPath.CurrentSelectedAvatar;
-                    if (avatar == null)
-                        return LanguageUtils.Translate("ここには現在のパスが表示されます", CurrentLanguage);
+                    if (avatar == null) return LanguageUtils.Translate("ここには現在のパスが表示されます", CurrentLanguage);
 
                     pathParts.Add(avatar);
                     break;
@@ -2488,8 +2486,7 @@ internal sealed partial class MainForm : Form
                 }
         }
 
-        if (CurrentPath.CurrentSelectedCategory == ItemType.Unknown)
-            return pathParts.Count > 1 ? AEUtils.GenerateSeparatedPath(pathParts.ToArray()) : LanguageUtils.Translate("ここには現在のパスが表示されます", CurrentLanguage);
+        if (CurrentPath.CurrentSelectedCategory == ItemType.Unknown) return pathParts.Count > 1 ? AEUtils.GenerateSeparatedPath(pathParts.ToArray()) : LanguageUtils.Translate("ここには現在のパスが表示されます", CurrentLanguage);
 
         var categoryName = ItemUtils.GetCategoryName(
             CurrentPath.CurrentSelectedCategory,
@@ -2499,12 +2496,10 @@ internal sealed partial class MainForm : Form
         pathParts.Add(categoryName);
 
         var item = CurrentPath.CurrentSelectedItem;
-        if (item != null)
-            pathParts.Add(item.Title);
+        if (item != null) pathParts.Add(item.Title);
 
         var itemCategory = CurrentPath.CurrentSelectedItemCategory;
-        if (itemCategory != null)
-            pathParts.Add(LanguageUtils.Translate(itemCategory, CurrentLanguage));
+        if (itemCategory != null) pathParts.Add(LanguageUtils.Translate(itemCategory, CurrentLanguage));
 
         return AEUtils.GenerateSeparatedPath(pathParts.ToArray());
     }
