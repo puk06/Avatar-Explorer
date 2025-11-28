@@ -388,6 +388,20 @@ internal static class DatabaseUtils
             item.AuthorImageFilePath = FixPath(item.AuthorImageFilePath);
         }
     }
+    /// <summary>
+    /// 相対パスのエスケープを直してくれます。
+    /// </summary>
+    /// <param name="commonAvatars"></param>
+    private static void FixRelativePathEscapes(List<CommonAvatar> commonAvatars)
+    {
+        foreach (var avatars in commonAvatars.Select(ca => ca.Avatars))
+        {
+            for (int i = 0; i < avatars.Count; i++)
+            {
+                avatars[i] = FixPath(avatars[i]);
+            }
+        }
+    }
 
     /// <summary>
     /// データベース内の破損したアイテムの対応 / 実装アバターパスをチェックします。
@@ -408,21 +422,6 @@ internal static class DatabaseUtils
             LanguageUtils.Translate("この度はご迷惑をおかけし、誠に申し訳ございませんでした。", currentLanguage),
             LanguageUtils.Translate("データベースエラー", currentLanguage)
         );
-    }
-
-    /// <summary>
-    /// 相対パスのエスケープを直してくれます。
-    /// </summary>
-    /// <param name="commonAvatars"></param>
-    private static void FixRelativePathEscapes(List<CommonAvatar> commonAvatars)
-    {
-        foreach (var commonAvatar in commonAvatars)
-        {
-            for (int i = 0; i < commonAvatar.Avatars.Count; i++)
-            {
-                commonAvatar.Avatars[i] = FixPath(commonAvatar.Avatars[i]);
-            }
-        }
     }
 
     /// <summary>
