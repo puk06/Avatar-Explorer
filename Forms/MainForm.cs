@@ -2961,7 +2961,7 @@ internal sealed partial class MainForm : Form
             );
 
             using var sw = new StreamWriter("./Output/" + fileName, false, Encoding.UTF8);
-            sw.WriteLine("Title,AuthorName,AuthorImageFilePath,ImagePath,Type,Memo,SupportedAvatars,ImplementedAvatars,BoothId,ItemPath.Tags");
+            sw.WriteLine("Title,AuthorName,AuthorImageFilePath,ImagePath,Type,Memo,SupportedAvatars,ImplementedAvatars,BoothId,ItemPath,Tags");
 
             foreach (var item in Items)
             {
