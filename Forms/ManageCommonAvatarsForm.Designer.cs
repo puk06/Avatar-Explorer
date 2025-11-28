@@ -139,6 +139,7 @@ namespace Avatar_Explorer.Forms
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "ManageCommonAvatarsForm";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "共通素体の管理";
             ResumeLayout(false);
             PerformLayout();

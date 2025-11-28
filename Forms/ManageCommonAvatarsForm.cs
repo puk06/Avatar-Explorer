@@ -22,7 +22,7 @@ internal sealed partial class ManageCommonAvatarsForm : Form
     internal ManageCommonAvatarsForm(MainForm mainform)
     {
         _mainForm = mainform;
-        _commonAvatars = _mainForm.CommonAvatars;
+        _commonAvatars = new List<CommonAvatar>(_mainForm.CommonAvatars);
 
         InitializeComponent();
         AdditionalInitialize();
@@ -84,6 +84,7 @@ internal sealed partial class ManageCommonAvatarsForm : Form
     private void GenerateAvatarList()
     {
         AvatarList.Controls.Clear();
+
         var items = _mainForm.Items
             .Where(item => item.Type == ItemType.Avatar)
             .OrderBy(item => item.Title);
