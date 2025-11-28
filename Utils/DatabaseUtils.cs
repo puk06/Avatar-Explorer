@@ -525,14 +525,13 @@ internal static class DatabaseUtils
         }
         else
         {
-            List<CommonAvatar> filterCommonAvatars = searchFilter.CommonAvatars
+            List<CommonAvatar?> filterCommonAvatars = searchFilter.CommonAvatars
                 .Select(name => GetCommonAvatar(commonAvatars, name))
-                .Where(c => c != null)
-                .ToList()!;
+                .ToList();
 
             matchCommon = searchFilter.IsOrSearch
-                ? item.SupportedAvatars.Any(avatar => filterCommonAvatars.Any(ca => ca!.Avatars.Contains(avatar)))
-                : filterCommonAvatars.All(ca => item.SupportedAvatars.Any(avatar => ca!.Avatars.Contains(avatar)));
+                ? item.SupportedAvatars.Any(avatar => filterCommonAvatars.Any(ca => ca != null && ca.Avatars.Contains(avatar)))
+                : filterCommonAvatars.All(ca => ca != null && item.SupportedAvatars.Any(avatar => ca.Avatars.Contains(avatar)));
         }
 
         bool matchBroken = !searchFilter.BrokenItems || (searchFilter.BrokenItems && !(item.SupportedAvatars.Contains(item.ItemPath) || item.ImplementedAvatars.Contains(item.ItemPath)));

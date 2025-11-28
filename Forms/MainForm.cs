@@ -2737,7 +2737,7 @@ internal sealed partial class MainForm : Form
             ("実装アバター", searchFilter.ImplementedAvatars),
             ("未実装アバター", searchFilter.NotImplementedAvatars),
             ("タグ", searchFilter.Tags),
-            ("共通素体名", searchFilter.CommonAvatars)
+            ("共通素体", searchFilter.CommonAvatars)
         };
 
         foreach (var (label, values) in filters)
