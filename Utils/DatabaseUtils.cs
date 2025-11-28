@@ -90,8 +90,7 @@ internal static class DatabaseUtils
     /// <returns></returns>
     internal static List<CommonAvatar> LoadCommonAvatarsData(string path = "./Datas/CommonAvatar.json")
     {
-        if (!File.Exists(path))
-            return [];
+        if (!File.Exists(path)) return [];
 
         try
         {
@@ -199,8 +198,7 @@ internal static class DatabaseUtils
     internal static string GetAvatarNameFromPath(List<Item> items, string? path)
     {
         if (string.IsNullOrEmpty(path)) return string.Empty;
-        var item = items.FirstOrDefault(x => x.ItemPath == path);
-        return item?.Title ?? string.Empty;
+        return items.FirstOrDefault(x => x.ItemPath == path)?.Title ?? string.Empty;
     }
 
     /// <summary>
@@ -341,11 +339,11 @@ internal static class DatabaseUtils
     {
         string currentDirectory = Path.GetFullPath(".");
 
-        foreach (var commonAvatar in commonAvatars)
+        foreach (var avatars in commonAvatars.Select(ca => ca.Avatars))
         {
-            for (int i = 0; i < commonAvatar.Avatars.Count; i++)
+            for (int i = 0; i < avatars.Count; i++)
             {
-                commonAvatar.Avatars[i] = FixItemRelativePath(commonAvatar.Avatars[i], currentDirectory);
+                avatars[i] = FixItemRelativePath(avatars[i], currentDirectory);
             }
         }
     }
@@ -556,21 +554,17 @@ internal static class DatabaseUtils
     /// <returns></returns>
     private static void FixSupportedAvatarPaths(List<Item> items)
     {
-        var avatars = items.Where(x => x.Type == ItemType.Avatar);
+        var avatarDict = items
+            .Where(x => x.Type == ItemType.Avatar)
+            .ToDictionary(x => x.Title, x => x.ItemPath);
 
         foreach (var item in items)
         {
             if (item.SupportedAvatars.Count == 0) continue;
-            foreach (var supportedAvatar in item.SupportedAvatars)
-            {
-                var avatar = avatars.FirstOrDefault(x => x.Title == supportedAvatar);
-                if (avatar == null) continue;
 
-                item.SupportedAvatar = item.SupportedAvatars
-                    .Where(x => x != supportedAvatar)
-                    .Append(avatar.ItemPath)
-                    .ToList();
-            }
+            item.SupportedAvatar = item.SupportedAvatars
+                .Select(supported => avatarDict.TryGetValue(supported, out var path) ? path : supported)
+                .ToList();
         }
     }
 }
