@@ -584,10 +584,7 @@ internal sealed partial class AddItemForm : Form
         if (_item.BoothId != -1)
         {
             var thumbnailFolderPath = Path.Combine("Datas", "Thumbnail");
-            if (!Directory.Exists(thumbnailFolderPath))
-            {
-                Directory.CreateDirectory(thumbnailFolderPath);
-            }
+            if (!Directory.Exists(thumbnailFolderPath)) Directory.CreateDirectory(thumbnailFolderPath);
 
             var thumbnailPath = Path.Combine(thumbnailFolderPath, $"{_item.BoothId}.png");
             if (!File.Exists(thumbnailPath))
@@ -620,10 +617,7 @@ internal sealed partial class AddItemForm : Form
         if (!string.IsNullOrEmpty(_item.AuthorId))
         {
             var authorImageFolderPath = Path.Combine("Datas", "AuthorImage");
-            if (!Directory.Exists(authorImageFolderPath))
-            {
-                Directory.CreateDirectory(authorImageFolderPath);
-            }
+            if (!Directory.Exists(authorImageFolderPath)) Directory.CreateDirectory(authorImageFolderPath);
 
             var authorImagePath = Path.Combine(authorImageFolderPath, $"{_item.AuthorId}.png");
             if (!File.Exists(authorImagePath))

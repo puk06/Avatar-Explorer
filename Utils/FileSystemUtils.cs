@@ -150,11 +150,9 @@ internal static class FileSystemUtils
             {
                 void Copy(string source, string dest)
                 {
-                    if (cts.Token.IsCancellationRequested)
-                        cts.Token.ThrowIfCancellationRequested();
+                    if (cts.Token.IsCancellationRequested) cts.Token.ThrowIfCancellationRequested();
 
-                    if (!Directory.Exists(dest))
-                        Directory.CreateDirectory(dest);
+                    if (!Directory.Exists(dest)) Directory.CreateDirectory(dest);
 
                     var dir = new DirectoryInfo(source);
 
@@ -167,14 +165,13 @@ internal static class FileSystemUtils
                         file.CopyTo(temppath, true);
                         copiedFiles++;
 
-                        int percent = (int)((copiedFiles / (double)totalFiles) * 100);
+                        int percent = (int)(copiedFiles / (double)totalFiles * 100);
                         UpdateProgress(percent, $"{copiedFiles}/{totalFiles} {LanguageUtils.Translate("コピー中", currentLanguage)}");
                     }
 
                     foreach (var subdir in dir.GetDirectories())
                     {
-                        if (cts.Token.IsCancellationRequested)
-                            cts.Token.ThrowIfCancellationRequested();
+                        if (cts.Token.IsCancellationRequested) cts.Token.ThrowIfCancellationRequested();
 
                         var temppath = Path.Combine(dest, subdir.Name);
                         Copy(subdir.FullName, temppath);

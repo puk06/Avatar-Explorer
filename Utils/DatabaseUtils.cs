@@ -17,8 +17,7 @@ internal static class DatabaseUtils
     /// <returns></returns>
     internal static List<Item> LoadItemsData(string path = "./Datas/ItemsData.json")
     {
-        if (!File.Exists(path))
-            return [];
+        if (!File.Exists(path)) return [];
 
         try
         {
@@ -143,10 +142,7 @@ internal static class DatabaseUtils
     /// <param name="path"></param>
     /// <returns></returns>
     internal static int GetItemDatabaseCount(string path)
-    {
-        var itemDatas = LoadItemsData(path + "/ItemsData.json");
-        return itemDatas.Count;
-    }
+        => LoadItemsData(path + "/ItemsData.json").Count;
 
     /// <summary>
     /// 共通素体データベースの数を取得します。
@@ -154,10 +150,7 @@ internal static class DatabaseUtils
     /// <param name="path"></param>
     /// <returns></returns>
     internal static int GetCommonAvatarDatabaseCount(string path)
-    {
-        var commonAvatars = LoadCommonAvatarsData(path + "/CommonAvatar.json");
-        return commonAvatars.Count;
-    }
+        => LoadCommonAvatarsData(path + "/CommonAvatar.json").Count;
 
     /// <summary>
     /// アイテムデータベース内の全てのカスタムカテゴリを取得します。

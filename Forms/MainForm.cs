@@ -1793,10 +1793,7 @@ internal sealed partial class MainForm : Form
         if (item.BoothId != -1)
         {
             var thumbnailFolderPath = Path.Combine("Datas", "Thumbnail");
-            if (!Directory.Exists(thumbnailFolderPath))
-            {
-                Directory.CreateDirectory(thumbnailFolderPath);
-            }
+            if (!Directory.Exists(thumbnailFolderPath)) Directory.CreateDirectory(thumbnailFolderPath);
 
             var currentTime = DateTime.Now;
             if (_lastGetTime.AddSeconds(5) > currentTime)
