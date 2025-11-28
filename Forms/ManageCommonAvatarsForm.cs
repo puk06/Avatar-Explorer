@@ -31,16 +31,7 @@ internal sealed partial class ManageCommonAvatarsForm : Form
         Text = LanguageUtils.Translate("共通素体の管理", _mainForm.CurrentLanguage);
         TranslateControls();
 
-        foreach (var commonAvatar in _commonAvatars)
-        {
-            CommonAvatarsCombobox.Items.Add(commonAvatar.Name);
-        }
-
-        if (CommonAvatarsCombobox.Items.Count > 0)
-        {
-            CommonAvatarsCombobox.SelectedIndex = 0;
-        }
-
+        RefleshCommonAvatarsCombobox();
         GenerateAvatarList();
         RefleshCommonAvatarButtonColor();
     }
@@ -49,6 +40,13 @@ internal sealed partial class ManageCommonAvatarsForm : Form
     {
         AvatarList.MouseWheel += AEUtils.OnScroll;
         AvatarList.Scroll += AEUtils.OnScroll;
+    }
+
+    private void RefleshCommonAvatarsCombobox()
+    {
+        CommonAvatarsCombobox.Items.Clear();
+        CommonAvatarsCombobox.Items.AddRange(_commonAvatars.Select(ca => ca.Name).ToArray());
+        if (CommonAvatarsCombobox.Items.Count > 0)  CommonAvatarsCombobox.SelectedIndex = 0;
     }
 
     private void SetDarkMode()
@@ -187,6 +185,7 @@ internal sealed partial class ManageCommonAvatarsForm : Form
             LanguageUtils.Translate("完了", _mainForm.CurrentLanguage)
         );
         RefleshCommonAvatarButtonColor();
+        RefleshCommonAvatarsCombobox();
     }
 
     private void CommonAvatarsCombobox_TextChanged(object sender, EventArgs e) =>
@@ -224,7 +223,9 @@ internal sealed partial class ManageCommonAvatarsForm : Form
                 LanguageUtils.Translate("完了", _mainForm.CurrentLanguage)
             );
             
-            CommonAvatarsCombobox.Items.Add(name);
+            RefleshCommonAvatarsCombobox();
+            var index = CommonAvatarsCombobox.Items.IndexOf(name);
+            if (index != -1) CommonAvatarsCombobox.SelectedIndex = index;
         }
         else
         {
