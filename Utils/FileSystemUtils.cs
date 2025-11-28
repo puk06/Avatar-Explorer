@@ -156,7 +156,9 @@ internal static class FileSystemUtils
         {
             progressForm = new(progressFormTitle);
             progressForm.FormClosing += (s, e) => cts.Cancel();
-            progressForm.Show();
+#pragma warning disable WFO5002 // 種類は、評価の目的でのみ提供されています。将来の更新で変更または削除されることがあります。続行するには、この診断を非表示にします。
+            _ = progressForm.ShowAsync();
+#pragma warning restore WFO5002 // 種類は、評価の目的でのみ提供されています。将来の更新で変更または削除されることがあります。続行するには、この診断を非表示にします。
         }
 
         try
