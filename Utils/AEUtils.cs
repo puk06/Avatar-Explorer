@@ -292,11 +292,11 @@ internal static partial class AEUtils
 
                 switch (key)
                 {
-                    case "Author":
-                        searchFilter.Authors.Add(value);
-                        break;
                     case "Title":
                         searchFilter.Titles.Add(value);
+                        break;
+                    case "Author":
+                        searchFilter.Authors.Add(value);
                         break;
                     case "Booth":
                         searchFilter.BoothIds.Add(value);
