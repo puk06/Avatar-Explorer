@@ -196,7 +196,7 @@ internal static class DatabaseUtils
     /// <param name="items"></param>
     /// <param name="path"></param>
     /// <returns></returns>
-    internal static string GetAvatarNameFromPaths(List<Item> items, string? path)
+    internal static string GetAvatarNameFromPath(List<Item> items, string? path)
     {
         if (string.IsNullOrEmpty(path)) return string.Empty;
         var item = items.FirstOrDefault(x => x.ItemPath == path);
@@ -458,112 +458,88 @@ internal static class DatabaseUtils
     /// <returns></returns>
     internal static bool GetSearchResult(List<Item> items, Item item, SearchFilter searchFilter, string CurrentLanguage)
     {
-        if (
-                !MatchesFilter(
-                    new[] { item.AuthorName }, searchFilter.Authors,
-                    searchFilter.IsOrSearch,
-                    (target, filter) => target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
-                )
-            )
-            return false;
+        bool matchTitle = MatchesFilter(
+            new[] { item.Title }, searchFilter.Titles,
+            searchFilter.IsOrSearch,
+            (target, filter) => target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
+        );
 
-        if (
-                !MatchesFilter(
-                    new[] { item.Title }, searchFilter.Titles,
-                    searchFilter.IsOrSearch,
-                    (target, filter) => target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
-                )
-            )
-            return false;
+        bool matchAuthor = MatchesFilter(
+            new[] { item.AuthorName }, searchFilter.Authors,
+            searchFilter.IsOrSearch,
+            (target, filter) => target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
+        );
 
-        if (
-                !MatchesFilter(
-                    new[] { item.BoothId.ToString() }, searchFilter.BoothIds,
-                    searchFilter.IsOrSearch,
-                    (target, filter) => target == filter
-                )
-            )
-            return false;
+        bool matchBooth = MatchesFilter(
+            new[] { item.BoothId.ToString() }, searchFilter.BoothIds,
+            searchFilter.IsOrSearch,
+            (target, filter) => target == filter
+        );
 
-        if (
-                !MatchesFilter(
-                    item.SupportedAvatars.Select(a => GetAvatarNameFromPaths(items, a)), searchFilter.SupportedAvatars,
-                    searchFilter.IsOrSearch,
-                    (target, filter) => !string.IsNullOrEmpty(target) && target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
-                )
-            )
-            return false;
+        bool matchAvatar = MatchesFilter(
+            item.SupportedAvatars.Select(avatar => GetAvatarNameFromPath(items, avatar)), searchFilter.SupportedAvatars,
+            searchFilter.IsOrSearch,
+            (target, filter) => !string.IsNullOrEmpty(target) && target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
+        );
 
-        if (
-                !MatchesFilter(
-                    new[] { ItemUtils.GetCategoryName(item.Type, CurrentLanguage) }, searchFilter.Categories,
-                    searchFilter.IsOrSearch,
-                    (target, filter) => target.Contains(filter) || item.CustomCategory.Contains(filter)
-                )
-            )
-            return false;
+        bool matchCategory = MatchesFilter(
+            new[] { ItemUtils.GetCategoryName(item.Type, CurrentLanguage) }, searchFilter.Categories,
+            searchFilter.IsOrSearch,
+            (target, filter) => target.Contains(filter) || item.CustomCategory.Contains(filter)
+        );
 
-        if (
-                !MatchesFilter(
-                    new[] { item.ItemMemo }, searchFilter.ItemMemos,
-                    searchFilter.IsOrSearch,
-                    (target, filter) => target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
-                )
-            )
-            return false;
+        bool matchMemo = MatchesFilter(
+            new[] { item.ItemMemo }, searchFilter.ItemMemos,
+            searchFilter.IsOrSearch,
+            (target, filter) => target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
+        );
 
-        if (
-                !MatchesFilter(
-                    new[] { Path.GetFileName(item.ItemPath), Path.GetFileName(item.MaterialPath) }, searchFilter.FolderNames,
-                    searchFilter.IsOrSearch,
-                    (target, filter) => target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
-                )
-            )
-            return false;
+        bool matchPath = MatchesFilter(
+            new[] { Path.GetFileName(item.ItemPath), Path.GetFileName(item.MaterialPath) }, searchFilter.FolderNames,
+            searchFilter.IsOrSearch,
+            (target, filter) => target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
+        );
 
-        if (
-                !MatchesFilter(
-                    ItemUtils.GetItemFolderInfo(item.ItemPath, item.MaterialPath).GetAllItem().Select(f => f.FileName + f.FileExtension), searchFilter.FileNames,
-                    searchFilter.IsOrSearch,
-                    (target, filter) => target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
-                )
-            )
-            return false;
+        bool matchFile = searchFilter.FileNames.Count == 0
+            || MatchesFilter(
+                ItemUtils.GetItemFolderInfo(item.ItemPath, item.MaterialPath).GetAllItem().Select(file => file.FileName + file.FileExtension), searchFilter.FileNames,
+                searchFilter.IsOrSearch,
+                (target, filter) => target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
+            );
+        
+        var implementedAvatarNames = item.ImplementedAvatars.Select(avatar => GetAvatarNameFromPath(items, avatar));
 
-        var implementedAvatarNames = item.ImplementedAvatars.Select(a => GetAvatarNameFromPaths(items, a));
+        bool matchImplemented = MatchesFilter(
+            implementedAvatarNames, searchFilter.ImplementedAvatars,
+            searchFilter.IsOrSearch,
+            (target, filter) => !string.IsNullOrEmpty(target) && target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
+        );
 
-        if (
-                !MatchesFilter(
-                    implementedAvatarNames, searchFilter.ImplementedAvatars,
-                    searchFilter.IsOrSearch,
-                    (target, filter) => !string.IsNullOrEmpty(target) && target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
-                )
-            )
-            return false;
-
-        if (searchFilter.NotImplementedAvatars.Count > 0)
-        {
-            bool match = searchFilter.IsOrSearch
+        bool matchNotImplemented = searchFilter.NotImplementedAvatars.Count == 0
+            || (searchFilter.NotImplementedAvatars.Count > 0 && searchFilter.IsOrSearch
                 ? searchFilter.NotImplementedAvatars.Any(filter => !implementedAvatarNames.Any(name => name.Contains(filter, StringComparison.CurrentCultureIgnoreCase)))
-                : searchFilter.NotImplementedAvatars.All(filter => !implementedAvatarNames.Any(name => name.Contains(filter, StringComparison.CurrentCultureIgnoreCase)));
+                : searchFilter.NotImplementedAvatars.All(filter => !implementedAvatarNames.Any(name => name.Contains(filter, StringComparison.CurrentCultureIgnoreCase))));
 
-            if (!match)
-                return false;
-        }
+        bool matchTag = MatchesFilter(
+            item.Tags, searchFilter.Tags,
+            searchFilter.IsOrSearch,
+            (target, filter) => target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
+        );
 
-        if (
-                !MatchesFilter(
-                    item.Tags, searchFilter.Tags,
-                    searchFilter.IsOrSearch,
-                    (target, filter) => target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
-                )
-            )
-            return false;
+        bool matchBroken = !searchFilter.BrokenItems || (searchFilter.BrokenItems && !(item.SupportedAvatars.Contains(item.ItemPath) || item.ImplementedAvatars.Contains(item.ItemPath)));
 
-        if (searchFilter.BrokenItems && !(item.SupportedAvatars.Contains(item.ItemPath) || item.ImplementedAvatars.Contains(item.ItemPath)))
-            return false;
-
-        return true;
+        return matchTitle
+            && matchAuthor
+            && matchBooth
+            && matchAvatar
+            && matchCategory
+            && matchMemo
+            && matchPath
+            && matchFile
+            && matchImplemented
+            && matchNotImplemented
+            && matchTag
+            && matchBroken;
     }
 
     private static bool MatchesFilter<T>(IEnumerable<T> targets, IEnumerable<T> filters, bool isOrSearch, Func<T, T, bool> comparer)

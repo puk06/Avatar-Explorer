@@ -6,14 +6,14 @@ namespace Avatar_Explorer.Models;
 internal class SearchFilter
 {
     /// <summary>
-    /// 検索する作者の名前を取得または設定します。
-    /// </summary>
-    internal List<string> Authors { get; set; } = new List<string>();
-
-    /// <summary>
     /// 検索するアイテムのタイトルを取得または設定します。
     /// </summary>
     internal List<string> Titles { get; set; } = new List<string>();
+
+    /// <summary>
+    /// 検索する作者の名前を取得または設定します。
+    /// </summary>
+    internal List<string> Authors { get; set; } = new List<string>();
 
     /// <summary>
     /// 検索するアイテムのIDを取得または設定します。

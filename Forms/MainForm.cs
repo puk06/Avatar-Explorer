@@ -1417,7 +1417,7 @@ internal sealed partial class MainForm : Form
                 {
                     ToolStripMenuItem avatarToolStripMenuItem = new()
                     {
-                        Text = DatabaseUtils.GetAvatarNameFromPaths(Items, avatar.ItemPath),
+                        Text = DatabaseUtils.GetAvatarNameFromPath(Items, avatar.ItemPath),
                         Tag = avatar.ItemPath,
                         Checked = item.ImplementedAvatars.Contains(avatar.ItemPath)
                     };
@@ -1902,12 +1902,12 @@ internal sealed partial class MainForm : Form
                 item.Title.Contains(word, StringComparison.CurrentCultureIgnoreCase) ||
                 item.AuthorName.Contains(word, StringComparison.CurrentCultureIgnoreCase) ||
                 item.SupportedAvatars
-                    .Select(avatar => DatabaseUtils.GetAvatarNameFromPaths(Items, avatar))
+                    .Select(avatar => DatabaseUtils.GetAvatarNameFromPath(Items, avatar))
                     .Any(avatar => !string.IsNullOrEmpty(avatar) && avatar.Contains(word, StringComparison.CurrentCultureIgnoreCase)) ||
                 item.BoothId.ToString().Contains(word, StringComparison.CurrentCultureIgnoreCase) ||
                 item.ItemMemo.Contains(word, StringComparison.CurrentCultureIgnoreCase) ||
                 item.ImplementedAvatars
-                    .Select(avatar => DatabaseUtils.GetAvatarNameFromPaths(Items, avatar))
+                    .Select(avatar => DatabaseUtils.GetAvatarNameFromPath(Items, avatar))
                     .Any(avatar => !string.IsNullOrEmpty(avatar) && avatar.Contains(word, StringComparison.CurrentCultureIgnoreCase)) ||
                 item.Tags
                     .Any(tag => tag.Contains(word, StringComparison.CurrentCultureIgnoreCase));
@@ -1938,14 +1938,21 @@ internal sealed partial class MainForm : Form
 
                 fieldsToSearch.AddRange(
                     item.SupportedAvatars
-                        .Select(avatar => DatabaseUtils.GetAvatarNameFromPaths(Items, avatar))
+                        .Select(avatar => DatabaseUtils.GetAvatarNameFromPath(Items, avatar))
                         .Where(name => !string.IsNullOrEmpty(name))
                 );
 
+                fieldsToSearch.AddRange(
+                    item.ImplementedAvatars
+                        .Select(avatar => DatabaseUtils.GetAvatarNameFromPath(Items, avatar))
+                        .Where(name => !string.IsNullOrEmpty(name))
+                );
+
+                fieldsToSearch.AddRange(item.Tags);
+
                 foreach (var word in searchFilter.SearchWords)
                 {
-                    matchCount += fieldsToSearch.Count(field =>
-                        field.Contains(word, StringComparison.CurrentCultureIgnoreCase));
+                    matchCount += fieldsToSearch.Count(field => field.Contains(word, StringComparison.CurrentCultureIgnoreCase));
                 }
 
                 return matchCount;
@@ -2159,7 +2166,7 @@ internal sealed partial class MainForm : Form
                 {
                     ToolStripMenuItem avatarToolStripMenuItem = new()
                     {
-                        Text = DatabaseUtils.GetAvatarNameFromPaths(Items, avatar.ItemPath),
+                        Text = DatabaseUtils.GetAvatarNameFromPath(Items, avatar.ItemPath),
                         Tag = avatar.ItemPath,
                         Checked = item.ImplementedAvatars.Contains(avatar.ItemPath)
                     };
@@ -2719,8 +2726,8 @@ internal sealed partial class MainForm : Form
 
         var filters = new (string label, List<string> values)[]
         {
-            ("作者", searchFilter.Authors),
             ("タイトル", searchFilter.Titles),
+            ("作者", searchFilter.Authors),
             ("BoothID", searchFilter.BoothIds),
             ("アバター", searchFilter.SupportedAvatars),
             ("カテゴリ", searchFilter.Categories),
