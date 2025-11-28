@@ -124,7 +124,10 @@ internal static partial class AEUtils
         {
             int i = 1;
             while (Directory.Exists(Path.Combine(basePath, i.ToString())))
+            {
                 i++;
+            }
+            
             return Path.Combine(basePath, i.ToString());
         }
 

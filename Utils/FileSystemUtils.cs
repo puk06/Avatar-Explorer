@@ -66,8 +66,15 @@ internal static class FileSystemUtils
             var dir = dirs.Pop();
 
             string[] subDirs;
-            try { subDirs = Directory.GetDirectories(dir); }
-            catch { continue; }
+            try
+            {
+                subDirs = Directory.GetDirectories(dir);
+            }
+            catch
+            {
+                // Ignored
+                continue;
+            }
 
             foreach (var d in subDirs)
             {
@@ -75,8 +82,15 @@ internal static class FileSystemUtils
             }
 
             string[] files;
-            try { files = Directory.GetFiles(dir); }
-            catch { continue; }
+            try
+            {
+                files = Directory.GetFiles(dir);
+            }
+            catch
+            {
+                // Ignored
+                continue;
+            }
 
             foreach (var f in files)
             {
@@ -136,7 +150,14 @@ internal static class FileSystemUtils
 
         if (removeOriginal)
         {
-            try { File.Delete(zipPath); } catch { }
+            try
+            {
+                File.Delete(zipPath);
+            }
+            catch
+            {
+                // Ignored
+            }
         }
 
         return extractFolder;
@@ -174,41 +195,38 @@ internal static class FileSystemUtils
 
             await Task.Run(() =>
             {
-                Parallel.ForEach(
-                    allFiles, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism, CancellationToken = cts.Token },
-                    file =>
+                Parallel.ForEach(allFiles, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism, CancellationToken = cts.Token }, file =>
+                {
+                    try
                     {
-                        try
+                        string relativePath = Path.GetRelativePath(sourceDirName, file);
+                        string destPath = Path.Combine(destDirName, relativePath);
+                        Directory.CreateDirectory(Path.GetDirectoryName(destPath)!);
+
+                        using var sourceStream = File.OpenRead(file);
+                        using var destStream = File.Create(destPath);
+                        sourceStream.CopyTo(destStream, 1024 * 1024);
+
+                        lock (progressLock)
                         {
-                            string relativePath = Path.GetRelativePath(sourceDirName, file);
-                            string destPath = Path.Combine(destDirName, relativePath);
-                            Directory.CreateDirectory(Path.GetDirectoryName(destPath)!);
-
-                            using var sourceStream = File.OpenRead(file);
-                            using var destStream = File.Create(destPath);
-                            sourceStream.CopyTo(destStream, 1024 * 1024);
-
-                            lock (progressLock)
+                            copiedFiles++;
+                            int percent = (int)(copiedFiles / (double)totalFiles * 100);
+                            if (percent != lastPercent)
                             {
-                                copiedFiles++;
-                                int percent = (int)(copiedFiles / (double)totalFiles * 100);
-                                if (percent != lastPercent)
-                                {
-                                    lastPercent = percent;
-                                    progressForm?.UpdateProgress(percent, $"{copiedFiles}/{totalFiles} {LanguageUtils.Translate("コピー中", currentLanguage)}");
-                                }
+                                lastPercent = percent;
+                                progressForm?.UpdateProgress(percent, $"{copiedFiles}/{totalFiles} {LanguageUtils.Translate("コピー中", currentLanguage)}");
                             }
                         }
-                        catch (OperationCanceledException)
-                        {
-                            throw;
-                        }
-                        catch (Exception ex)
-                        {
-                            LogUtils.ErrorLogger("ファイルコピー失敗: " + file, ex);
-                        }
                     }
-                );
+                    catch (OperationCanceledException)
+                    {
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        LogUtils.ErrorLogger("ファイルコピー失敗: " + file, ex);
+                    }
+                });
             }, cts.Token);
 
             progressForm?.UpdateProgress(100, LanguageUtils.Translate("完了", currentLanguage));
