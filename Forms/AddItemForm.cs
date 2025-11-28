@@ -43,7 +43,7 @@ internal sealed partial class AddItemForm : Form
     /// <summary>
     /// 対応しているアバターのリストを取得または設定します。
     /// </summary>
-    internal List<string> SupportedAvatar = new();
+    internal readonly List<string> SupportedAvatar = new();
     
     private string[] _itemFolderPaths = Array.Empty<string>();
 

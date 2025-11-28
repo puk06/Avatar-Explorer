@@ -177,7 +177,9 @@ internal sealed partial class ManageCommonAvatarsForm : Form
         if (!result) return;
 
         _commonAvatars.RemoveAll(_commonAvatar => _commonAvatar.Name == commonAvatar.Name);
-        _mainForm.CommonAvatars = _commonAvatars;
+
+        _mainForm.CommonAvatars.Clear();
+        _mainForm.CommonAvatars.AddRange(_commonAvatars);
 
         FormUtils.ShowMessageBox(
             LanguageUtils.Translate("削除が完了しました。", _mainForm.CurrentLanguage),
@@ -220,6 +222,7 @@ internal sealed partial class ManageCommonAvatarsForm : Form
                 LanguageUtils.Translate("共通素体名: ", _mainForm.CurrentLanguage) + name + "\n\n" + LanguageUtils.Translate("共通素体データの追加が完了しました。", _mainForm.CurrentLanguage),
                 LanguageUtils.Translate("完了", _mainForm.CurrentLanguage)
             );
+            
             CommonAvatarsCombobox.Items.Add(name);
         }
         else
@@ -236,7 +239,9 @@ internal sealed partial class ManageCommonAvatarsForm : Form
             );
         }
 
-        _mainForm.CommonAvatars = _commonAvatars;
+        _mainForm.CommonAvatars.Clear();
+        _mainForm.CommonAvatars.AddRange(_commonAvatars);
+
         RefleshCommonAvatarButtonColor();
     }
     #endregion
@@ -247,7 +252,7 @@ internal sealed partial class ManageCommonAvatarsForm : Form
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    private CommonAvatar? GetCommonAvatar(string? name) 
+    private CommonAvatar? GetCommonAvatar(string? name)
         => string.IsNullOrWhiteSpace(name) ? null : _commonAvatars.FirstOrDefault(commonAvatar => commonAvatar.Name == name);
 
     /// <summary>

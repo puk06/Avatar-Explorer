@@ -26,12 +26,12 @@ internal sealed partial class MainForm : Form
     /// <summary>
     /// アイテムデータベース
     /// </summary>
-    internal List<Item> Items;
+    internal readonly List<Item> Items;
 
     /// <summary>
     /// 共通素体データベース
     /// </summary>
-    internal List<CommonAvatar> CommonAvatars;
+    internal readonly List<CommonAvatar> CommonAvatars;
 
     /// <summary>
     /// カスタムカテゴリデータベース
@@ -3196,7 +3196,8 @@ internal sealed partial class MainForm : Form
                 }
                 else
                 {
-                    Items = DatabaseUtils.LoadItemsData(filePath);
+                    Items.Clear();
+                    Items.AddRange(DatabaseUtils.LoadItemsData(filePath));
                     DatabaseUtils.SaveItemsData(Items);
                 }
 
@@ -3211,7 +3212,8 @@ internal sealed partial class MainForm : Form
                 }
                 else
                 {
-                    CommonAvatars = DatabaseUtils.LoadCommonAvatarsData(filePath2);
+                    CommonAvatars.Clear();
+                    CommonAvatars.AddRange(DatabaseUtils.LoadCommonAvatarsData(filePath2));
                     DatabaseUtils.SaveCommonAvatarsData(CommonAvatars);
                 }
 
@@ -3258,7 +3260,8 @@ internal sealed partial class MainForm : Form
                 }
                 else
                 {
-                    Items = DatabaseUtils.LoadItemsData(filePath);
+                    Items.Clear();
+                    Items.AddRange(DatabaseUtils.LoadItemsData(filePath));
                     DatabaseUtils.SaveItemsData(Items);
                 }
 
@@ -3273,7 +3276,8 @@ internal sealed partial class MainForm : Form
                 }
                 else
                 {
-                    CommonAvatars = DatabaseUtils.LoadCommonAvatarsData(filePath2);
+                    CommonAvatars.Clear();
+                    CommonAvatars.AddRange(DatabaseUtils.LoadCommonAvatarsData(filePath2));
                     DatabaseUtils.SaveCommonAvatarsData(CommonAvatars);
                 }
 

@@ -136,11 +136,14 @@ internal sealed partial class SelectSupportedAvatarForm : Form
     #region イベントハンドラ
     private void ConfirmButton_Click(object sender, EventArgs e)
     {
-        _addItem.SupportedAvatar = AvatarList.Controls.OfType<Button>()
-            .Where(button => button.BackColor == DarkModeUtils.GetSelectedButtonColor(_mainForm.DarkMode))
-            .Select(button => button.Tag?.ToString() ?? string.Empty)
-            .Where(tag => !string.IsNullOrWhiteSpace(tag))
-            .ToList();
+        _addItem.SupportedAvatar.Clear();
+        _addItem.SupportedAvatar.AddRange(
+            AvatarList.Controls.OfType<Button>()
+                .Where(button => button.BackColor == DarkModeUtils.GetSelectedButtonColor(_mainForm.DarkMode))
+                .Select(button => button.Tag?.ToString() ?? string.Empty)
+                .Where(tag => !string.IsNullOrWhiteSpace(tag))
+        );
+        
         Close();
     }
     #endregion
