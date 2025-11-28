@@ -78,7 +78,7 @@ internal static partial class AEUtils
             await Task.Run(async () =>
             {
                 progressForm.UpdateProgress(0, LanguageUtils.Translate("準備中", currentLanguage));
-                var (saveFolder, saveFilePath, unityPackagePath) = PrepareSavePaths(file, currentPath);
+                var (saveFolder, saveFilePath, unityPackagePath) = PrepareSavePaths(file);
                 PrepareSaveDirectory(saveFolder, saveFilePath);
 
                 var extractingStatus = LanguageUtils.Translate("ファイルの展開中", currentLanguage);
@@ -118,12 +118,17 @@ internal static partial class AEUtils
         }
     }
 
-    private static (string saveFolder, string saveFilePath, string unityPackagePath) PrepareSavePaths(FileData file, CurrentPath currentPath)
+    private static (string saveFolder, string saveFilePath, string unityPackagePath) PrepareSavePaths(FileData file)
     {
-        string authorName = FileSystemUtils.CheckFilePath(currentPath.CurrentSelectedItem?.AuthorName ?? "Unknown");
-        string itemTitle = FileSystemUtils.CheckFilePath(currentPath.CurrentSelectedItem?.Title ?? "Unknown");
+        static string getNextFolder(string basePath)
+        {
+            int i = 1;
+            while (Directory.Exists(Path.Combine(basePath, i.ToString())))
+                i++;
+            return Path.Combine(basePath, i.ToString());
+        }
 
-        string saveFolder = Path.Combine("./Datas", "Temp", authorName, itemTitle);
+        var saveFolder = getNextFolder("./Datas/Temp");
         string saveFilePath = Path.Combine(saveFolder, $"{Path.GetFileNameWithoutExtension(file.FileName)}_export");
         string unityPackagePath = saveFilePath + ".unitypackage";
 
