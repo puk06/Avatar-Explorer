@@ -29,21 +29,60 @@ internal static class FileSystemUtils
     /// <exception cref="DirectoryNotFoundException"></exception>
     internal static void CreateTarArchive(string sourceFolder, string outputTarFile)
     {
-        if (!Directory.Exists(sourceFolder))
-        {
-            throw new DirectoryNotFoundException($"指定されたフォルダーが見つかりません: {sourceFolder}");
-        }
+        if (!Directory.Exists(sourceFolder)) throw new DirectoryNotFoundException($"指定されたフォルダーが見つかりません: {sourceFolder}");
 
         using var archive = TarArchive.Create();
 
-        foreach (string filePath in Directory.EnumerateFiles(sourceFolder, "*", SearchOption.AllDirectories))
+        foreach (string filePath in FastEnumerateFiles(sourceFolder))
         {
             string relativePath = Path.GetRelativePath(sourceFolder, filePath);
             archive.AddEntry(relativePath, filePath);
         }
 
-        using var fileStream = File.OpenWrite(outputTarFile);
+        using var fileStream = new FileStream(
+            outputTarFile,
+            FileMode.Create,
+            FileAccess.Write,
+            FileShare.None,
+            bufferSize: 1024 * 1024,
+            FileOptions.SequentialScan
+        );
+
         archive.SaveTo(fileStream, new WriterOptions(CompressionType.None));
+    }
+
+    /// <summary>
+    /// 高速でファイルを列挙します。
+    /// </summary>
+    /// <param name="root"></param>
+    /// <returns></returns>
+    internal static IEnumerable<string> FastEnumerateFiles(string root)
+    {
+        var dirs = new Stack<string>();
+        dirs.Push(root);
+
+        while (dirs.Count > 0)
+        {
+            var dir = dirs.Pop();
+
+            string[] subDirs;
+            try { subDirs = Directory.GetDirectories(dir); }
+            catch { continue; }
+
+            foreach (var d in subDirs)
+            {
+                dirs.Push(d);
+            }
+
+            string[] files;
+            try { files = Directory.GetFiles(dir); }
+            catch { continue; }
+
+            foreach (var f in files)
+            {
+                yield return f;
+            }
+        }
     }
 
     /// <summary>
@@ -56,51 +95,48 @@ internal static class FileSystemUtils
     internal static string ExtractZip(string zipPath, string extractPath, bool removeOriginal)
     {
         var extractFolder = Path.Combine(extractPath, Path.GetFileNameWithoutExtension(zipPath));
-        if (!Directory.Exists(extractFolder))
-        {
-            Directory.CreateDirectory(extractFolder);
-        }
-        else
+
+        if (Directory.Exists(extractFolder))
         {
             int i = 1;
-            while (Directory.Exists(extractFolder + " - " + i))
-            {
-                i++;
-            }
+            while (Directory.Exists(extractFolder + " - " + i)) i++;
             extractFolder += " - " + i;
-            Directory.CreateDirectory(extractFolder);
         }
+        Directory.CreateDirectory(extractFolder);
 
-        using (var archive = SharpCompress.Archives.Zip.ZipArchive.Open(zipPath))
+        const int BufferSize = 1024 * 1024;
+        byte[] buffer = new byte[BufferSize];
+
+        using var archive = SharpCompress.Archives.Zip.ZipArchive.Open(zipPath);
+
+        foreach (var entry in archive.Entries)
         {
-            foreach (var entry in archive.Entries)
+            if (!entry.IsDirectory)
             {
-                if (entry.IsDirectory)
+                string fullPath = Path.Combine(extractFolder, entry.Key!);
+                Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
+
+                using var inStream = entry.OpenEntryStream();
+                using var outStream = File.Create(fullPath);
+
+                int read;
+                while ((read = inStream.Read(buffer, 0, buffer.Length)) > 0)
                 {
-                    if (entry.Key == null) continue;
-                    Directory.CreateDirectory(Path.Combine(extractFolder, entry.Key));
+                    outStream.Write(buffer, 0, read);
                 }
-                else
+            }
+            else
+            {
+                if (entry.Key != null)
                 {
-                    entry.WriteToDirectory(extractFolder, new ExtractionOptions()
-                    {
-                        ExtractFullPath = true,
-                        Overwrite = true
-                    });
+                    Directory.CreateDirectory(Path.Combine(extractFolder, entry.Key));
                 }
             }
         }
 
         if (removeOriginal)
         {
-            try
-            {
-                File.Delete(zipPath);
-            }
-            catch
-            {
-                // Ignored
-            }
+            try { File.Delete(zipPath); } catch { }
         }
 
         return extractFolder;
@@ -111,98 +147,81 @@ internal static class FileSystemUtils
     /// </summary>
     /// <param name="sourceDirName"></param>
     /// <param name="destDirName"></param>
-    internal static async Task CopyDirectoryWithProgress(string sourceDirName, string destDirName, string currentLanguage = "", string progressFormTitle = "", bool showProgress = false)
+    internal static async Task CopyDirectoryWithProgress(
+        string sourceDirName,
+        string destDirName,
+        string currentLanguage = "",
+        string progressFormTitle = "",
+        bool showProgress = false,
+        int maxDegreeOfParallelism = 4)
     {
         var cts = new CancellationTokenSource();
+        ProgressForm? progressForm = null;
 
-        ProgressForm progressForm = new(progressFormTitle);
-
-        progressForm.FormClosing += (s, e) =>
+        if (showProgress)
         {
-            cts.Cancel();
-        };
-
-        if (showProgress) progressForm.Show();
+            progressForm = new(progressFormTitle);
+            progressForm.FormClosing += (s, e) => cts.Cancel();
+            progressForm.Show();
+        }
 
         try
         {
-            void UpdateProgress(int percent, string message)
-            {
-                if (showProgress)
-                {
-                    if (progressForm.InvokeRequired)
-                    {
-                        progressForm.Invoke(() => progressForm.UpdateProgress(percent, message));
-                    }
-                    else
-                    {
-                        progressForm.UpdateProgress(percent, message);
-                    }
-                }
-            }
+            progressForm?.UpdateProgress(0, LanguageUtils.Translate("準備中", currentLanguage));
 
-            UpdateProgress(0, LanguageUtils.Translate("準備中", currentLanguage));
-
-            var totalFiles = CountFiles(sourceDirName);
+            var allFiles = FastEnumerateFiles(sourceDirName).ToList();
+            int totalFiles = allFiles.Count;
             int copiedFiles = 0;
+            int lastPercent = -1;
+
+            object progressLock = new();
 
             await Task.Run(() =>
             {
-                void Copy(string source, string dest)
-                {
-                    if (cts.Token.IsCancellationRequested) cts.Token.ThrowIfCancellationRequested();
-
-                    if (!Directory.Exists(dest)) Directory.CreateDirectory(dest);
-
-                    var dir = new DirectoryInfo(source);
-
-                    foreach (var file in dir.GetFiles())
+                Parallel.ForEach(
+                    allFiles, new ParallelOptions { MaxDegreeOfParallelism = maxDegreeOfParallelism, CancellationToken = cts.Token },
+                    file =>
                     {
-                        if (cts.Token.IsCancellationRequested)
-                            cts.Token.ThrowIfCancellationRequested();
+                        try
+                        {
+                            string relativePath = Path.GetRelativePath(sourceDirName, file);
+                            string destPath = Path.Combine(destDirName, relativePath);
+                            Directory.CreateDirectory(Path.GetDirectoryName(destPath)!);
 
-                        var temppath = Path.Combine(dest, file.Name);
-                        file.CopyTo(temppath, true);
-                        copiedFiles++;
+                            using var sourceStream = File.OpenRead(file);
+                            using var destStream = File.Create(destPath);
+                            sourceStream.CopyTo(destStream, 1024 * 1024);
 
-                        int percent = (int)(copiedFiles / (double)totalFiles * 100);
-                        UpdateProgress(percent, $"{copiedFiles}/{totalFiles} {LanguageUtils.Translate("コピー中", currentLanguage)}");
+                            lock (progressLock)
+                            {
+                                copiedFiles++;
+                                int percent = (int)(copiedFiles / (double)totalFiles * 100);
+                                if (percent != lastPercent)
+                                {
+                                    lastPercent = percent;
+                                    progressForm?.UpdateProgress(percent, $"{copiedFiles}/{totalFiles} {LanguageUtils.Translate("コピー中", currentLanguage)}");
+                                }
+                            }
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            throw;
+                        }
+                        catch (Exception ex)
+                        {
+                            LogUtils.ErrorLogger("ファイルコピー失敗: " + file, ex);
+                        }
                     }
-
-                    foreach (var subdir in dir.GetDirectories())
-                    {
-                        if (cts.Token.IsCancellationRequested) cts.Token.ThrowIfCancellationRequested();
-
-                        var temppath = Path.Combine(dest, subdir.Name);
-                        Copy(subdir.FullName, temppath);
-                    }
-                }
-
-                Copy(sourceDirName, destDirName);
+                );
             }, cts.Token);
 
-            UpdateProgress(100, LanguageUtils.Translate("完了", currentLanguage));
+            progressForm?.UpdateProgress(100, LanguageUtils.Translate("完了", currentLanguage));
         }
         finally
         {
-            progressForm.Close();
+            progressForm?.Close();
             cts.Dispose();
         }
-    }
-
-    private static int CountFiles(string path)
-    {
-        int count = 0;
-        var dir = new DirectoryInfo(path);
-
-        count += dir.GetFiles().Length;
-
-        foreach (var subdir in dir.GetDirectories())
-        {
-            count += CountFiles(subdir.FullName);
-        }
-
-        return count;
     }
 
     /// <summary>

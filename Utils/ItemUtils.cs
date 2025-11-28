@@ -103,56 +103,62 @@ internal static class ItemUtils
     {
         var itemFolderInfo = new ItemFolderInfo();
         if (!Directory.Exists(path)) return itemFolderInfo;
-        var files = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
-        foreach (var file in files)
-        {
-            var extension = Path.GetExtension(file);
-            var item = new FileData
-            {
-                FileName = Path.GetFileName(file),
-                FilePath = file
-            };
 
-            switch (extension.ToLower())
+        try
+        {
+            foreach (var file in FileSystemUtils.FastEnumerateFiles(path))
             {
-                case ".psd":
-                case ".clip":
-                case ".blend":
-                case ".fbx":
-                    itemFolderInfo.FilesForModification.Add(item);
-                    break;
-                case ".png":
-                case ".jpg":
-                    itemFolderInfo.TextureFiles.Add(item);
-                    break;
-                case ".txt":
-                case ".md":
-                case ".pdf":
-                    itemFolderInfo.DocumentFiles.Add(item);
-                    break;
-                case ".unitypackage":
-                    itemFolderInfo.UnityPackageFiles.Add(item);
-                    break;
-                default:
-                    itemFolderInfo.UnknownFiles.Add(item);
-                    break;
+                var extension = Path.GetExtension(file);
+                var item = new FileData
+                {
+                    FileName = Path.GetFileName(file),
+                    FilePath = file
+                };
+
+                switch (extension.ToLower())
+                {
+                    case ".psd":
+                    case ".clip":
+                    case ".blend":
+                    case ".fbx":
+                        itemFolderInfo.FilesForModification.Add(item);
+                        break;
+                    case ".png":
+                    case ".jpg":
+                        itemFolderInfo.TextureFiles.Add(item);
+                        break;
+                    case ".txt":
+                    case ".md":
+                    case ".pdf":
+                        itemFolderInfo.DocumentFiles.Add(item);
+                        break;
+                    case ".unitypackage":
+                        itemFolderInfo.UnityPackageFiles.Add(item);
+                        break;
+                    default:
+                        itemFolderInfo.UnknownFiles.Add(item);
+                        break;
+                }
+            }
+
+            if (string.IsNullOrEmpty(materialPath)) return itemFolderInfo;
+
+            foreach (var file in FileSystemUtils.FastEnumerateFiles(materialPath))
+            {
+                var item = new FileData
+                {
+                    FileName = Path.GetFileName(file),
+                    FilePath = file
+                };
+
+                itemFolderInfo.MaterialFiles.Add(item);
             }
         }
-
-        if (string.IsNullOrEmpty(materialPath)) return itemFolderInfo;
-
-        var materialFiles = Directory.GetFiles(materialPath, "*.*", SearchOption.AllDirectories);
-        foreach (var file in materialFiles)
+        catch
         {
-            var item = new FileData
-            {
-                FileName = Path.GetFileName(file),
-                FilePath = file
-            };
-
-            itemFolderInfo.MaterialFiles.Add(item);
+            // Ignored
         }
-
+        
         return itemFolderInfo;
     }
 
