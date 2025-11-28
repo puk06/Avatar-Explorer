@@ -147,13 +147,7 @@ internal static class FileSystemUtils
     /// </summary>
     /// <param name="sourceDirName"></param>
     /// <param name="destDirName"></param>
-    internal static async Task CopyDirectoryWithProgress(
-        string sourceDirName,
-        string destDirName,
-        string currentLanguage = "",
-        string progressFormTitle = "",
-        bool showProgress = false,
-        int maxDegreeOfParallelism = 4)
+    internal static async Task CopyDirectoryWithProgress(string sourceDirName, string destDirName, string currentLanguage = "", string progressFormTitle = "", bool showProgress = false, int maxDegreeOfParallelism = 4)
     {
         var cts = new CancellationTokenSource();
         ProgressForm? progressForm = null;
