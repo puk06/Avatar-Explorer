@@ -191,7 +191,7 @@ internal sealed partial class MainForm : Form
     /// </summary>
     private readonly Timer _searchboxTimer = new()
     {
-        Interval = 300
+        Interval = 750
     };
     #endregion
 
@@ -2868,8 +2868,6 @@ internal sealed partial class MainForm : Form
     /// <param name="e"></param>
     private void ExplorerList_DragDrop(object? sender, DragEventArgs e)
     {
-        var files = AEUtils.GetFileDropPaths(e);
-
         AddItemForm addItem = new(this, CurrentPath.CurrentSelectedCategory, CurrentPath.CurrentSelectedCustomCategory, false, null, AEUtils.GetFileDropPaths(e));
 
         void ItemAdded(object? sender, EventArgs? e)
@@ -2896,9 +2894,7 @@ internal sealed partial class MainForm : Form
     /// <param name="e"></param>
     private void FilterList_DragDrop(object? sender, DragEventArgs e)
     {
-        var files = AEUtils.GetFileDropPaths(e);
-
-        AddItemForm addItem = new(this, ItemType.Avatar, null, false, null, files);
+        AddItemForm addItem = new(this, ItemType.Avatar, null, false, null, AEUtils.GetFileDropPaths(e));
 
         void ItemAdded(object? sender, EventArgs? e)
         {
@@ -2929,10 +2925,7 @@ internal sealed partial class MainForm : Form
         try
         {
             ExportButton.Enabled = false;
-            if (!Directory.Exists("./Output"))
-            {
-                Directory.CreateDirectory("./Output");
-            }
+            if (!Directory.Exists("./Output")) Directory.CreateDirectory("./Output");
 
             var currentTimeStr = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
             var fileName = currentTimeStr + ".csv";
@@ -3013,8 +3006,9 @@ internal sealed partial class MainForm : Form
                 var ImplementedAvatarList = CsvUtils.EscapeCsv(string.Join(Environment.NewLine, ImplementedAvatarNames));
                 var boothId = CsvUtils.EscapeCsv(item.BoothId.ToString());
                 var itemPath = CsvUtils.EscapeCsv(item.ItemPath);
+                var tags = CsvUtils.EscapeCsv(string.Join(Environment.NewLine, item.Tags));
 
-                sw.WriteLine($"{itemTitle},{authorName},{authorImageFilePath},{imagePath},{type},{memo},{SupportedAvatarList},{ImplementedAvatarList},{boothId},{itemPath}");
+                sw.WriteLine($"{itemTitle},{authorName},{authorImageFilePath},{imagePath},{type},{memo},{SupportedAvatarList},{ImplementedAvatarList},{boothId},{itemPath},{tags}");
             }
 
             FormUtils.ShowMessageBox(
@@ -3045,10 +3039,7 @@ internal sealed partial class MainForm : Form
         try
         {
             MakeBackupButton.Enabled = false;
-            if (!Directory.Exists("./Backup"))
-            {
-                Directory.CreateDirectory("./Backup");
-            }
+            if (!Directory.Exists("./Backup")) Directory.CreateDirectory("./Backup");
 
             var currentTimeStr = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
             var fileName = currentTimeStr + ".zip";
@@ -3150,12 +3141,13 @@ internal sealed partial class MainForm : Form
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void LoadData_Click(object sender, EventArgs e) => LoadDataFromFolder();
+    private void LoadData_Click(object sender, EventArgs e)
+        => _ = LoadDataFromFolder();
 
     /// <summary>
     /// フォルダ選択ダイアログを表示し、選択されたフォルダからデータを読み込みます。
     /// </summary>
-    private async void LoadDataFromFolder()
+    private async Task LoadDataFromFolder()
     {
         // 自動バックアップフォルダから復元するか聞く
         var result = FormUtils.ShowConfirmDialog(
@@ -3611,12 +3603,8 @@ internal sealed partial class MainForm : Form
         {
             return name switch
             {
-                "BackPageButton" => TabPageUtils.GetFirstButtonLocation(containerWidth, labelWidth, 0, true).X
-                                         + TabPageUtils.SmallButtonSpacing
-                                         + TabPageUtils.SmallButtonSize.Width,
-                "NextPageButton" => TabPageUtils.GetLastButtonLocation(containerWidth, labelWidth, 0, true).X
-                                         - TabPageUtils.SmallButtonSpacing
-                                         - TabPageUtils.SmallButtonSize.Width,
+                "BackPageButton" => TabPageUtils.GetFirstButtonLocation(containerWidth, labelWidth, 0, true).X + TabPageUtils.SmallButtonSpacing + TabPageUtils.SmallButtonSize.Width,
+                "NextPageButton" => TabPageUtils.GetLastButtonLocation(containerWidth, labelWidth, 0, true).X - TabPageUtils.SmallButtonSpacing - TabPageUtils.SmallButtonSize.Width,
                 "FirstPageButton" => TabPageUtils.GetFirstButtonLocation(containerWidth, labelWidth, 0, true).X,
                 "LastPageButton" => TabPageUtils.GetLastButtonLocation(containerWidth, labelWidth, 0, true).X,
                 _ => 0,
@@ -3626,12 +3614,8 @@ internal sealed partial class MainForm : Form
         {
             return name switch
             {
-                "BackPageButton" => TabPageUtils.GetFirstButtonLocation(containerWidth, labelWidth, 0, false).X
-                                         + TabPageUtils.ButtonSpacing
-                                         + TabPageUtils.ButtonSize.Width,
-                "NextPageButton" => TabPageUtils.GetLastButtonLocation(containerWidth, labelWidth, 0, false).X
-                                         - TabPageUtils.ButtonSpacing
-                                         - TabPageUtils.ButtonSize.Width,
+                "BackPageButton" => TabPageUtils.GetFirstButtonLocation(containerWidth, labelWidth, 0, false).X + TabPageUtils.ButtonSpacing + TabPageUtils.ButtonSize.Width,
+                "NextPageButton" => TabPageUtils.GetLastButtonLocation(containerWidth, labelWidth, 0, false).X - TabPageUtils.ButtonSpacing - TabPageUtils.ButtonSize.Width,
                 "FirstPageButton" => TabPageUtils.GetFirstButtonLocation(containerWidth, labelWidth, 0, false).X,
                 "LastPageButton" => TabPageUtils.GetLastButtonLocation(containerWidth, labelWidth, 0, false).X,
                 _ => 0,
@@ -3687,8 +3671,7 @@ internal sealed partial class MainForm : Form
     private readonly static string[] BackupFiles = new[]
     {
         "./Datas/ItemsData.json",
-        "./Datas/CommonAvatar.json",
-        "./Datas/CustomCategory.txt"
+        "./Datas/CommonAvatar.json"
     };
 
     /// <summary>

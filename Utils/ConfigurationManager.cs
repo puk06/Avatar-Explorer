@@ -42,8 +42,7 @@ internal class ConfigurationManager
         get => _data.TryGetValue(key, out var value) ? value : null;
         set
         {
-            if (value != null)
-                _data[key] = value;
+            if (value != null) _data[key] = value;
         }
     }
 

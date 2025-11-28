@@ -16,16 +16,10 @@ internal static class BackupUtils
         foreach (var path in paths)
         {
             if (!File.Exists(path)) continue;
-            if (!Directory.Exists(backupPath))
-            {
-                Directory.CreateDirectory(backupPath);
-            }
+            if (!Directory.Exists(backupPath)) Directory.CreateDirectory(backupPath);
 
             var backupFolderPath = Path.Combine(backupPath, folderPath);
-            if (!Directory.Exists(backupFolderPath))
-            {
-                Directory.CreateDirectory(backupFolderPath);
-            }
+            if (!Directory.Exists(backupFolderPath)) Directory.CreateDirectory(backupFolderPath);
 
             File.WriteAllText(Path.Combine(backupFolderPath, Path.GetFileName(path)), File.ReadAllText(path));
         }
