@@ -395,16 +395,10 @@ internal static class DatabaseUtils
     /// <param name="items"></param>
     internal static void CheckBrokenItemPaths(List<Item> items, string currentLanguage)
     {
-        int brokenItemsCount = 0;
-        foreach (var itemData in items)
-        {
-            if (itemData.SupportedAvatars.Contains(itemData.ItemPath) || itemData.ImplementedAvatars.Contains(itemData.ItemPath))
-            {
-                brokenItemsCount++;
-            }
-        }
-
+        int brokenItemsCount = items
+            .Count(item => item.SupportedAvatars.Contains(item.ItemPath) || item.ImplementedAvatars.Contains(item.ItemPath));
         if (brokenItemsCount == 0) return;
+
         FormUtils.ShowMessageBox(
             LanguageUtils.Translate("対応 / 実装アバターのパスが壊れているアイテムが見つかりました。", currentLanguage) + "\n\n" +
             LanguageUtils.Translate("検索パネルで、\"BrokenItems=true\"と入力することで、壊れたアイテム一覧を表示することが出来ます。", currentLanguage) + "\n\n" +
