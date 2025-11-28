@@ -42,7 +42,7 @@ internal sealed class ProgressForm : Form
     {
         if (InvokeRequired)
         {
-            Invoke(() => UpdateProgress(percentage, message));
+            BeginInvoke(() => UpdateProgress(percentage, message));
             return;
         }
 

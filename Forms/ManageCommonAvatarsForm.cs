@@ -46,7 +46,7 @@ internal sealed partial class ManageCommonAvatarsForm : Form
     {
         CommonAvatarsCombobox.Items.Clear();
         CommonAvatarsCombobox.Items.AddRange(_commonAvatars.Select(ca => ca.Name).ToArray());
-        if (CommonAvatarsCombobox.Items.Count > 0)  CommonAvatarsCombobox.SelectedIndex = 0;
+        if (CommonAvatarsCombobox.Items.Count > 0) CommonAvatarsCombobox.SelectedIndex = 0;
     }
 
     private void SetDarkMode()
@@ -265,10 +265,14 @@ internal sealed partial class ManageCommonAvatarsForm : Form
         foreach (Button button in AvatarList.Controls)
         {
             var commonAvatar = GetCommonAvatar(CommonAvatarsCombobox.Text);
-            NewLabel.Visible = commonAvatar is null && !string.IsNullOrWhiteSpace(CommonAvatarsCombobox.Text);
-            AddButton.Text = commonAvatar is null ? LanguageUtils.Translate("追加", _mainForm.CurrentLanguage) : LanguageUtils.Translate("更新", _mainForm.CurrentLanguage);
+
+            NewLabel.Visible = commonAvatar == null && !string.IsNullOrWhiteSpace(CommonAvatarsCombobox.Text);
+
+            AddButton.Text = commonAvatar == null ? LanguageUtils.Translate("追加", _mainForm.CurrentLanguage) : LanguageUtils.Translate("更新", _mainForm.CurrentLanguage);
             AddButton.Enabled = !string.IsNullOrWhiteSpace(CommonAvatarsCombobox.Text);
+
             DeleteSelectedGroupButton.Enabled = !string.IsNullOrWhiteSpace(CommonAvatarsCombobox.Text) && commonAvatar != null;
+
             button.BackColor = commonAvatar != null
                 ? commonAvatar.Avatars.Contains(button.Tag?.ToString() ?? string.Empty)
                     ? DarkModeUtils.GetSelectedButtonColor(_mainForm.DarkMode)

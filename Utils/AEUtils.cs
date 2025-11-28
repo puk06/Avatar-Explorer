@@ -54,6 +54,7 @@ internal static partial class AEUtils
         {
             _pendingScrollSenders.Add(sender);
         }
+        
         ThumbnailUpdateTimer.Stop();
         ThumbnailUpdateTimer.Start();
     }
@@ -72,33 +73,35 @@ internal static partial class AEUtils
 
         try
         {
-            progressForm.UpdateProgress(0, LanguageUtils.Translate("準備中", currentLanguage));
-
-            var (saveFolder, saveFilePath, unityPackagePath) = PrepareSavePaths(file, currentPath);
-            PrepareSaveDirectory(saveFolder, saveFilePath);
-
-            var extractingStatus = LanguageUtils.Translate("ファイルの展開中", currentLanguage);
-            progressForm.UpdateProgress(10, extractingStatus);
-
-            int totalEntries = await CountTarEntriesAsync(file.FilePath);
-            var category = ItemUtils.GetCategoryName(currentPath.CurrentSelectedCategory, currentLanguage, currentPath.CurrentSelectedCustomCategory);
-            await ExtractTarToFolderAsync(file.FilePath, saveFilePath, category, totalEntries, extractingStatus, progressForm);
-
-            progressForm.UpdateProgress(90, LanguageUtils.Translate("UnityPackageの作成中", currentLanguage));
-            FileSystemUtils.CreateTarArchive(saveFilePath, unityPackagePath);
-
-            Directory.Delete(saveFilePath, true);
-            progressForm.UpdateProgress(100, LanguageUtils.Translate("完了", currentLanguage));
-
-            Process.Start(new ProcessStartInfo
+            await Task.Run(async () =>
             {
-                FileName = unityPackagePath,
-                UseShellExecute = true,
+                progressForm.UpdateProgress(0, LanguageUtils.Translate("準備中", currentLanguage));
+                var (saveFolder, saveFilePath, unityPackagePath) = PrepareSavePaths(file, currentPath);
+                PrepareSaveDirectory(saveFolder, saveFilePath);
+
+                var extractingStatus = LanguageUtils.Translate("ファイルの展開中", currentLanguage);
+                progressForm.UpdateProgress(10, extractingStatus);
+                int totalEntries = await CountTarEntriesAsync(file.FilePath);
+                var category = ItemUtils.GetCategoryName(currentPath.CurrentSelectedCategory, currentLanguage, currentPath.CurrentSelectedCustomCategory);
+                await ExtractTarToFolderAsync(file.FilePath, saveFilePath, category, totalEntries, extractingStatus, progressForm);
+
+                progressForm.UpdateProgress(90, LanguageUtils.Translate("UnityPackageの作成中", currentLanguage));
+                FileSystemUtils.CreateTarArchive(saveFilePath, unityPackagePath);
+
+                Directory.Delete(saveFilePath, true);
+                progressForm.UpdateProgress(100, LanguageUtils.Translate("完了", currentLanguage));
+
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = unityPackagePath,
+                    UseShellExecute = true,
+                });
             });
         }
         catch (Exception ex)
         {
             LogUtils.ErrorLogger("UnityPackageの展開に失敗しました。", ex);
+
             FormUtils.ShowMessageBox(
                 LanguageUtils.Translate("UnityPackageの展開に失敗しました。詳細はErrorLog.txtをご覧ください。", currentLanguage),
                 LanguageUtils.Translate("エラー", currentLanguage),
@@ -121,6 +124,7 @@ internal static partial class AEUtils
         string saveFolder = Path.Combine("./Datas", "Temp", authorName, itemTitle);
         string saveFilePath = Path.Combine(saveFolder, $"{Path.GetFileNameWithoutExtension(file.FileName)}_export");
         string unityPackagePath = saveFilePath + ".unitypackage";
+
         return (saveFolder, saveFilePath, unityPackagePath);
     }
 
@@ -162,6 +166,8 @@ internal static partial class AEUtils
         await using var gzipStream = new GZipStream(fileStream, CompressionMode.Decompress);
         await using var tarReader = new TarReader(gzipStream);
 
+        int lastProgress = -1;
+
         while (await tarReader.GetNextEntryAsync() is { } entry)
         {
             if (Path.GetFileName(entry.Name) == "pathname" && entry.DataStream != null)
@@ -190,7 +196,12 @@ internal static partial class AEUtils
 
             processedEntries++;
             int progress = 10 + (int)(80.0 * processedEntries / totalEntries);
-            progressForm.UpdateProgress(progress, $"{extractingStatus}: {processedEntries}/{totalEntries}");
+
+            if (progress != lastProgress)
+            {
+                progressForm.UpdateProgress(progress, $"{extractingStatus}: {processedEntries}/{totalEntries}");
+                lastProgress = progress;
+            }
         }
     }
 
