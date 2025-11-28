@@ -1914,7 +1914,7 @@ internal sealed partial class MainForm : Form
         }
 
         var filteredItems = Items
-            .Where(item => DatabaseUtils.GetSearchResult(Items, item, searchFilter, CurrentLanguage))
+            .Where(item => DatabaseUtils.GetSearchResult(Items, CommonAvatars, item, searchFilter, CurrentLanguage))
             .Where(item =>
             {
                 if (searchFilter.SearchWords.Count == 0)
@@ -2736,7 +2736,8 @@ internal sealed partial class MainForm : Form
             ("ファイル名", searchFilter.FileNames),
             ("実装アバター", searchFilter.ImplementedAvatars),
             ("未実装アバター", searchFilter.NotImplementedAvatars),
-            ("タグ", searchFilter.Tags)
+            ("タグ", searchFilter.Tags),
+            ("共通素体名", searchFilter.CommonAvatars)
         };
 
         foreach (var (label, values) in filters)

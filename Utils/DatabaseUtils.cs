@@ -443,11 +443,12 @@ internal static class DatabaseUtils
     /// アイテムの検索結果を取得します。
     /// </summary>
     /// <param name="items"></param>
+    /// <param name="commonAvatars"></param>
     /// <param name="item"></param>
     /// <param name="searchFilter"></param>
     /// <param name="CurrentLanguage"></param>
     /// <returns></returns>
-    internal static bool GetSearchResult(List<Item> items, Item item, SearchFilter searchFilter, string CurrentLanguage)
+    internal static bool GetSearchResult(List<Item> items, List<CommonAvatar> commonAvatars, Item item, SearchFilter searchFilter, string CurrentLanguage)
     {
         bool matchTitle = MatchesFilter(
             new[] { item.Title }, searchFilter.Titles,
@@ -517,6 +518,23 @@ internal static class DatabaseUtils
             (target, filter) => target.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
         );
 
+        bool matchCommon;
+        if (searchFilter.CommonAvatars.Count == 0)
+        {
+            matchCommon = true;
+        }
+        else
+        {
+            List<CommonAvatar> filterCommonAvatars = searchFilter.CommonAvatars
+                .Select(name => GetCommonAvatar(commonAvatars, name))
+                .Where(c => c != null)
+                .ToList()!;
+
+            matchCommon = searchFilter.IsOrSearch
+                ? item.SupportedAvatars.Any(avatar => filterCommonAvatars.Any(ca => ca!.Avatars.Contains(avatar)))
+                : filterCommonAvatars.All(ca => item.SupportedAvatars.Any(avatar => ca!.Avatars.Contains(avatar)));
+        }
+
         bool matchBroken = !searchFilter.BrokenItems || (searchFilter.BrokenItems && !(item.SupportedAvatars.Contains(item.ItemPath) || item.ImplementedAvatars.Contains(item.ItemPath)));
 
         return matchTitle
@@ -530,8 +548,12 @@ internal static class DatabaseUtils
             && matchImplemented
             && matchNotImplemented
             && matchTag
+            && matchCommon
             && matchBroken;
     }
+
+    private static CommonAvatar? GetCommonAvatar(List<CommonAvatar> commonAvatars, string? name)
+        => string.IsNullOrWhiteSpace(name) ? null : commonAvatars.FirstOrDefault(commonAvatar => commonAvatar.Name == name);
 
     private static bool MatchesFilter<T>(IEnumerable<T> targets, IEnumerable<T> filters, bool isOrSearch, Func<T, T, bool> comparer)
     {

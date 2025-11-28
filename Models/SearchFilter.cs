@@ -59,6 +59,11 @@ internal class SearchFilter
     /// 検索するタグを取得または設定します。
     /// </summary>
     internal List<string> Tags { get; set; } = new List<string>();
+
+    /// <summary>
+    /// 検索する共通素体グループを取得または設定します。
+    /// </summary>
+    internal List<string> CommonAvatars { get; set; } = new List<string>();
     
     /// <summary>
     /// OR検索かどうかを取得または設定します。

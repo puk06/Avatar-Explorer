@@ -12,7 +12,7 @@ namespace Avatar_Explorer.Utils;
 
 internal static partial class AEUtils
 {
-    [GeneratedRegex(@"(?<key>Title|Author|Booth|Avatar|Category|Memo|Folder|File|Implemented|NotImplemented|Tag|OR|BrokenItems)=(?:""(?<value>.*?)""|(?<value>[^\s]+))|(?<word>[^\s]+)")]
+    [GeneratedRegex(@"(?<key>Title|Author|Booth|Avatar|Category|Memo|Folder|File|Implemented|NotImplemented|Tag|Common|OR|BrokenItems)=(?:""(?<value>.*?)""|(?<value>[^\s]+))|(?<word>[^\s]+)")]
     private static partial Regex SearchFilterRegex();
 
     [GeneratedRegex(@"\u3010[^\u3011]+\u3011")]
@@ -324,6 +324,9 @@ internal static partial class AEUtils
                         break;
                     case "Tag":
                         searchFilter.Tags.Add(value);
+                        break;
+                    case "Common":
+                        searchFilter.CommonAvatars.Add(value);
                         break;
                     case "OR":
                         searchFilter.IsOrSearch = value.Equals("true", StringComparison.CurrentCultureIgnoreCase);
