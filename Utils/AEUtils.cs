@@ -34,10 +34,7 @@ internal static partial class AEUtils
             var toProcess = _pendingScrollSenders.ToList();
             _pendingScrollSenders.Clear();
 
-            foreach (var sender in toProcess)
-            {
-                UpdateExplorerThumbnails(sender);
-            }
+            toProcess.ForEach(sender => UpdateExplorerThumbnails(sender));
         };
     }
 
@@ -369,7 +366,7 @@ internal static partial class AEUtils
     /// <summary>
     /// 引数からスラッシュで区切られたパスを生成します。
     /// </summary>
-    internal static string GenerateSeparatedPath(params string[] paths)
+    internal static string GenerateSeparatedPath(params IEnumerable<string> paths)
         => string.Join(" > ", paths);
 
     /// <summary>

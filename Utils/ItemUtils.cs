@@ -17,7 +17,7 @@ internal static class ItemUtils
         if (item.SupportedAvatars.Contains(path)) return new SupportedOrCommonAvatar { IsSupported = true };
 
         if (item.Type != ItemType.Clothing) return new SupportedOrCommonAvatar();
-        var commonAvatarsArray = commonAvatars.Where(x => x.Avatars.Contains(path)).ToArray();
+        var commonAvatarsArray = commonAvatars.Where(x => x.Avatars.Contains(path));
         var commonAvatarBool = item.SupportedAvatars.Any(supportedAvatar => commonAvatarsArray.Any(x => x.Avatars.Contains(supportedAvatar)));
 
         if (!commonAvatarBool) return new SupportedOrCommonAvatar();

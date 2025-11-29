@@ -79,7 +79,7 @@ internal sealed partial class AddItemForm : Form
     /// <param name="totalPaths">全パスの数</param>
     private void ShowInvalidPathsMessage(string[] invalidPaths, int totalPaths)
     {
-        var invalidItems = invalidPaths.Select(file => "- " + Path.GetFileName(file)).ToArray();
+        var invalidItems = invalidPaths.Select(file => "- " + Path.GetFileName(file));
         FormUtils.ShowMessageBox(
             LanguageUtils.Translate("以下のアイテムは対応していない、もしくは存在しないため追加されません {0}", _mainForm.CurrentLanguage, $"{invalidPaths.Length}/{totalPaths}\n\n") + string.Join("\n", invalidItems),
             LanguageUtils.Translate("エラー", _mainForm.CurrentLanguage),
@@ -552,23 +552,23 @@ internal sealed partial class AddItemForm : Form
         _item.Type = typeInfo.Item1;
         if (_item.Type == ItemType.Custom) _item.CustomCategory = typeInfo.Item2;
 
-        var itemFolderArray = Array.Empty<string>();
+        var itemFolders = new List<string>();
         foreach (var itemFolderPath in ItemFolderPaths)
         {
             var result = ExtractZipWithHandling(itemFolderPath, Path.Combine("Datas", "Items"), _mainForm.RemoveOriginal && MaterialTextBox.Text != itemFolderPath);
             if (result == null) return;
-            itemFolderArray = itemFolderArray.Append(result).ToArray();
+            itemFolders.Add(result);
         }
 
-        var parentFolder = itemFolderArray[0];
-        if (itemFolderArray.Length > 1)
+        var parentFolder = itemFolders[0];
+        if (itemFolders.Count > 1)
         {
-            for (var i = 1; i < itemFolderArray.Length; i++)
+            for (var i = 1; i < itemFolders.Count; i++)
             {
-                var folderName = Path.GetFileName(itemFolderArray[i]);
+                var folderName = Path.GetFileName(itemFolders[i]);
                 var newPath = Path.Combine(parentFolder, "Others", folderName);
 
-                await FileSystemUtils.CopyDirectoryWithProgress(Path.GetFullPath(itemFolderArray[i]), newPath);
+                await FileSystemUtils.CopyDirectoryWithProgress(Path.GetFullPath(itemFolders[i]), newPath);
             }
         }
 

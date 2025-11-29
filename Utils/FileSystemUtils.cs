@@ -121,27 +121,25 @@ internal static class FileSystemUtils
         const int BufferSize = 1024 * 1024;
         byte[] buffer = new byte[BufferSize];
 
-        using var archive = SharpCompress.Archives.Zip.ZipArchive.Open(zipPath);
-
-        foreach (var entry in archive.Entries)
+        using (var archive = SharpCompress.Archives.Zip.ZipArchive.Open(zipPath))
         {
-            if (!entry.IsDirectory)
+            foreach (var entry in archive.Entries)
             {
-                string fullPath = Path.Combine(extractFolder, entry.Key!);
-                Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
-
-                using var inStream = entry.OpenEntryStream();
-                using var outStream = File.Create(fullPath);
-
-                int read;
-                while ((read = inStream.Read(buffer, 0, buffer.Length)) > 0)
+                if (!entry.IsDirectory)
                 {
-                    outStream.Write(buffer, 0, read);
+                    string fullPath = Path.Combine(extractFolder, entry.Key!);
+                    Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
+
+                    using var inStream = entry.OpenEntryStream();
+                    using var outStream = File.Create(fullPath);
+
+                    int read;
+                    while ((read = inStream.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        outStream.Write(buffer, 0, read);
+                    }
                 }
-            }
-            else
-            {
-                if (entry.Key != null)
+                else if (entry.Key != null)
                 {
                     Directory.CreateDirectory(Path.Combine(extractFolder, entry.Key));
                 }

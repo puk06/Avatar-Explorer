@@ -14,7 +14,7 @@ internal sealed partial class MainForm : Form
     /// <summary>
     /// ソフトの現在のバージョン
     /// </summary>
-    private const string CurrentVersion = "v1.1.11";
+    private const string CurrentVersion = "v1.1.12";
 
     /// <summary>
     /// デフォルトのフォームテキスト
@@ -1179,13 +1179,13 @@ internal sealed partial class MainForm : Form
 
         filteredItems = SortingBox.SelectedIndex switch
         {
-            0 => filteredItems.OrderBy(item => item.GetTitle(_removeBrackets)).ToArray(),
-            1 => filteredItems.OrderBy(item => item.AuthorName).ToArray(),
-            2 => filteredItems.OrderByDescending(item => item.CreatedDate).ToArray(),
-            3 => filteredItems.OrderByDescending(item => item.UpdatedDate).ToArray(),
+            0 => filteredItems.OrderBy(item => item.GetTitle(_removeBrackets)),
+            1 => filteredItems.OrderBy(item => item.AuthorName),
+            2 => filteredItems.OrderByDescending(item => item.CreatedDate),
+            3 => filteredItems.OrderByDescending(item => item.UpdatedDate),
             4 => filteredItems.OrderBy(item => ItemUtils.ContainsSelectedAvatar(item, CurrentPath.CurrentSelectedAvatarPath) ? 0 : 1),
             5 => filteredItems.OrderBy(item => ItemUtils.ContainsSelectedAvatar(item, CurrentPath.CurrentSelectedAvatarPath) ? 1 : 0),
-            _ => filteredItems.OrderBy(item => item.GetTitle(_removeBrackets)).ToArray(),
+            _ => filteredItems.OrderBy(item => item.GetTitle(_removeBrackets)),
         };
 
         if (!filteredItems.Any()) return;
@@ -1953,8 +1953,7 @@ internal sealed partial class MainForm : Form
                 }
 
                 return matchCount;
-            })
-            .AsEnumerable();
+            });
 
         SearchResultLabel.Text = LanguageUtils.Translate("検索結果: {0}件 (全{1}件)", CurrentLanguage, filteredItems.Count().ToString(), Items.Count.ToString());
 
@@ -2159,13 +2158,13 @@ internal sealed partial class MainForm : Form
                 );
 
                 var implementedMenu = createContextMenu.AddItem(LanguageUtils.Translate("実装/未実装", CurrentLanguage), SharedImages.GetImage(SharedImages.Images.EditIcon));
-                foreach (var avatar in Items.Where(i => i.Type == ItemType.Avatar))
+                foreach (var avatarPath in Items.Where(i => i.Type == ItemType.Avatar).Select(i => i.ItemPath))
                 {
                     ToolStripMenuItem avatarToolStripMenuItem = new()
                     {
-                        Text = DatabaseUtils.GetAvatarNameFromPath(Items, avatar.ItemPath),
-                        Tag = avatar.ItemPath,
-                        Checked = item.ImplementedAvatars.Contains(avatar.ItemPath)
+                        Text = DatabaseUtils.GetAvatarNameFromPath(Items, avatarPath),
+                        Tag = avatarPath,
+                        Checked = item.ImplementedAvatars.Contains(avatarPath)
                     };
 
                     CreateContextMenu.AddDropDownItem(
@@ -2344,8 +2343,7 @@ internal sealed partial class MainForm : Form
 
         var filteredFileData = fileDatas
             .Where(file => searchWords.SearchWords.All(word => file.FileName.Contains(word, StringComparison.CurrentCultureIgnoreCase)))
-            .OrderByDescending(file => searchWords.SearchWords.Count(word => file.FileName.Contains(word, StringComparison.CurrentCultureIgnoreCase)))
-            .AsEnumerable();
+            .OrderByDescending(file => searchWords.SearchWords.Count(word => file.FileName.Contains(word, StringComparison.CurrentCultureIgnoreCase)));
 
         SearchResultLabel.Text = LanguageUtils.Translate("フォルダー内検索結果: {0}件 (全{1}件)", CurrentLanguage, filteredFileData.Count().ToString(), fileDatas.Count().ToString());
 
@@ -2490,7 +2488,7 @@ internal sealed partial class MainForm : Form
                 }
         }
 
-        if (CurrentPath.CurrentSelectedCategory == ItemType.Unknown) return pathParts.Count > 1 ? AEUtils.GenerateSeparatedPath(pathParts.ToArray()) : LanguageUtils.Translate("ここには現在のパスが表示されます", CurrentLanguage);
+        if (CurrentPath.CurrentSelectedCategory == ItemType.Unknown) return pathParts.Count > 1 ? AEUtils.GenerateSeparatedPath(pathParts) : LanguageUtils.Translate("ここには現在のパスが表示されます", CurrentLanguage);
 
         var categoryName = ItemUtils.GetCategoryName(
             CurrentPath.CurrentSelectedCategory,
@@ -2505,7 +2503,7 @@ internal sealed partial class MainForm : Form
         var itemCategory = CurrentPath.CurrentSelectedItemCategory;
         if (itemCategory != null) pathParts.Add(LanguageUtils.Translate(itemCategory, CurrentLanguage));
 
-        return AEUtils.GenerateSeparatedPath(pathParts.ToArray());
+        return AEUtils.GenerateSeparatedPath(pathParts);
     }
 
     /// <summary>
@@ -2520,12 +2518,7 @@ internal sealed partial class MainForm : Form
         CurrentPath.CurrentSelectedAvatar = avatarName ?? "*";
         CurrentPath.CurrentSelectedAvatarPath = avatarPath;
         CurrentPath.CurrentSelectedCategory = item.Type;
-
-        if (item.Type == ItemType.Custom)
-        {
-            CurrentPath.CurrentSelectedCustomCategory = item.CustomCategory;
-        }
-
+        if (item.Type == ItemType.Custom) CurrentPath.CurrentSelectedCustomCategory = item.CustomCategory;
         CurrentPath.CurrentSelectedItem = item;
     }
     #endregion
@@ -2963,16 +2956,16 @@ internal sealed partial class MainForm : Form
 
             foreach (var item in Items)
             {
-                List<string> SupportedAvatarNames = new();
-                List<string> SupportedAvatarPaths = new();
+                List<string> supportedAvatarNames = new();
+                List<string> supportedAvatarPaths = new();
 
                 foreach (var avatar in item.SupportedAvatars)
                 {
                     var avatarName = DatabaseUtils.GetAvatarName(Items, avatar);
                     if (avatarName == null) continue;
 
-                    SupportedAvatarNames.Add(avatarName);
-                    SupportedAvatarPaths.Add(avatar);
+                    supportedAvatarNames.Add(avatarName);
+                    supportedAvatarPaths.Add(avatar);
 
                     if (!commonAvatarResult) continue;
 
@@ -2981,24 +2974,24 @@ internal sealed partial class MainForm : Form
                     {
                         foreach (var commonAvatarPath in commonAvatar.Avatars)
                         {
-                            if (SupportedAvatarPaths.Contains(commonAvatarPath)) continue;
+                            if (supportedAvatarPaths.Contains(commonAvatarPath)) continue;
 
                             var name = DatabaseUtils.GetAvatarName(Items, commonAvatarPath);
                             if (name == null) continue;
 
-                            SupportedAvatarNames.Add(name);
-                            SupportedAvatarPaths.Add(commonAvatarPath);
+                            supportedAvatarNames.Add(name);
+                            supportedAvatarPaths.Add(commonAvatarPath);
                         }
                     }
                 }
 
-                List<string> ImplementedAvatarNames = new();
-                foreach (var avatar in item.ImplementedAvatars)
+                List<string> implementedAvatarNames = new();
+                foreach (var implementedAvatar in item.ImplementedAvatars)
                 {
-                    var avatarName = DatabaseUtils.GetAvatarName(Items, avatar);
+                    var avatarName = DatabaseUtils.GetAvatarName(Items, implementedAvatar);
                     if (avatarName == null) continue;
 
-                    ImplementedAvatarNames.Add(avatarName);
+                    implementedAvatarNames.Add(avatarName);
                 }
 
                 var itemTitle = CsvUtils.EscapeCsv(item.Title);
@@ -3007,13 +3000,13 @@ internal sealed partial class MainForm : Form
                 var imagePath = CsvUtils.EscapeCsv(item.ImagePath);
                 var type = CsvUtils.EscapeCsv(ItemUtils.GetCategoryName(item.Type, CurrentLanguage, item.CustomCategory));
                 var memo = CsvUtils.EscapeCsv(item.ItemMemo);
-                var SupportedAvatarList = CsvUtils.EscapeCsv(string.Join(Environment.NewLine, SupportedAvatarNames));
-                var ImplementedAvatarList = CsvUtils.EscapeCsv(string.Join(Environment.NewLine, ImplementedAvatarNames));
+                var supportedAvatarList = CsvUtils.EscapeCsv(string.Join(Environment.NewLine, supportedAvatarNames));
+                var implementedAvatarList = CsvUtils.EscapeCsv(string.Join(Environment.NewLine, implementedAvatarNames));
                 var boothId = CsvUtils.EscapeCsv(item.BoothId.ToString());
                 var itemPath = CsvUtils.EscapeCsv(item.ItemPath);
                 var tags = CsvUtils.EscapeCsv(string.Join(Environment.NewLine, item.Tags));
 
-                sw.WriteLine($"{itemTitle},{authorName},{authorImageFilePath},{imagePath},{type},{memo},{SupportedAvatarList},{ImplementedAvatarList},{boothId},{itemPath},{tags}");
+                sw.WriteLine($"{itemTitle},{authorName},{authorImageFilePath},{imagePath},{type},{memo},{supportedAvatarList},{implementedAvatarList},{boothId},{itemPath},{tags}");
             }
 
             FormUtils.ShowMessageBox(
@@ -3139,7 +3132,8 @@ internal sealed partial class MainForm : Form
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void SortingBox_SelectedIndexChanged(object sender, EventArgs e) => RefleshWindow();
+    private void SortingBox_SelectedIndexChanged(object sender, EventArgs e)
+        => RefleshWindow();
 
     /// <summary>
     /// データを読み込むボタンが押された際の処理を行います。
@@ -3411,9 +3405,7 @@ internal sealed partial class MainForm : Form
 
     #region スクロール位置の処理
     private void SaveScrollPoint()
-    {
-        _lastScrollPoint = ExplorerList.AutoScrollPosition;
-    }
+        => _lastScrollPoint = ExplorerList.AutoScrollPosition;
 
     private void RestoreScrollPoint()
     {
@@ -3568,11 +3560,11 @@ internal sealed partial class MainForm : Form
     /// </summary>
     private void ScaleItemButtons()
     {
-        const int baseItemExplorerWidth = 874;
-        const int baseItemListWidth = 303;
+        const int BaseItemExplorerWidth = 874;
+        const int BaseItemListWidth = 303;
 
-        int explorerWidth = baseItemExplorerWidth + GetExplorerListWidth;
-        int listWidth = baseItemListWidth + GetFilterListWidth;
+        int explorerWidth = BaseItemExplorerWidth + GetExplorerListWidth;
+        int listWidth = BaseItemListWidth + GetFilterListWidth;
 
         ScaleItemButtonsInContainer(ExplorerList, explorerWidth, ExplorerList.Width);
         ScaleItemButtonsInContainer(FilterList, listWidth, FilterList.Width, true);
@@ -3590,11 +3582,9 @@ internal sealed partial class MainForm : Form
                 case CustomItemButton customButton:
                     customButton.Size = customButton.Size with { Width = buttonWidth };
                     break;
-
                 case Button navButton:
                     navButton.Location = navButton.Location with { X = GetUpdatedX(navButton.Name, listWidth, labelSize.Width, small) };
                     break;
-
                 case Label label when label.Name == "PageInfoLabel":
                     label.Location = label.Location with { X = TabPageUtils.GetLabelLocation(listWidth, label.Size).X };
                     break;
@@ -3604,28 +3594,17 @@ internal sealed partial class MainForm : Form
 
     private static int GetUpdatedX(string name, int containerWidth, int labelWidth, bool small = false)
     {
-        if (small)
+        var buttonSpacing = small ? TabPageUtils.SmallButtonSpacing : TabPageUtils.ButtonSpacing;
+        var buttonSizeWidth = small ? TabPageUtils.SmallButtonSize.Width : TabPageUtils.ButtonSize.Width;
+
+        return name switch
         {
-            return name switch
-            {
-                "BackPageButton" => TabPageUtils.GetFirstButtonLocation(containerWidth, labelWidth, 0, true).X + TabPageUtils.SmallButtonSpacing + TabPageUtils.SmallButtonSize.Width,
-                "NextPageButton" => TabPageUtils.GetLastButtonLocation(containerWidth, labelWidth, 0, true).X - TabPageUtils.SmallButtonSpacing - TabPageUtils.SmallButtonSize.Width,
-                "FirstPageButton" => TabPageUtils.GetFirstButtonLocation(containerWidth, labelWidth, 0, true).X,
-                "LastPageButton" => TabPageUtils.GetLastButtonLocation(containerWidth, labelWidth, 0, true).X,
-                _ => 0,
-            };
-        }
-        else
-        {
-            return name switch
-            {
-                "BackPageButton" => TabPageUtils.GetFirstButtonLocation(containerWidth, labelWidth, 0, false).X + TabPageUtils.ButtonSpacing + TabPageUtils.ButtonSize.Width,
-                "NextPageButton" => TabPageUtils.GetLastButtonLocation(containerWidth, labelWidth, 0, false).X - TabPageUtils.ButtonSpacing - TabPageUtils.ButtonSize.Width,
-                "FirstPageButton" => TabPageUtils.GetFirstButtonLocation(containerWidth, labelWidth, 0, false).X,
-                "LastPageButton" => TabPageUtils.GetLastButtonLocation(containerWidth, labelWidth, 0, false).X,
-                _ => 0,
-            };
-        }
+            "BackPageButton" => TabPageUtils.GetFirstButtonLocation(containerWidth, labelWidth, 0, true).X + buttonSpacing + buttonSizeWidth,
+            "NextPageButton" => TabPageUtils.GetLastButtonLocation(containerWidth, labelWidth, 0, true).X - buttonSpacing - buttonSizeWidth,
+            "FirstPageButton" => TabPageUtils.GetFirstButtonLocation(containerWidth, labelWidth, 0, true).X,
+            "LastPageButton" => TabPageUtils.GetLastButtonLocation(containerWidth, labelWidth, 0, true).X,
+            _ => 0,
+        };
     }
     #endregion
 
