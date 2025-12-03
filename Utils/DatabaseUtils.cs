@@ -468,7 +468,7 @@ internal static class DatabaseUtils
         );
 
         bool matchCategory = MatchesFilter(
-            new[] { ItemUtils.GetCategoryName(item.Type, CurrentLanguage) }, searchFilter.Categories,
+            new[] { ItemUtils.GetCategoryName(item.Type, CurrentLanguage, item.CustomCategory) }, searchFilter.Categories,
             searchFilter.IsOrSearch,
             (target, filter) => target.Contains(filter) || item.CustomCategory.Contains(filter)
         );
